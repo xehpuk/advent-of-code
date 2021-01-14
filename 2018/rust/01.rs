@@ -33,16 +33,11 @@ fn part1(input: &str) -> Result<i32, ParseIntError> {
 }
 
 fn part2(input: &str) -> Result<i32, ParseIntError> {
-    let changes: Vec<i32> = input
-        .lines()
-        .map(|line| line.parse::<i32>())
-        .collect::<Result<Vec<_>, _>>()?;
-
     let mut drifts = HashSet::new();
     let mut drift = 0;
     drifts.insert(drift);
-    for change in changes.into_iter().cycle() {
-        drift += change;
+    for change in input.lines().map(|line| line.parse::<i32>()).cycle() {
+        drift += change?;
         if !drifts.insert(drift) {
             return Ok(drift);
         }
