@@ -83,5 +83,5 @@ fn solve_part2(input: &str) -> Result<(u32, u32, u32), SolveErr> {
 }
 
 fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("01.txt")
+    std::fs::read_to_string("../01.txt")
 }

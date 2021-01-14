@@ -45,5 +45,5 @@ fn solve_part2(input: &str) {
 }
 
 fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("02.txt")
+    std::fs::read_to_string("../02.txt")
 }

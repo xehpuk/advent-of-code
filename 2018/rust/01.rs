@@ -47,5 +47,5 @@ fn part2(input: &str) -> Result<i32, ParseIntError> {
 }
 
 fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("01.txt")
+    std::fs::read_to_string("../01.txt")
 }
