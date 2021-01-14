@@ -5,20 +5,21 @@ use std::num::ParseIntError;
 fn main() {
     match read_input() {
         Ok(text) => {
-            match solve_part1(&text) {
-                Ok(drift) => println!("{}", drift),
-                Err(err) => eprintln!("{:#?}", err),
-            }
-            match solve_part2(&text) {
-                Ok(drift) => println!("{}", drift),
-                Err(err) => eprintln!("{:#?}", err),
-            }
+            solve(part1, &text);
+            solve(part2, &text);
         }
         Err(err) => eprintln!("{:#?}", err),
     }
 }
 
-fn solve_part1(input: &str) -> Result<i32, ParseIntError> {
+fn solve(part: fn(&str) -> Result<i32, ParseIntError>, text: &str) {
+    match part(text) {
+        Ok(drift) => println!("{}", drift),
+        Err(err) => eprintln!("{:#?}", err),
+    }
+}
+
+fn part1(input: &str) -> Result<i32, ParseIntError> {
     input
         .lines()
         .map(|line| line.parse())
@@ -31,7 +32,7 @@ fn solve_part1(input: &str) -> Result<i32, ParseIntError> {
         })
 }
 
-fn solve_part2(input: &str) -> Result<i32, ParseIntError> {
+fn part2(input: &str) -> Result<i32, ParseIntError> {
     let changes: Vec<i32> = input
         .lines()
         .map(|line| line.parse::<i32>())
