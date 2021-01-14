@@ -18,15 +18,21 @@ impl From<ParseIntError> for SolveErr {
 
 fn main() {
     match read_input() {
-        Ok(text) => match solve(&text) {
-            Ok((m, n)) => println!("{} * {} = {}", m, n, m * n),
-            Err(err) => eprintln!("{:#?}", err),
-        },
+        Ok(text) => {
+            match solve_part1(&text) {
+                Ok((m, n)) => println!("{} * {} = {}", m, n, m * n),
+                Err(err) => eprintln!("{:#?}", err),
+            }
+            match solve_part2(&text) {
+                Ok((m, n, o)) => println!("{} * {} * {} = {}", m, n, o, m * n * o),
+                Err(err) => eprintln!("{:#?}", err),
+            }
+        }
         Err(err) => eprintln!("{:#?}", err),
     }
 }
 
-fn solve(input: &str) -> Result<(u32, u32), SolveErr> {
+fn solve_part1(input: &str) -> Result<(u32, u32), SolveErr> {
     let set = input
         .lines()
         .map(|line| line.parse::<u32>())
@@ -36,6 +42,40 @@ fn solve(input: &str) -> Result<(u32, u32), SolveErr> {
         let candidate = SUM - expense;
         if set.contains(&candidate) {
             return Ok((expense, candidate));
+        }
+    }
+
+    Err(SolveErr::Unsolvable)
+}
+
+fn solve_part2(input: &str) -> Result<(u32, u32, u32), SolveErr> {
+    let mut vec = input
+        .lines()
+        .map(|line| line.parse::<u32>())
+        .collect::<Result<Vec<u32>, _>>()?;
+    vec.sort();
+
+    // https://en.wikipedia.org/wiki/3SUM#Quadratic_algorithm
+    let n = vec.len();
+    for i in 0..n - 2 {
+        let a = vec[i];
+        let mut start = i + 1;
+        let mut end = n - 1;
+        while start < end {
+            let b = vec[start];
+            let c = vec[end];
+            let sum = a + b + c;
+            if sum == SUM {
+                return Ok((a, b, c));
+                // If we wanted to find all combinations:
+                // start = start + 1;
+                // end = end - 1;
+            }
+            if sum > SUM {
+                end -= 1;
+            } else {
+                start += 1;
+            }
         }
     }
 
