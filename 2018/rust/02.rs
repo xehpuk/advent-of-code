@@ -22,7 +22,8 @@ impl From<&str> for Contains {
 fn main() {
     match read_input() {
         Ok(text) => {
-            solve_part1(&text);
+            let (twice, thrice) = solve_part1(&text);
+            println!("{} * {} = {}", twice, thrice, twice * thrice);
             match solve_part2(&text) {
                 Some((i, common)) => println!("{}: {}", i, common),
                 None => eprintln!("{}", "Correct box IDs not found!"),
@@ -32,7 +33,7 @@ fn main() {
     }
 }
 
-fn solve_part1(input: &str) {
+fn solve_part1(input: &str) -> (usize, usize) {
     let contains = input
         .lines()
         .map(|line| line.into())
@@ -40,7 +41,7 @@ fn solve_part1(input: &str) {
     let twice = contains.iter().filter(|c| c.twice).count();
     let thrice = contains.iter().filter(|c| c.thrice).count();
 
-    println!("{} * {} = {}", twice, thrice, twice * thrice)
+    (twice, thrice)
 }
 
 fn solve_part2(input: &str) -> Option<(usize, String)> {
