@@ -155,24 +155,25 @@ impl FromStr for Claim {
 }
 
 fn main() {
-    match read_input() {
-        Ok(text) => match solve_part1(&text) {
-            Ok(count) => println!("{:?}", count),
-            Err(err) => eprintln!("{:#?}", err),
+    match read_input().map(|text| parse_claims(&text)) {
+        Ok(Ok(claims)) => {
+            println!("{:?}", solve_part1(&claims));
         },
-        Err(err) => eprintln!("{:#?}", err),
+        err => eprintln!("{:#?}", err),
     }
 }
 
-fn solve_part1(input: &str) -> Result<usize, ParseError> {
-    let rects = input
+fn parse_claims(input: &str) -> Result<Vec<Claim>, ParseError> {
+    input
         .lines()
         .map(Claim::from_str)
-        .collect::<Result<Vec<Claim>, _>>()?;
+        .collect()
+}
 
+fn solve_part1(claims: &[Claim]) -> usize {
     let mut squares = HashSet::new();
-    for (i, claim) in rects.iter().enumerate() {
-        for claim2 in &rects[i + 1..] {
+    for (i, claim) in claims.iter().enumerate() {
+        for claim2 in &claims[i + 1..] {
             if let Some(intersection) = claim.rect.intersect(&claim2.rect) {
                 for x in intersection.left..intersection.right() {
                     for y in intersection.top..intersection.bottom() {
@@ -183,11 +184,11 @@ fn solve_part1(input: &str) -> Result<usize, ParseError> {
         }
     }
 
-    Ok(squares.len())
+    squares.len()
 }
 
 #[allow(dead_code)]
-fn solve_part2(_input: &str) -> ! {
+fn solve_part2(_claims: &[Claim]) -> ! {
     todo!()
 }
 
