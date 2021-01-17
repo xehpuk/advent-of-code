@@ -2,8 +2,7 @@ use std::cmp::{max, min};
 use std::collections::HashSet;
 use std::io::Error;
 use std::num::ParseIntError;
-use std::str::Chars;
-use std::str::FromStr;
+use std::str::{Chars, FromStr};
 
 #[derive(Debug)]
 struct Rect {
@@ -158,16 +157,14 @@ fn main() {
     match read_input().map(|text| parse_claims(&text)) {
         Ok(Ok(claims)) => {
             println!("{:?}", solve_part1(&claims));
-        },
+            println!("{:?}", solve_part2(&claims));
+        }
         err => eprintln!("{:#?}", err),
     }
 }
 
 fn parse_claims(input: &str) -> Result<Vec<Claim>, ParseError> {
-    input
-        .lines()
-        .map(Claim::from_str)
-        .collect()
+    input.lines().map(Claim::from_str).collect()
 }
 
 fn solve_part1(claims: &[Claim]) -> usize {
@@ -187,9 +184,17 @@ fn solve_part1(claims: &[Claim]) -> usize {
     squares.len()
 }
 
-#[allow(dead_code)]
-fn solve_part2(_claims: &[Claim]) -> ! {
-    todo!()
+fn solve_part2(claims: &[Claim]) -> Option<&Claim> {
+    'a: for (i, claim) in claims.iter().enumerate() {
+        for (_, claim2) in claims.iter().enumerate().filter(|&(j, _)| j != i) {
+            if let Some(_) = claim.rect.intersect(&claim2.rect) {
+                continue 'a;
+            }
+        }
+        return Some(claim);
+    }
+
+    None
 }
 
 fn read_input() -> Result<String, Error> {
