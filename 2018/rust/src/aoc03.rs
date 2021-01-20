@@ -153,7 +153,7 @@ impl FromStr for Claim {
     }
 }
 
-fn main() {
+pub fn main() {
     match read_input().map(|text| parse_claims(&text)) {
         Ok(Ok(claims)) => {
             println!("{:?}", solve_part1(&claims));

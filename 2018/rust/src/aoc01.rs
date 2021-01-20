@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::io::Error;
 use std::num::ParseIntError;
 
-fn main() {
+pub fn main() {
     match read_input() {
         Ok(text) => {
             solve(part1, &text);

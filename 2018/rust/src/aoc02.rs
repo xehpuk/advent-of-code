@@ -19,7 +19,7 @@ impl From<&str> for Contains {
     }
 }
 
-fn main() {
+pub fn main() {
     match read_input() {
         Ok(text) => {
             let (twice, thrice) = solve_part1(&text);
