@@ -6,7 +6,22 @@ pub fn main() {
         Ok(input) => {
             let records = sort_records(&input);
             // println!("{}", records.join("\n"));
-            solve_part1(&records);
+            match solve_part1(&records) {
+                Some((guard_id, (max_minute, minutes_slept))) => {
+                    println!(
+                        "Guard #{} slept the most at minute {} with {} minutes over all their shifts.",
+                        guard_id, max_minute, minutes_slept
+                    );
+                    // FIXME: 1459 * 39 = 56901 is wrong :(
+                    println!(
+                        "This should give an answer of {} * {} = {}.",
+                        guard_id,
+                        max_minute,
+                        guard_id as usize * max_minute
+                    )
+                }
+                None => eprintln!("Couldn't find sleepy guards. Crappy records."),
+            }
             solve_part2(&records);
         }
         Err(err) => eprintln!("{:#?}", err),
@@ -33,13 +48,14 @@ fn sort_records(input: &str) -> Vec<&str> {
 // [1518-03-04 00:43] falls asleep
 // [1518-03-04 00:56] wakes up
 
-/// Returns Some<(guard_id, max_minute)>
-fn solve_part1(records: &[&str]) -> Option<(u32, usize)> {
+/// Returns Some<(guard_id, (max_minute, minutes_slept))>
+fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32))> {
     let mut map: HashMap<u32, [u32; 59]> = HashMap::new();
     let mut current_guard: Option<&mut [u32; 59]> = None;
     let mut fell_asleep: Option<usize> = None;
     for &record in records {
-        match &record[19..24] { // first word after timestamp
+        match &record[19..24] {
+            // first word after timestamp
             "Guard" => current_guard = Some(map.entry(parse_guard_id(record)).or_insert([0; 59])),
             "falls" => fell_asleep = Some(parse_minute(record)),
             "wakes" => {
@@ -55,8 +71,25 @@ fn solve_part1(records: &[&str]) -> Option<(u32, usize)> {
             unknown => panic!("Record of unknown type: {:?}", unknown),
         }
     }
-    println!("{:#?}", map);
-    todo!("find guard with max sleepiness")
+
+    let mut sleepiest_guard: Option<(u32, (usize, u32))> = None;
+    for (&guard_id, minutes) in &map {
+        let mut max = (0, 0);
+        for (minute, &minutes_slept) in minutes.iter().enumerate() {
+            if minutes_slept > max.1 {
+                max = (minute, minutes_slept);
+            }
+        }
+        if let Some(current_sleepiest_guard) = sleepiest_guard {
+            if max.1 > current_sleepiest_guard.1 .1 {
+                sleepiest_guard = Some((guard_id, max));
+            }
+        } else {
+            sleepiest_guard = Some((guard_id, max));
+        }
+    }
+
+    sleepiest_guard
 }
 
 // # is at 25, so ID starts at 26, ends at next space (variable number of digits)
