@@ -6,24 +6,37 @@ pub fn main() {
         Ok(input) => {
             let records = sort_records(&input);
             // println!("{}", records.join("\n"));
-            match solve_part1(&records) {
-                Some((guard_id, (max_minute, shifts_slept), minutes_slept_total)) => {
-                    println!(
-                        "Guard #{} slept the most at minute {} with {} shifts. Total time slept: {} minutes",
-                        guard_id, max_minute, shifts_slept, minutes_slept_total
-                    );
-                    println!(
-                        "This should give an answer of {} * {} = {}.",
-                        guard_id,
-                        max_minute,
-                        guard_id as usize * max_minute
-                    )
-                }
-                None => eprintln!("Couldn't find sleepy guards. Crappy records."),
-            }
-            solve_part2(&records);
+            let statistics = create_statistics(&records);
+            // println!("{:#?}", statistics);
+            let strategy1 = |_, minutes_slept_total, (_, _, current_minutes_slept_total)| {
+                minutes_slept_total > current_minutes_slept_total
+            };
+            let strategy2 = |(_, shifts_slept), _, (_, (_, current_shifts_slept), _)| {
+                shifts_slept > current_shifts_slept
+            };
+            print_solution(1, solve(&statistics, strategy1));
+            print_solution(2, solve(&statistics, strategy2));
         }
         Err(err) => eprintln!("{:#?}", err),
+    }
+}
+
+fn print_solution(part: u8, sleepiest_guard: Option<(u32, (usize, u32), u32)>) {
+    match sleepiest_guard {
+        Some((guard_id, (max_minute, shifts_slept), minutes_slept_total)) => {
+            println!(
+                "Guard #{} slept the most at minute {} with {} shifts. Total time slept: {} minutes",
+                guard_id, max_minute, shifts_slept, minutes_slept_total
+            );
+            println!(
+                "For part {}, this should give an answer of {} * {} = {}.",
+                part,
+                guard_id,
+                max_minute,
+                guard_id as usize * max_minute
+            );
+        }
+        None => eprintln!("Couldn't find sleepy guards. Crappy records."),
     }
 }
 
@@ -47,8 +60,7 @@ fn sort_records(input: &str) -> Vec<&str> {
 // [1518-03-04 00:43] falls asleep
 // [1518-03-04 00:56] wakes up
 
-/// Returns Some<(guard_id, (max_minute, shifts_slept), minutes_slept_total)>
-fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32), u32)> {
+fn create_statistics(records: &[&str]) -> HashMap<u32, [u32; 59]> {
     let mut map: HashMap<u32, [u32; 59]> = HashMap::new();
     let mut current_guard: Option<&mut [u32; 59]> = None;
     let mut fell_asleep: Option<usize> = None;
@@ -75,8 +87,16 @@ fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32), u32)> {
         }
     }
 
+    map
+}
+
+/// Returns Some<(guard_id, (max_minute, shifts_slept), minutes_slept_total)>
+fn solve<F>(map: &HashMap<u32, [u32; 59]>, strategy: F) -> Option<(u32, (usize, u32), u32)>
+where
+    F: FnOnce((usize, u32), u32, (u32, (usize, u32), u32)) -> bool + Copy,
+{
     let mut sleepiest_guard: Option<(u32, (usize, u32), u32)> = None;
-    for (&guard_id, minutes) in &map {
+    for (&guard_id, minutes) in map {
         // (minute, shifts_slept)
         let mut max = (0, 0);
         let mut minutes_slept_total = 0u32;
@@ -87,7 +107,7 @@ fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32), u32)> {
             minutes_slept_total += shifts_slept;
         }
         if let Some(current_sleepiest_guard) = sleepiest_guard {
-            if minutes_slept_total > current_sleepiest_guard.2 {
+            if strategy(max, minutes_slept_total, current_sleepiest_guard) {
                 sleepiest_guard = Some((guard_id, max, minutes_slept_total));
             }
         } else {
@@ -109,10 +129,6 @@ fn parse_guard_id(record: &str) -> u32 {
 // minute starts at 15, ends at 17 (always two digits)
 fn parse_minute(record: &str) -> usize {
     record[15..17].parse().unwrap()
-}
-
-fn solve_part2(_records: &[&str]) -> ! {
-    todo!()
 }
 
 fn read_input() -> Result<String, Error> {
