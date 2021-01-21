@@ -7,12 +7,11 @@ pub fn main() {
             let records = sort_records(&input);
             // println!("{}", records.join("\n"));
             match solve_part1(&records) {
-                Some((guard_id, (max_minute, minutes_slept))) => {
+                Some((guard_id, (max_minute, shifts_slept), minutes_slept_total)) => {
                     println!(
-                        "Guard #{} slept the most at minute {} with {} minutes over all their shifts.",
-                        guard_id, max_minute, minutes_slept
+                        "Guard #{} slept the most at minute {} with {} shifts. Total time slept: {} minutes",
+                        guard_id, max_minute, shifts_slept, minutes_slept_total
                     );
-                    // FIXME: 1459 * 39 = 56901 is wrong :(
                     println!(
                         "This should give an answer of {} * {} = {}.",
                         guard_id,
@@ -48,8 +47,8 @@ fn sort_records(input: &str) -> Vec<&str> {
 // [1518-03-04 00:43] falls asleep
 // [1518-03-04 00:56] wakes up
 
-/// Returns Some<(guard_id, (max_minute, minutes_slept))>
-fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32))> {
+/// Returns Some<(guard_id, (max_minute, shifts_slept), minutes_slept_total)>
+fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32), u32)> {
     let mut map: HashMap<u32, [u32; 59]> = HashMap::new();
     let mut current_guard: Option<&mut [u32; 59]> = None;
     let mut fell_asleep: Option<usize> = None;
@@ -65,27 +64,34 @@ fn solve_part1(records: &[&str]) -> Option<(u32, (usize, u32))> {
                         for minute in fell_asleep..woke_up {
                             current_guard[minute] += 1;
                         }
+                    } else {
+                        panic!("404 Guard Not Found")
                     }
+                } else {
+                    panic!("404 Sleep Not Found")
                 }
             }
             unknown => panic!("Record of unknown type: {:?}", unknown),
         }
     }
 
-    let mut sleepiest_guard: Option<(u32, (usize, u32))> = None;
+    let mut sleepiest_guard: Option<(u32, (usize, u32), u32)> = None;
     for (&guard_id, minutes) in &map {
+        // (minute, shifts_slept)
         let mut max = (0, 0);
-        for (minute, &minutes_slept) in minutes.iter().enumerate() {
-            if minutes_slept > max.1 {
-                max = (minute, minutes_slept);
+        let mut minutes_slept_total = 0u32;
+        for (minute, &shifts_slept) in minutes.iter().enumerate() {
+            if shifts_slept > max.1 {
+                max = (minute, shifts_slept);
             }
+            minutes_slept_total += shifts_slept;
         }
         if let Some(current_sleepiest_guard) = sleepiest_guard {
-            if max.1 > current_sleepiest_guard.1 .1 {
-                sleepiest_guard = Some((guard_id, max));
+            if minutes_slept_total > current_sleepiest_guard.2 {
+                sleepiest_guard = Some((guard_id, max, minutes_slept_total));
             }
         } else {
-            sleepiest_guard = Some((guard_id, max));
+            sleepiest_guard = Some((guard_id, max, minutes_slept_total));
         }
     }
 
