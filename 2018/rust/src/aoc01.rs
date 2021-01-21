@@ -49,3 +49,55 @@ fn part2(input: &str) -> Result<i32, ParseIntError> {
 fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../01.txt")
 }
+
+fn test_input(input: &str) -> String {
+    input.split(", ").collect::<Vec<_>>().join("\n")
+}
+
+fn test_part1(input: &str) -> Result<i32, ParseIntError> {
+    part1(&test_input(input))
+}
+
+fn test_part2(input: &str) -> Result<i32, ParseIntError> {
+    part2(&test_input(input))
+}
+
+#[test]
+fn test1a() {
+    assert_eq!(Ok(3), test_part1("+1, -2, +3, +1"));
+}
+
+#[test]
+fn test1b() {
+    assert_eq!(Ok(3), test_part1("+1, -2, +3, +1"));
+}
+
+#[test]
+fn test1c() {
+    assert_eq!(Ok(0), test_part1("+1, +1, -2"));
+}
+
+#[test]
+fn test1d() {
+    assert_eq!(Ok(-6), test_part1("-1, -2, -3"));
+}
+
+#[test]
+fn test2a() {
+    assert_eq!(Ok(0), test_part2("+1, -1"));
+}
+
+#[test]
+fn test2b() {
+    assert_eq!(Ok(10), test_part2("+3, +3, +4, -2, -4"));
+}
+
+#[test]
+fn test2c() {
+    assert_eq!(Ok(5), test_part2("-6, +3, +8, +5, -6"));
+}
+
+#[test]
+fn test2d() {
+    assert_eq!(Ok(14), test_part2("+7, +7, -2, -7, -4"));
+}
