@@ -80,3 +80,25 @@ fn solve_part2(input: &str) -> Option<(usize, String)> {
 fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../02.txt")
 }
+
+#[test]
+fn test1() {
+    assert_eq!((4, 3), solve_part1("abcdef
+bababc
+abbcde
+abcccd
+aabcdd
+abcdee
+ababab"));
+}
+
+#[test]
+fn test2() {
+    assert_eq!(Some((2, "fgij".into())), solve_part2("abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz"));
+}
