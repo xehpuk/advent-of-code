@@ -6,19 +6,29 @@ pub fn main() {
         Ok(input) => {
             let records = sort_records(&input);
             // println!("{}", records.join("\n"));
-            let statistics = create_statistics(&records);
-            // println!("{:#?}", statistics);
-            let strategy1 = |_, minutes_slept_total, (_, _, current_minutes_slept_total)| {
-                minutes_slept_total > current_minutes_slept_total
-            };
-            let strategy2 = |(_, shifts_slept), _, (_, (_, current_shifts_slept), _)| {
-                shifts_slept > current_shifts_slept
-            };
-            print_solution(1, solve(&statistics, strategy1));
-            print_solution(2, solve(&statistics, strategy2));
+            let stats = create_stats(&records);
+            // println!("{:#?}", stats);
+            print_solution(1, solve_part1(&stats));
+            print_solution(2, solve_part2(&stats));
         }
         Err(err) => eprintln!("{:#?}", err),
     }
+}
+
+fn solve_part1(stats: &HashMap<u32, [u32; 59]>) -> Option<(u32, (usize, u32), u32)> {
+    let strategy1 = |_, minutes_slept_total, (_, _, current_minutes_slept_total)| {
+        minutes_slept_total > current_minutes_slept_total
+    };
+
+    solve(&stats, strategy1)
+}
+
+fn solve_part2(stats: &HashMap<u32, [u32; 59]>) -> Option<(u32, (usize, u32), u32)> {
+    let strategy2 = |(_, shifts_slept), _, (_, (_, current_shifts_slept), _)| {
+        shifts_slept > current_shifts_slept
+    };
+
+    solve(&stats, strategy2)
 }
 
 fn print_solution(part: u8, sleepiest_guard: Option<(u32, (usize, u32), u32)>) {
@@ -60,14 +70,14 @@ fn sort_records(input: &str) -> Vec<&str> {
 // [1518-03-04 00:43] falls asleep
 // [1518-03-04 00:56] wakes up
 
-fn create_statistics(records: &[&str]) -> HashMap<u32, [u32; 59]> {
-    let mut map: HashMap<u32, [u32; 59]> = HashMap::new();
+fn create_stats(records: &[&str]) -> HashMap<u32, [u32; 59]> {
+    let mut stats: HashMap<u32, [u32; 59]> = HashMap::new();
     let mut current_guard: Option<&mut [u32; 59]> = None;
     let mut fell_asleep: Option<usize> = None;
     for &record in records {
         match &record[19..24] {
             // first word after timestamp
-            "Guard" => current_guard = Some(map.entry(parse_guard_id(record)).or_insert([0; 59])),
+            "Guard" => current_guard = Some(stats.entry(parse_guard_id(record)).or_insert([0; 59])),
             "falls" => fell_asleep = Some(parse_minute(record)),
             "wakes" => {
                 let woke_up = parse_minute(record);
@@ -87,16 +97,16 @@ fn create_statistics(records: &[&str]) -> HashMap<u32, [u32; 59]> {
         }
     }
 
-    map
+    stats
 }
 
 /// Returns Some<(guard_id, (max_minute, shifts_slept), minutes_slept_total)>
-fn solve<F>(map: &HashMap<u32, [u32; 59]>, strategy: F) -> Option<(u32, (usize, u32), u32)>
+fn solve<F>(stats: &HashMap<u32, [u32; 59]>, strategy: F) -> Option<(u32, (usize, u32), u32)>
 where
     F: FnOnce((usize, u32), u32, (u32, (usize, u32), u32)) -> bool + Copy,
 {
     let mut sleepiest_guard: Option<(u32, (usize, u32), u32)> = None;
-    for (&guard_id, minutes) in map {
+    for (&guard_id, minutes) in stats {
         // (minute, shifts_slept)
         let mut max = (0, 0);
         let mut minutes_slept_total = 0u32;
@@ -133,4 +143,56 @@ fn parse_minute(record: &str) -> usize {
 
 fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../04.txt")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{create_stats, solve_part1, solve_part2};
+    use std::collections::HashMap;
+
+    const INPUT: &str = "[1518-11-01 00:00] Guard #10 begins shift
+[1518-11-01 00:05] falls asleep
+[1518-11-01 00:25] wakes up
+[1518-11-01 00:30] falls asleep
+[1518-11-01 00:55] wakes up
+[1518-11-01 23:58] Guard #99 begins shift
+[1518-11-02 00:40] falls asleep
+[1518-11-02 00:50] wakes up
+[1518-11-03 00:05] Guard #10 begins shift
+[1518-11-03 00:24] falls asleep
+[1518-11-03 00:29] wakes up
+[1518-11-04 00:02] Guard #99 begins shift
+[1518-11-04 00:36] falls asleep
+[1518-11-04 00:46] wakes up
+[1518-11-05 00:03] Guard #99 begins shift
+[1518-11-05 00:45] falls asleep
+[1518-11-05 00:55] wakes up";
+
+    fn create_test_stats() -> HashMap<u32, [u32; 59]> {
+        create_stats(&INPUT.lines().collect::<Vec<_>>())
+    }
+
+    #[test]
+    fn test1() {
+        let stats = create_test_stats();
+
+        let (guard_id, (max_minute, shifts_slept), minutes_slept_total) =
+            solve_part1(&stats).unwrap();
+        assert_eq!(10, guard_id);
+        assert_eq!(50, minutes_slept_total);
+        assert_eq!(24, max_minute);
+        assert_eq!(2, shifts_slept);
+    }
+
+    #[test]
+    fn test2() {
+        let stats = create_test_stats();
+
+        let (guard_id, (max_minute, shifts_slept), minutes_slept_total) =
+            solve_part2(&stats).unwrap();
+        assert_eq!(99, guard_id);
+        assert_eq!(30, minutes_slept_total);
+        assert_eq!(45, max_minute);
+        assert_eq!(3, shifts_slept);
+    }
 }

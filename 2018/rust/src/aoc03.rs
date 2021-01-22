@@ -201,18 +201,27 @@ fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../03.txt")
 }
 
-#[test]
-fn test1() {
-    let claims = parse_claims("#1 @ 1,3: 4x4
-#2 @ 3,1: 4x4
-#3 @ 5,5: 2x2").unwrap();
-    assert_eq!(4, solve_part1(&claims));
-}
+#[cfg(test)]
+mod tests {
+    use super::{parse_claims, solve_part1, solve_part2, Claim};
 
-#[test]
-fn test2() {
-    let claims = parse_claims("#1 @ 1,3: 4x4
+    const INPUT: &str = "#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
-#3 @ 5,5: 2x2").unwrap();
-    assert_eq!(3, solve_part2(&claims).unwrap().id);
+#3 @ 5,5: 2x2";
+
+    fn parse_test_claims() -> Vec<Claim> {
+        parse_claims(INPUT).unwrap()
+    }
+
+    #[test]
+    fn test1() {
+        let claims = parse_test_claims();
+        assert_eq!(4, solve_part1(&claims));
+    }
+
+    #[test]
+    fn test2() {
+        let claims = parse_test_claims();
+        assert_eq!(3, solve_part2(&claims).unwrap().id);
+    }
 }
