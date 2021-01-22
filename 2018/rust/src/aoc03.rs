@@ -200,3 +200,19 @@ fn solve_part2(claims: &[Claim]) -> Option<&Claim> {
 fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../03.txt")
 }
+
+#[test]
+fn test1() {
+    let claims = parse_claims("#1 @ 1,3: 4x4
+#2 @ 3,1: 4x4
+#3 @ 5,5: 2x2").unwrap();
+    assert_eq!(4, solve_part1(&claims));
+}
+
+#[test]
+fn test2() {
+    let claims = parse_claims("#1 @ 1,3: 4x4
+#2 @ 3,1: 4x4
+#3 @ 5,5: 2x2").unwrap();
+    assert_eq!(3, solve_part2(&claims).unwrap().id);
+}
