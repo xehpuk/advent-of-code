@@ -11,8 +11,20 @@ pub fn main() {
     }
 }
 
+fn react(a: char, b: char) -> bool {
+    a != b && a.eq_ignore_ascii_case(&b)
+}
+
 fn solve_part1(polymer: &str) -> String {
-    polymer.into()
+    let mut reduced_polymer = Vec::with_capacity(polymer.len());
+    for b in polymer.chars() {
+        if reduced_polymer.last().map_or(true, |&a| !react(a, b)) {
+            reduced_polymer.push(b);
+        } else {
+            reduced_polymer.pop();
+        }
+    }
+    reduced_polymer.into_iter().collect()
 }
 
 #[allow(dead_code, unused_variables)]
