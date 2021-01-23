@@ -1,9 +1,13 @@
 use std::io::Error;
+use std::str::from_utf8;
 
 pub fn main() {
     match read_input() {
         Ok(polymer) => {
             let reduced_polymer = solve_part1(&polymer);
+            println!("Reduced polymer: {}", reduced_polymer);
+            println!("Length: {}", reduced_polymer.len());
+            let reduced_polymer = solve_part2(&polymer);
             println!("Reduced polymer: {}", reduced_polymer);
             println!("Length: {}", reduced_polymer.len());
         }
@@ -27,9 +31,31 @@ fn solve_part1(polymer: &str) -> String {
     String::from_utf8(reduced_polymer).unwrap()
 }
 
-#[allow(dead_code, unused_variables)]
 fn solve_part2(polymer: &str) -> String {
-    todo!()
+    (b'a'..=b'z')
+        .fold(None, |reduced_polymer: Option<String>, c| {
+            let current_reduced_polymer = solve_part1(
+                from_utf8(
+                    &polymer
+                        .bytes()
+                        .filter(|a| !c.eq_ignore_ascii_case(a))
+                        .collect::<Vec<u8>>(),
+                )
+                .unwrap(),
+            );
+
+            Some(match reduced_polymer {
+                Some(reduced_polymer) => {
+                    if reduced_polymer.len() < current_reduced_polymer.len() {
+                        reduced_polymer
+                    } else {
+                        current_reduced_polymer
+                    }
+                }
+                None => current_reduced_polymer,
+            })
+        })
+        .unwrap()
 }
 
 fn read_input() -> Result<String, Error> {
@@ -41,7 +67,32 @@ mod tests {
     use super::{solve_part1, solve_part2};
 
     #[test]
-    fn test1() {
+    fn test1a() {
         assert_eq!("dabCBAcaDA", solve_part1("dabAcCaCBAcCcaDA"));
+    }
+
+    #[test]
+    fn test1b() {
+        assert_eq!("dbCBcD", solve_part1("dbcCCBcCcD"));
+    }
+
+    #[test]
+    fn test1c() {
+        assert_eq!("daCAcaDA", solve_part1("daAcCaCAcCcaDA"));
+    }
+
+    #[test]
+    fn test1d() {
+        assert_eq!("daDA", solve_part1("dabAaBAaDA"));
+    }
+
+    #[test]
+    fn test1e() {
+        assert_eq!("abCBAc", solve_part1("abAcCaCBAcCcaA"));
+    }
+
+    #[test]
+    fn test2() {
+        assert_eq!(4, solve_part2("dabAcCaCBAcCcaDA").len());
     }
 }
