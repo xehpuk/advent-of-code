@@ -150,7 +150,8 @@ mod tests {
     use super::{create_stats, solve_part1, solve_part2};
     use std::collections::HashMap;
 
-    const INPUT: &str = "[1518-11-01 00:00] Guard #10 begins shift
+    const INPUT: &str = "\
+[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
 [1518-11-01 00:25] wakes up
 [1518-11-01 00:30] falls asleep

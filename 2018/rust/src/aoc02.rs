@@ -87,7 +87,8 @@ mod tests {
 
     #[test]
     fn test1() {
-        let input = "abcdef
+        let input = "\
+abcdef
 bababc
 abbcde
 abcccd
@@ -99,7 +100,8 @@ ababab";
 
     #[test]
     fn test2() {
-        let input = "abcde
+        let input = "\
+abcde
 fghij
 klmno
 pqrst

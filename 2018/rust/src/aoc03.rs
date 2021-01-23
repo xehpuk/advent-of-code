@@ -205,7 +205,8 @@ fn read_input() -> Result<String, Error> {
 mod tests {
     use super::{parse_claims, solve_part1, solve_part2, Claim};
 
-    const INPUT: &str = "#1 @ 1,3: 4x4
+    const INPUT: &str = "\
+#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2";
 
