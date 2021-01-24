@@ -130,20 +130,38 @@ impl Coordinates {
             .max()
             .unwrap()
     }
+
+    // This worked for the puzzle but I think it won't for sufficiently high cutoffs.
+    // The region may expand the rectangle that's examined here.
+    fn solve_part2(&self, cutoff: u32) -> u32 {
+        let vec = &self.0;
+        let min_x = vec.iter().map(|c| c.x).min().unwrap();
+        let min_y = vec.iter().map(|c| c.y).min().unwrap();
+        let max_x = vec.iter().map(|c| c.x).max().unwrap();
+        let max_y = vec.iter().map(|c| c.y).max().unwrap();
+        let mut region_size = 0u32;
+        // May want to eliminate the loops to go fully functional (filter, count).
+        for y in min_y..=max_y {
+            for x in min_x..=max_x {
+                let current = Coordinate { x, y };
+                let summed_distance: u32 = vec.iter().map(|c| current.manhattan_distance(c)).sum();
+                if summed_distance < cutoff {
+                    region_size += 1;
+                }
+            }
+        }
+        region_size
+    }
 }
 
 pub fn main() {
     match read_input().map(|input| parse_input(&input)) {
         Ok(Ok(coordinates)) => {
             println!("Max area: {}", coordinates.solve_part1());
+            println!("Max area: {}", coordinates.solve_part2(10000));
         }
         err => eprintln!("{:#?}", err),
     }
-}
-
-#[allow(dead_code, unused_variables)]
-fn solve_part2(coordinates: &Coordinates) -> u32 {
-    todo!()
 }
 
 fn parse_input(input: &str) -> Result<Coordinates, ParseError> {
@@ -171,9 +189,16 @@ mod tests {
     }
 
     #[test]
-    fn test1a() {
+    fn test1() {
         let coordinates = create_test_coordinates();
 
         assert_eq!(17, coordinates.solve_part1());
+    }
+
+    #[test]
+    fn test2() {
+        let coordinates = create_test_coordinates();
+
+        assert_eq!(16, coordinates.solve_part2(32));
     }
 }
