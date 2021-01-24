@@ -93,18 +93,16 @@ impl Coordinate {
 }
 
 impl Coordinates {
-    /* TODO:
-     *     works for test, but not for puzzle (4146 is too high)
-     *     needs to filter out infinite areas
-     */
     fn solve_part1(&self) -> u32 {
         let vec = &self.0;
         let min_x = vec.iter().map(|c| c.x).min().unwrap();
         let min_y = vec.iter().map(|c| c.y).min().unwrap();
         let max_x = vec.iter().map(|c| c.x).max().unwrap();
         let max_y = vec.iter().map(|c| c.y).max().unwrap();
-        let mut areas = vec![0u32; vec.len()];
+        // size, finite
+        let mut areas = vec![(0u32, true); vec.len()];
         for y in min_y..=max_y {
+            let edgy = y == min_y || y == max_y;
             for x in min_x..=max_x {
                 // coordinate_index, distance, unique
                 let mut closest = (0usize, u32::MAX, false);
@@ -119,12 +117,18 @@ impl Coordinates {
                     }
                 }
                 if closest.2 {
-                    areas[closest.0] += 1;
+                    areas[closest.0].0 += 1;
+                    areas[closest.0].1 &= !(edgy || x == min_x || x == max_x);
                 }
             }
         }
 
-        areas.into_iter().max().unwrap()
+        areas
+            .into_iter()
+            .filter(|(_, finite)| *finite)
+            .map(|(size, _)| size)
+            .max()
+            .unwrap()
     }
 }
 
@@ -152,7 +156,7 @@ fn read_input() -> Result<String, Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_input, solve_part1, solve_part2, Coordinate, Coordinates};
+    use super::{parse_input, Coordinates};
 
     const INPUT: &str = "\
 1, 1
@@ -170,6 +174,6 @@ mod tests {
     fn test1a() {
         let coordinates = create_test_coordinates();
 
-        assert_eq!(17, solve_part1(&coordinates));
+        assert_eq!(17, coordinates.solve_part1());
     }
 }
