@@ -1,16 +1,43 @@
+use std::collections::BTreeSet;
 use std::io::Error;
 
 pub fn main() {
     match read_input().map(|input| parse_input(&input)) {
-        Ok(Some(instructions)) => {
-            println!("Correct order: {}", solve_part1(&instructions));
-        }
+        Ok(Some(instructions)) => match solve_part1(&instructions) {
+            Some(order) => println!("Correct order: {}", order),
+            None => eprintln!("Couldn't find order."),
+        },
         err => eprintln!("{:#?}", err),
     }
 }
 
-fn solve_part1(instructions: &[(char, char)]) -> String {
-    todo!()
+fn solve_part1(instructions: &[(char, char)]) -> Option<String> {
+    let mut steps_left = instructions
+        .iter()
+        .flat_map(|&(left, right)| vec![left, right])
+        .collect::<BTreeSet<_>>();
+    let mut order = String::with_capacity(steps_left.len());
+    while !steps_left.is_empty() {
+        let mut found = None;
+        for &step in steps_left.iter() {
+            if instructions
+                .iter()
+                .find(|(left, right)| *right == step && steps_left.contains(left))
+                .is_none()
+            {
+                order.push(step);
+                found = Some(step);
+                break;
+            }
+        }
+        match found {
+            Some(step) => {
+                steps_left.remove(&step);
+            }
+            None => return None,
+        }
+    }
+    Some(order)
 }
 
 fn parse_input(input: &str) -> Option<Vec<(char, char)>> {
@@ -24,7 +51,7 @@ fn parse_input(input: &str) -> Option<Vec<(char, char)>> {
 }
 
 fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("../06.txt")
+    std::fs::read_to_string("../07.txt")
 }
 
 #[cfg(test)]
@@ -64,6 +91,6 @@ Step F must be finished before step E can begin.";
     fn test1() {
         let instructions = create_test_instructions();
 
-        assert_eq!("CABDFE", solve_part1(&instructions));
+        assert_eq!("CABDFE", solve_part1(&instructions).unwrap());
     }
 }
