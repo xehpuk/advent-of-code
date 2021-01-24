@@ -7,6 +7,7 @@ mod aoc03;
 mod aoc04;
 mod aoc05;
 mod aoc06;
+mod aoc07;
 
 fn main() -> Result<(), ParseIntError> {
     match args().nth(1) {
@@ -17,11 +18,12 @@ fn main() -> Result<(), ParseIntError> {
             4 => aoc04::main(),
             5 => aoc05::main(),
             6 => aoc06::main(),
-            n => eprintln!("Number must be in 1..=6, {} clearly isn't.", n)
+            7 => aoc07::main(),
+            n => eprintln!("Number must be in 1..=7, {} clearly isn't.", n)
         },
         None => {
-            println!("Running latest exercise (day 6). You may provide a number, e.g.: cargo run -- 2");
-            aoc06::main();
+            println!("Running latest exercise (day 7). You may provide a number, e.g.: cargo run -- 2");
+            aoc07::main();
         }
     }
 
