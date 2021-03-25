@@ -185,7 +185,7 @@ mod tests {
 8, 9";
 
     fn create_test_coordinates() -> Coordinates {
-        parse_input(&INPUT).unwrap()
+        parse_input(INPUT).unwrap()
     }
 
     #[test]

@@ -68,7 +68,7 @@ Step D must be finished before step E can begin.
 Step F must be finished before step E can begin.";
 
     fn create_test_instructions() -> Vec<(char, char)> {
-        parse_input(&INPUT).unwrap()
+        parse_input(INPUT).unwrap()
     }
 
     #[test]

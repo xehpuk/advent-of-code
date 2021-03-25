@@ -26,7 +26,7 @@ pub fn main() {
             println!("{} * {} = {}", twice, thrice, twice * thrice);
             match solve_part2(&text) {
                 Some((i, common)) => println!("{}: {}", i, common),
-                None => eprintln!("{}", "Correct box IDs not found!"),
+                None => eprintln!("Correct box IDs not found!"),
             }
         }
         Err(err) => eprintln!("{:#?}", err),

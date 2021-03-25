@@ -105,7 +105,7 @@ impl FromStr for Claim {
         let mut chars = s.chars();
         let parse_u32 = |chars: &mut Chars| -> Result<(u32, Option<char>), Self::Err> {
             let mut s = String::new();
-            while let Some(c) = chars.next() {
+            for c in chars {
                 if c.is_ascii_digit() {
                     s.push(c);
                 } else {
@@ -149,7 +149,7 @@ impl FromStr for Claim {
             return Err(Self::Err::DanglingInput);
         }
 
-        Self::new(id, left, top, width, height).map_err(|err| ParseError::Invalid(err))
+        Self::new(id, left, top, width, height).map_err(ParseError::Invalid)
     }
 }
 
@@ -187,7 +187,7 @@ fn solve_part1(claims: &[Claim]) -> usize {
 fn solve_part2(claims: &[Claim]) -> Option<&Claim> {
     'a: for (i, claim) in claims.iter().enumerate() {
         for (_, claim2) in claims.iter().enumerate().filter(|&(j, _)| j != i) {
-            if let Some(_) = claim.rect.intersect(&claim2.rect) {
+            if claim.rect.intersect(&claim2.rect).is_some() {
                 continue 'a;
             }
         }
