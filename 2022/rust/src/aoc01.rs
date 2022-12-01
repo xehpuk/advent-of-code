@@ -31,7 +31,7 @@ mod tests {
     use std::num::ParseIntError;
 
     fn test_input(input: &str) -> String {
-        input.split(", ").collect::<Vec<_>>().join("\n")
+        input.split(",").collect::<Vec<_>>().join("\n")
     }
 
     fn test_part1(input: &str) -> Result<i32, ParseIntError> {
