@@ -6,6 +6,7 @@ pub fn main() {
     match read_input() {
         Ok(text) => {
             solve(part1, &text);
+            solve(part2, &text);
         }
         Err(err) => eprintln!("{:#?}", err),
     }
@@ -32,13 +33,17 @@ fn part1(input: &str) -> Result<i32, ParseIntError> {
     Ok(most_calories)
 }
 
+fn part2(input: &str) -> Result<i32, ParseIntError> {
+    todo!()
+}
+
 fn read_input() -> Result<String, Error> {
     std::fs::read_to_string("../01.txt")
 }
 
 #[cfg(test)]
 mod tests {
-    use super::part1;
+    use super::{part1, part2};
     use std::num::ParseIntError;
 
     fn test_input(input: &str) -> String {
@@ -49,11 +54,23 @@ mod tests {
         part1(&test_input(input))
     }
 
+    fn test_part2(input: &str) -> Result<i32, ParseIntError> {
+        part2(&test_input(input))
+    }
+
     #[test]
     fn test1() {
         assert_eq!(
             Ok(24000),
             test_part1("1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000")
+        );
+    }
+
+    #[test]
+    fn test2() {
+        assert_eq!(
+            Ok(45000),
+            test_part2("1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000")
         );
     }
 }
