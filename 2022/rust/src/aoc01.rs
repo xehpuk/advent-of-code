@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::io::Error;
 use std::num::ParseIntError;
 
@@ -18,7 +19,17 @@ fn solve(part: fn(&str) -> Result<i32, ParseIntError>, text: &str) {
 }
 
 fn part1(input: &str) -> Result<i32, ParseIntError> {
-    todo!()
+    let mut most_calories = 0;
+    let mut current_calories = 0;
+    for line in input.lines() {
+        if line.is_empty() {
+            most_calories = max(most_calories, current_calories);
+            current_calories = 0;
+        } else {
+            current_calories += line.parse::<i32>()?;
+        }
+    }
+    Ok(most_calories)
 }
 
 fn read_input() -> Result<String, Error> {
