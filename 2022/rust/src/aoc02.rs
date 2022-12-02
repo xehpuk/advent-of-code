@@ -1,5 +1,6 @@
 use std::io::Error;
 
+#[derive(Clone, Copy)]
 enum Item {
     Rock,
     Paper,
@@ -12,6 +13,23 @@ impl Item {
             "A" | "X" => Some(Self::Rock),
             "B" | "Y" => Some(Self::Paper),
             "C" | "Z" => Some(Self::Scissors),
+            &_ => None,
+        }
+    }
+}
+
+enum Outcome {
+    Win,
+    Draw,
+    Lose,
+}
+
+impl Outcome {
+    fn parse(input: &str) -> Option<Self> {
+        match input {
+            "X" => Some(Self::Lose),
+            "Y" => Some(Self::Draw),
+            "Z" => Some(Self::Win),
             &_ => None,
         }
     }
@@ -38,17 +56,23 @@ fn part1(input: &str) -> Option<i32> {
     // todo: do not collect
     let items = input
         .lines()
-        .map(parse_line)
+        .map(parse_line1)
         .collect::<Option<Vec<(Item, Item)>>>()?;
 
-    Some(items.into_iter().map(calc_score).sum())
+    Some(items.into_iter().map(calc_score1).sum())
 }
 
 fn part2(input: &str) -> Option<i32> {
-    todo!()
+    // todo: do not collect
+    let items = input
+        .lines()
+        .map(parse_line2)
+        .collect::<Option<Vec<(Item, Outcome)>>>()?;
+
+    Some(items.into_iter().map(calc_score2).sum())
 }
 
-fn calc_score(round: (Item, Item)) -> i32 {
+fn calc_score1(round: (Item, Item)) -> i32 {
     return match round.1 {
         Item::Rock => 1,
         Item::Paper => 2,
@@ -66,7 +90,24 @@ fn calc_score(round: (Item, Item)) -> i32 {
     };
 }
 
-fn parse_line(line: &str) -> Option<(Item, Item)> {
+fn calc_score2(round: (Item, Outcome)) -> i32 {
+    return calc_score1((
+        round.0,
+        match round {
+            (Item::Rock, Outcome::Win) => Item::Paper,
+            (Item::Rock, Outcome::Draw) => Item::Rock,
+            (Item::Rock, Outcome::Lose) => Item::Scissors,
+            (Item::Paper, Outcome::Win) => Item::Scissors,
+            (Item::Paper, Outcome::Draw) => Item::Paper,
+            (Item::Paper, Outcome::Lose) => Item::Rock,
+            (Item::Scissors, Outcome::Win) => Item::Rock,
+            (Item::Scissors, Outcome::Draw) => Item::Scissors,
+            (Item::Scissors, Outcome::Lose) => Item::Paper,
+        },
+    ));
+}
+
+fn parse_line1(line: &str) -> Option<(Item, Item)> {
     let mut chosen_items = line.split(' ');
 
     fn next_item<'a, T: Iterator<Item = &'a str>>(chosen_items: &mut T) -> Option<Item> {
@@ -77,6 +118,15 @@ fn parse_line(line: &str) -> Option<(Item, Item)> {
     let my_item = next_item(&mut chosen_items)?;
 
     Some((opponent_item, my_item))
+}
+
+fn parse_line2(line: &str) -> Option<(Item, Outcome)> {
+    let mut chosen_items = line.split(' ');
+
+    let opponent_item = chosen_items.next().map(Item::parse)??;
+    let outcome = chosen_items.next().map(Outcome::parse)??;
+
+    Some((opponent_item, outcome))
 }
 
 fn read_input() -> Result<String, Error> {
