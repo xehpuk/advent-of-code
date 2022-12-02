@@ -85,7 +85,7 @@ fn read_input() -> Result<String, Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::part1;
+    use super::{part1, part2};
 
     const INPUT: &str = "A Y,B X,C Z";
 
@@ -97,8 +97,17 @@ mod tests {
         part1(&test_input(input))
     }
 
+    fn test_part2(input: &str) -> Option<i32> {
+        part2(&test_input(input))
+    }
+
     #[test]
     fn test1() {
         assert_eq!(Some(15), test_part1(INPUT));
+    }
+
+    #[test]
+    fn test2() {
+        assert_eq!(Some(12), test_part2(INPUT));
     }
 }
