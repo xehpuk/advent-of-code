@@ -1,15 +1,14 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::io::Error;
-use std::str::Lines;
 
-struct Calories<'a> {
-    str_iter: Lines<'a>,
+struct Calories<'a, I: Iterator<Item = &'a str>> {
+    str_iter: I,
     current: Option<i32>,
 }
 
-impl<'a> Calories<'a> {
-    pub fn new(str_iter: Lines<'a>) -> Calories {
+impl<'a, I: Iterator<Item = &'a str>> Calories<'a, I> {
+    pub fn new(str_iter: I) -> Calories<'a, I> {
         Calories {
             str_iter,
             current: None,
@@ -17,7 +16,7 @@ impl<'a> Calories<'a> {
     }
 }
 
-impl<'a> Iterator for Calories<'a> {
+impl<'a, I: Iterator<Item = &'a str>> Iterator for Calories<'a, I> {
     type Item = i32;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -89,7 +88,7 @@ mod tests {
     const INPUT: &str = "1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000";
 
     fn test_input(input: &str) -> String {
-        input.split(",").collect::<Vec<_>>().join("\n")
+        input.split(',').collect::<Vec<_>>().join("\n")
     }
 
     fn test_part1(input: &str) -> Option<i32> {
