@@ -2,6 +2,44 @@ use std::cmp::{max, Reverse};
 use std::collections::BinaryHeap;
 use std::io::Error;
 use std::num::ParseIntError;
+use std::str::Lines;
+
+struct Calories<'a> {
+    str_iter: Lines<'a>,
+    current: Option<i32>,
+}
+
+impl<'a> Calories<'a> {
+    pub fn new(str_iter: Lines<'a>) -> Calories {
+        Calories {
+            str_iter,
+            current: None,
+        }
+    }
+}
+
+impl<'a> Iterator for Calories<'a> {
+    type Item = i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(line) = self.str_iter.next() {
+            if line.is_empty() {
+                if let Some(v) = self.current {
+                    self.current = None;
+                    return Some(v);
+                }
+            } else {
+                let calorie: i32 = line.parse().ok()?;
+                self.current = Some(self.current.map_or(calorie, |v| v + calorie));
+            }
+            self.next()
+        } else {
+            let next = self.current;
+            self.current = None;
+            next
+        }
+    }
+}
 
 pub fn main() {
     match read_input() {
@@ -22,22 +60,12 @@ fn solve(part: fn(&str) -> Result<i32, ParseIntError>, text: &str) {
 
 fn part1(input: &str) -> Result<i32, ParseIntError> {
     let mut most_calories = 0;
-    let mut current_calories = 0;
 
-    for line in input.lines() {
-        if line.is_empty() {
-            most_calories = max(most_calories, current_calories);
-            current_calories = 0;
-        } else {
-            current_calories += line.parse::<i32>()?;
-        }
+    for current_calories in Calories::new(input.lines()) {
+        most_calories = max(most_calories, current_calories);
     }
 
-    Ok(if current_calories > 0 {
-        max(most_calories, current_calories)
-    } else {
-        most_calories
-    })
+    Ok(most_calories)
 }
 
 fn part2(input: &str) -> Result<i32, ParseIntError> {
@@ -77,8 +105,9 @@ fn read_input() -> Result<String, Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{part1, part2};
     use std::num::ParseIntError;
+
+    use super::{part1, part2};
 
     const INPUT: &str = "1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000";
 
