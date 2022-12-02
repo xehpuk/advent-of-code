@@ -63,9 +63,8 @@ fn part1(input: &str) -> Option<i32> {
 
 fn part2(input: &str) -> Option<i32> {
     let mut most_calories = BinaryHeap::new();
-    let mut current_calories = 0;
 
-    fn update_most_calories(most_calories: &mut BinaryHeap<Reverse<i32>>, current_calories: i32) {
+    for current_calories in Calories::new(input.lines()) {
         if most_calories.len() < 3 {
             most_calories.push(Reverse(current_calories));
         } else {
@@ -74,19 +73,6 @@ fn part2(input: &str) -> Option<i32> {
                 *least_calories = Reverse(current_calories);
             }
         }
-    }
-
-    for line in input.lines() {
-        if line.is_empty() {
-            update_most_calories(&mut most_calories, current_calories);
-            current_calories = 0;
-        } else {
-            current_calories += line.parse::<i32>().ok()?;
-        }
-    }
-
-    if current_calories > 0 {
-        update_most_calories(&mut most_calories, current_calories);
     }
 
     Some(most_calories.iter().map(|calories| calories.0).sum())
