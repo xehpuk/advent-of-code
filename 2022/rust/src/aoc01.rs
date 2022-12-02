@@ -1,7 +1,6 @@
-use std::cmp::{max, Reverse};
+use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::io::Error;
-use std::num::ParseIntError;
 use std::str::Lines;
 
 struct Calories<'a> {
@@ -51,24 +50,18 @@ pub fn main() {
     }
 }
 
-fn solve(part: fn(&str) -> Result<i32, ParseIntError>, text: &str) {
+fn solve(part: fn(&str) -> Option<i32>, text: &str) {
     match part(text) {
-        Ok(most_calories) => println!("{}", most_calories),
-        Err(err) => eprintln!("{:#?}", err),
+        Some(most_calories) => println!("{}", most_calories),
+        None => eprintln!("No result!"),
     }
 }
 
-fn part1(input: &str) -> Result<i32, ParseIntError> {
-    let mut most_calories = 0;
-
-    for current_calories in Calories::new(input.lines()) {
-        most_calories = max(most_calories, current_calories);
-    }
-
-    Ok(most_calories)
+fn part1(input: &str) -> Option<i32> {
+    Calories::new(input.lines()).max()
 }
 
-fn part2(input: &str) -> Result<i32, ParseIntError> {
+fn part2(input: &str) -> Option<i32> {
     let mut most_calories = BinaryHeap::new();
     let mut current_calories = 0;
 
@@ -88,7 +81,7 @@ fn part2(input: &str) -> Result<i32, ParseIntError> {
             update_most_calories(&mut most_calories, current_calories);
             current_calories = 0;
         } else {
-            current_calories += line.parse::<i32>()?;
+            current_calories += line.parse::<i32>().ok()?;
         }
     }
 
@@ -96,7 +89,7 @@ fn part2(input: &str) -> Result<i32, ParseIntError> {
         update_most_calories(&mut most_calories, current_calories);
     }
 
-    Ok(most_calories.iter().map(|calories| calories.0).sum())
+    Some(most_calories.iter().map(|calories| calories.0).sum())
 }
 
 fn read_input() -> Result<String, Error> {
@@ -105,8 +98,6 @@ fn read_input() -> Result<String, Error> {
 
 #[cfg(test)]
 mod tests {
-    use std::num::ParseIntError;
-
     use super::{part1, part2};
 
     const INPUT: &str = "1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000";
@@ -115,21 +106,21 @@ mod tests {
         input.split(",").collect::<Vec<_>>().join("\n")
     }
 
-    fn test_part1(input: &str) -> Result<i32, ParseIntError> {
+    fn test_part1(input: &str) -> Option<i32> {
         part1(&test_input(input))
     }
 
-    fn test_part2(input: &str) -> Result<i32, ParseIntError> {
+    fn test_part2(input: &str) -> Option<i32> {
         part2(&test_input(input))
     }
 
     #[test]
     fn test1() {
-        assert_eq!(Ok(24000), test_part1(INPUT));
+        assert_eq!(Some(24000), test_part1(INPUT));
     }
 
     #[test]
     fn test2() {
-        assert_eq!(Ok(45000), test_part2(INPUT));
+        assert_eq!(Some(45000), test_part2(INPUT));
     }
 }
