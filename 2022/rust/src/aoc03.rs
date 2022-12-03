@@ -12,30 +12,34 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day03 {
             .map(Chars::collect::<Vec<_>>)
             .map(|chars| {
                 let (first, second) = chars.split_at(chars.len() / 2);
+                // todo: remove RandomState
                 let first: HashSet<_, RandomState> = HashSet::from_iter(first.iter());
                 let second: HashSet<_, RandomState> = HashSet::from_iter(second.iter());
                 let mut intersection = first.intersection(&second);
                 let x = *intersection.next()?;
                 if intersection.next().is_some() {
+                    // should only have one item
                     return None;
                 }
                 Some(x.to_owned())
             })
-            .map(|c| {
-                c.and_then(|c| match c {
-                    'a'..='z' => Some(1 + c as u32 - 'a' as u32),
-                    'A'..='Z' => Some(27 + c as u32 - 'A' as u32),
-                    _ => None,
-                })
-            })
-            .sum::<Option<u32>>()?
-            .try_into()
-            .ok()
+            .map(|c| c.and_then(get_priority))
+            .sum()
     }
 
     fn part2(input: I) -> Option<i32> {
         todo!()
     }
+}
+
+fn get_priority(c: char) -> Option<i32> {
+    match c {
+        'a'..='z' => Some(1 + c as u32 - 'a' as u32),
+        'A'..='Z' => Some(27 + c as u32 - 'A' as u32),
+        _ => None,
+    }?
+    .try_into()
+    .ok()
 }
 
 #[cfg(test)]
@@ -59,8 +63,17 @@ CrZsJsPPZsGzwwsLwLmpwMDw";
         Day03::part1(test_input(input))
     }
 
+    fn test_part2(input: &str) -> Option<i32> {
+        Day03::part2(test_input(input))
+    }
+
     #[test]
     fn test1() {
         assert_eq!(Some(157), test_part1(INPUT));
+    }
+
+    #[test]
+    fn test2() {
+        assert_eq!(Some(70), test_part2(INPUT));
     }
 }
