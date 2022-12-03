@@ -1,3 +1,5 @@
+use aoc01::Day01;
+use aoc02::Day02;
 use std::env::args;
 use std::io::Error;
 use std::str::Lines;
@@ -5,16 +7,32 @@ use std::str::Lines;
 mod aoc01;
 mod aoc02;
 
-type Part<I> = fn(I) -> Option<i32>;
-
 const LATEST_DAY: u8 = 2;
+
+trait Day<'a, I: Clone + Iterator<Item = &'a str>> {
+    fn part1(input: I) -> Option<i32>;
+    fn part2(input: I) -> Option<i32>;
+
+    fn solve(input: I) {
+        Self::solve_part(Self::part1, input.clone());
+        Self::solve_part(Self::part2, input);
+    }
+
+    fn solve_part(part: fn(I) -> Option<i32>, input: I) {
+        match part(input) {
+            Some(solution) => println!("{}", solution),
+            None => eprintln!("No solution!"),
+        }
+    }
+}
 
 fn main() -> Result<(), Error> {
     let day = determine_day();
     let input = std::fs::read_to_string(format!("../{:0>2}.txt", day))?;
+
     match day {
-        1 => solve_day(aoc01::part1, aoc01::part2, &input),
-        2 => solve_day(aoc02::part1, aoc02::part2, &input),
+        1 => solve_day::<Day01>(&input),
+        2 => solve_day::<Day02>(&input),
         _ => unreachable!(),
     }
 
@@ -43,14 +61,6 @@ fn determine_day() -> u8 {
     }
 }
 
-fn solve_day<'a>(part1: Part<Lines<'a>>, part2: Part<Lines<'a>>, input: &'a str) {
-    solve_part(part1, input.lines());
-    solve_part(part2, input.lines());
-}
-
-fn solve_part<'a>(part: Part<Lines<'a>>, input: Lines<'a>) {
-    match part(input) {
-        Some(result) => println!("{}", result),
-        None => eprintln!("No result!"),
-    }
+fn solve_day<'a, D: Day<'a, Lines<'a>>>(input: &'a str) {
+    D::solve(input.lines())
 }

@@ -1,3 +1,27 @@
+use super::Day;
+
+pub struct Day02;
+
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day02 {
+    fn part1(input: I) -> Option<i32> {
+        // todo: do not collect
+        let items = input
+            .map(parse_line1)
+            .collect::<Option<Vec<(Item, Item)>>>()?;
+
+        Some(items.into_iter().map(calc_score1).sum())
+    }
+
+    fn part2(input: I) -> Option<i32> {
+        // todo: do not collect
+        let items = input
+            .map(parse_line2)
+            .collect::<Option<Vec<(Item, Outcome)>>>()?;
+
+        Some(items.into_iter().map(calc_score2).sum())
+    }
+}
+
 #[derive(Clone, Copy)]
 enum Item {
     Rock,
@@ -40,24 +64,6 @@ impl Outcome {
             &_ => None,
         }
     }
-}
-
-pub fn part1<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
-    // todo: do not collect
-    let items = input
-        .map(parse_line1)
-        .collect::<Option<Vec<(Item, Item)>>>()?;
-
-    Some(items.into_iter().map(calc_score1).sum())
-}
-
-pub fn part2<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
-    // todo: do not collect
-    let items = input
-        .map(parse_line2)
-        .collect::<Option<Vec<(Item, Outcome)>>>()?;
-
-    Some(items.into_iter().map(calc_score2).sum())
 }
 
 fn calc_score1(round: (Item, Item)) -> i32 {
@@ -118,7 +124,7 @@ fn parse_line2(line: &str) -> Option<(Item, Outcome)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{part1, part2};
+    use super::{Day, Day02};
     use std::str::Split;
 
     const INPUT: &str = "A Y,B X,C Z";
@@ -128,11 +134,11 @@ mod tests {
     }
 
     fn test_part1(input: &str) -> Option<i32> {
-        part1(test_input(input))
+        Day02::part1(test_input(input))
     }
 
     fn test_part2(input: &str) -> Option<i32> {
-        part2(test_input(input))
+        Day02::part2(test_input(input))
     }
 
     #[test]

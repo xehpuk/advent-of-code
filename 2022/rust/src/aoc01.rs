@@ -1,5 +1,31 @@
+use super::Day;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
+
+pub struct Day01;
+
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day01 {
+    fn part1(input: I) -> Option<i32> {
+        Calories::new(input).max()
+    }
+
+    fn part2(input: I) -> Option<i32> {
+        let mut most_calories = BinaryHeap::new();
+
+        for current_calories in Calories::new(input) {
+            if most_calories.len() < 3 {
+                most_calories.push(Reverse(current_calories));
+            } else {
+                let mut least_calories = most_calories.peek_mut().unwrap();
+                if current_calories > least_calories.0 {
+                    *least_calories = Reverse(current_calories);
+                }
+            }
+        }
+
+        Some(most_calories.iter().map(|calories| calories.0).sum())
+    }
+}
 
 struct Calories<'a, I: Iterator<Item = &'a str>> {
     str_iter: I,
@@ -38,30 +64,9 @@ impl<'a, I: Iterator<Item = &'a str>> Iterator for Calories<'a, I> {
     }
 }
 
-pub fn part1<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
-    Calories::new(input).max()
-}
-
-pub fn part2<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
-    let mut most_calories = BinaryHeap::new();
-
-    for current_calories in Calories::new(input) {
-        if most_calories.len() < 3 {
-            most_calories.push(Reverse(current_calories));
-        } else {
-            let mut least_calories = most_calories.peek_mut().unwrap();
-            if current_calories > least_calories.0 {
-                *least_calories = Reverse(current_calories);
-            }
-        }
-    }
-
-    Some(most_calories.iter().map(|calories| calories.0).sum())
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{part1, part2};
+    use super::{Day, Day01};
     use std::str::Split;
 
     const INPUT: &str = "1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000";
@@ -71,11 +76,11 @@ mod tests {
     }
 
     fn test_part1(input: &str) -> Option<i32> {
-        part1(test_input(input))
+        Day01::part1(test_input(input))
     }
 
     fn test_part2(input: &str) -> Option<i32> {
-        part2(test_input(input))
+        Day01::part2(test_input(input))
     }
 
     #[test]
