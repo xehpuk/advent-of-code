@@ -28,7 +28,36 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day03 {
     }
 
     fn part2(input: I) -> Option<i32> {
-        todo!()
+        let mut count = 0;
+        let mut intersection = HashSet::new();
+        let mut priorities = 0;
+
+        for line in input {
+            count += 1;
+            let unique_chars = HashSet::from_iter(line.chars());
+            if count == 1 {
+                intersection = unique_chars;
+            } else {
+                intersection.retain(|c| unique_chars.contains(c));
+                if count >= 3 {
+                    let mut iter = intersection.iter();
+                    let badge = *iter.next()?;
+                    if iter.next().is_some() {
+                        // should only have one item
+                        return None;
+                    }
+                    priorities += get_priority(badge)?;
+                    count = 0;
+                }
+            }
+        }
+
+        if count != 0 {
+            // elves not divisible into groups of three
+            return None;
+        }
+
+        Some(priorities)
     }
 }
 
