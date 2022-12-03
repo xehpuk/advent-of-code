@@ -1,13 +1,15 @@
 use aoc01::Day01;
 use aoc02::Day02;
+use aoc03::Day03;
 use std::env::args;
 use std::io::Error;
 use std::str::Lines;
 
 mod aoc01;
 mod aoc02;
+mod aoc03;
 
-const LATEST_DAY: u8 = 2;
+const LATEST_DAY: u8 = 3;
 
 trait Day<'a, I: Clone + Iterator<Item = &'a str>> {
     fn part1(input: I) -> Option<i32>;
@@ -33,6 +35,7 @@ fn main() -> Result<(), Error> {
     match day {
         1 => solve_day::<Day01>(&input),
         2 => solve_day::<Day02>(&input),
+        3 => solve_day::<Day03>(&input),
         _ => unreachable!(),
     }
 
