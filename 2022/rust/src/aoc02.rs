@@ -1,5 +1,3 @@
-use std::io::Error;
-
 #[derive(Clone, Copy)]
 enum Item {
     Rock,
@@ -44,24 +42,7 @@ impl Outcome {
     }
 }
 
-pub fn main() {
-    match read_input() {
-        Ok(text) => {
-            solve(part1, &text);
-            solve(part2, &text);
-        }
-        Err(err) => eprintln!("{:#?}", err),
-    }
-}
-
-fn solve(part: fn(&str) -> Option<i32>, text: &str) {
-    match part(text) {
-        Some(result) => println!("{}", result),
-        None => eprintln!("No result!"),
-    }
-}
-
-fn part1(input: &str) -> Option<i32> {
+pub fn part1(input: &str) -> Option<i32> {
     // todo: do not collect
     let items = input
         .lines()
@@ -71,7 +52,7 @@ fn part1(input: &str) -> Option<i32> {
     Some(items.into_iter().map(calc_score1).sum())
 }
 
-fn part2(input: &str) -> Option<i32> {
+pub fn part2(input: &str) -> Option<i32> {
     // todo: do not collect
     let items = input
         .lines()
@@ -135,10 +116,6 @@ fn parse_line1(line: &str) -> Option<(Item, Item)> {
 
 fn parse_line2(line: &str) -> Option<(Item, Outcome)> {
     parse_line(line, Item::parse_opponent, Outcome::parse)
-}
-
-fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("../02.txt")
 }
 
 #[cfg(test)]

@@ -1,6 +1,5 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
-use std::io::Error;
 
 struct Calories<'a, I: Iterator<Item = &'a str>> {
     str_iter: I,
@@ -39,28 +38,11 @@ impl<'a, I: Iterator<Item = &'a str>> Iterator for Calories<'a, I> {
     }
 }
 
-pub fn main() {
-    match read_input() {
-        Ok(text) => {
-            solve(part1, &text);
-            solve(part2, &text);
-        }
-        Err(err) => eprintln!("{:#?}", err),
-    }
-}
-
-fn solve(part: fn(&str) -> Option<i32>, text: &str) {
-    match part(text) {
-        Some(most_calories) => println!("{}", most_calories),
-        None => eprintln!("No result!"),
-    }
-}
-
-fn part1(input: &str) -> Option<i32> {
+pub fn part1(input: &str) -> Option<i32> {
     Calories::new(input.lines()).max()
 }
 
-fn part2(input: &str) -> Option<i32> {
+pub fn part2(input: &str) -> Option<i32> {
     let mut most_calories = BinaryHeap::new();
 
     for current_calories in Calories::new(input.lines()) {
@@ -75,10 +57,6 @@ fn part2(input: &str) -> Option<i32> {
     }
 
     Some(most_calories.iter().map(|calories| calories.0).sum())
-}
-
-fn read_input() -> Result<String, Error> {
-    std::fs::read_to_string("../01.txt")
 }
 
 #[cfg(test)]
