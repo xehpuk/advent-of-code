@@ -42,20 +42,18 @@ impl Outcome {
     }
 }
 
-pub fn part1(input: &str) -> Option<i32> {
+pub fn part1<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
     // todo: do not collect
     let items = input
-        .lines()
         .map(parse_line1)
         .collect::<Option<Vec<(Item, Item)>>>()?;
 
     Some(items.into_iter().map(calc_score1).sum())
 }
 
-pub fn part2(input: &str) -> Option<i32> {
+pub fn part2<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
     // todo: do not collect
     let items = input
-        .lines()
         .map(parse_line2)
         .collect::<Option<Vec<(Item, Outcome)>>>()?;
 
@@ -121,19 +119,20 @@ fn parse_line2(line: &str) -> Option<(Item, Outcome)> {
 #[cfg(test)]
 mod tests {
     use super::{part1, part2};
+    use std::str::Split;
 
     const INPUT: &str = "A Y,B X,C Z";
 
-    fn test_input(input: &str) -> String {
-        input.split(',').collect::<Vec<_>>().join("\n")
+    fn test_input(input: &str) -> Split<char> {
+        input.split(',')
     }
 
     fn test_part1(input: &str) -> Option<i32> {
-        part1(&test_input(input))
+        part1(test_input(input))
     }
 
     fn test_part2(input: &str) -> Option<i32> {
-        part2(&test_input(input))
+        part2(test_input(input))
     }
 
     #[test]

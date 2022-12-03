@@ -38,14 +38,14 @@ impl<'a, I: Iterator<Item = &'a str>> Iterator for Calories<'a, I> {
     }
 }
 
-pub fn part1(input: &str) -> Option<i32> {
-    Calories::new(input.lines()).max()
+pub fn part1<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
+    Calories::new(input).max()
 }
 
-pub fn part2(input: &str) -> Option<i32> {
+pub fn part2<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<i32> {
     let mut most_calories = BinaryHeap::new();
 
-    for current_calories in Calories::new(input.lines()) {
+    for current_calories in Calories::new(input) {
         if most_calories.len() < 3 {
             most_calories.push(Reverse(current_calories));
         } else {
@@ -62,19 +62,20 @@ pub fn part2(input: &str) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::{part1, part2};
+    use std::str::Split;
 
     const INPUT: &str = "1000,2000,3000,,4000,,5000,6000,,7000,8000,9000,,10000";
 
-    fn test_input(input: &str) -> String {
-        input.split(',').collect::<Vec<_>>().join("\n")
+    fn test_input(input: &str) -> Split<char> {
+        input.split(',')
     }
 
     fn test_part1(input: &str) -> Option<i32> {
-        part1(&test_input(input))
+        part1(test_input(input))
     }
 
     fn test_part2(input: &str) -> Option<i32> {
-        part2(&test_input(input))
+        part2(test_input(input))
     }
 
     #[test]

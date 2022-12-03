@@ -1,10 +1,11 @@
 use std::env::args;
 use std::io::Error;
+use std::str::Lines;
 
 mod aoc01;
 mod aoc02;
 
-type Part = fn(&str) -> Option<i32>;
+type Part<I> = fn(I) -> Option<i32>;
 
 const LATEST_DAY: u8 = 2;
 
@@ -42,12 +43,12 @@ fn determine_day() -> u8 {
     }
 }
 
-fn solve_day(part1: Part, part2: Part, input: &str) {
-    solve_part(part1, input);
-    solve_part(part2, input);
+fn solve_day<'a>(part1: Part<Lines<'a>>, part2: Part<Lines<'a>>, input: &'a str) {
+    solve_part(part1, input.lines());
+    solve_part(part2, input.lines());
 }
 
-fn solve_part(part: fn(&str) -> Option<i32>, input: &str) {
+fn solve_part<'a>(part: Part<Lines<'a>>, input: Lines<'a>) {
     match part(input) {
         Some(result) => println!("{}", result),
         None => eprintln!("No result!"),
