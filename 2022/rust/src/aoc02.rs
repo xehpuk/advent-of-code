@@ -8,11 +8,20 @@ enum Item {
 }
 
 impl Item {
-    fn parse(input: &str) -> Option<Self> {
+    fn parse_opponent(input: &str) -> Option<Self> {
         match input {
-            "A" | "X" => Some(Self::Rock),
-            "B" | "Y" => Some(Self::Paper),
-            "C" | "Z" => Some(Self::Scissors),
+            "A" => Some(Self::Rock),
+            "B" => Some(Self::Paper),
+            "C" => Some(Self::Scissors),
+            &_ => None,
+        }
+    }
+
+    fn parse_mine(input: &str) -> Option<Self> {
+        match input {
+            "X" => Some(Self::Rock),
+            "Y" => Some(Self::Paper),
+            "Z" => Some(Self::Scissors),
             &_ => None,
         }
     }
@@ -73,11 +82,11 @@ fn part2(input: &str) -> Option<i32> {
 }
 
 fn calc_score1(round: (Item, Item)) -> i32 {
-    return match round.1 {
+    (match round.1 {
         Item::Rock => 1,
         Item::Paper => 2,
         Item::Scissors => 3,
-    } + match round {
+    }) + match round {
         (Item::Rock, Item::Rock) => 3,
         (Item::Rock, Item::Paper) => 6,
         (Item::Rock, Item::Scissors) => 0,
@@ -87,11 +96,11 @@ fn calc_score1(round: (Item, Item)) -> i32 {
         (Item::Scissors, Item::Rock) => 6,
         (Item::Scissors, Item::Paper) => 0,
         (Item::Scissors, Item::Scissors) => 3,
-    };
+    }
 }
 
 fn calc_score2(round: (Item, Outcome)) -> i32 {
-    return calc_score1((
+    calc_score1((
         round.0,
         match round {
             (Item::Rock, Outcome::Win) => Item::Paper,
@@ -104,29 +113,28 @@ fn calc_score2(round: (Item, Outcome)) -> i32 {
             (Item::Scissors, Outcome::Draw) => Item::Scissors,
             (Item::Scissors, Outcome::Lose) => Item::Paper,
         },
-    ));
+    ))
 }
 
-fn parse_line1(line: &str) -> Option<(Item, Item)> {
+fn parse_line<T, U>(
+    line: &str,
+    first: fn(&str) -> Option<T>,
+    second: fn(&str) -> Option<U>,
+) -> Option<(T, U)> {
     let mut chosen_items = line.split(' ');
 
-    fn next_item<'a, T: Iterator<Item = &'a str>>(chosen_items: &mut T) -> Option<Item> {
-        chosen_items.next().map(Item::parse)?
-    }
-
-    let opponent_item = next_item(&mut chosen_items)?;
-    let my_item = next_item(&mut chosen_items)?;
+    let opponent_item = chosen_items.next().map(first)??;
+    let my_item = chosen_items.next().map(second)??;
 
     Some((opponent_item, my_item))
 }
 
+fn parse_line1(line: &str) -> Option<(Item, Item)> {
+    parse_line(line, Item::parse_opponent, Item::parse_mine)
+}
+
 fn parse_line2(line: &str) -> Option<(Item, Outcome)> {
-    let mut chosen_items = line.split(' ');
-
-    let opponent_item = chosen_items.next().map(Item::parse)??;
-    let outcome = chosen_items.next().map(Outcome::parse)??;
-
-    Some((opponent_item, outcome))
+    parse_line(line, Item::parse_opponent, Outcome::parse)
 }
 
 fn read_input() -> Result<String, Error> {
