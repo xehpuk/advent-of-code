@@ -61,7 +61,30 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day04 {
     }
 
     fn part2(input: I) -> Option<i32> {
-        todo!()
+        let mut overlapping_assignment_pairs = 0;
+        for line in input {
+            let vec = line.split(',').collect::<Vec<_>>();
+            let vec = vec
+                .into_iter()
+                .map(|range| range.split('-').collect::<Vec<_>>())
+                .collect::<Vec<_>>();
+            let vec = vec
+                .into_iter()
+                .map(|range| {
+                    let start = range.get(0).unwrap().parse::<i32>().unwrap();
+                    let end = range.get(1).unwrap().parse::<i32>().unwrap();
+                    start..=end
+                })
+                .collect::<Vec<_>>();
+            let first_range = vec.get(0).unwrap();
+            let second_range = vec.get(1).unwrap();
+            if first_range.start() <= second_range.end()
+                && second_range.start() <= first_range.end()
+            {
+                overlapping_assignment_pairs += 1;
+            }
+        }
+        Some(overlapping_assignment_pairs)
     }
 }
 
