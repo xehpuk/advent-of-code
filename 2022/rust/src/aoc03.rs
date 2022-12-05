@@ -5,7 +5,7 @@ use std::str::Chars;
 
 pub struct Day03;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day03 {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day03 {
     fn part1(input: I) -> Option<i32> {
         input
             .map(str::chars)

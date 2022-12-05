@@ -2,7 +2,7 @@ use super::Day;
 
 pub struct Day02;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day02 {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day02 {
     fn part1(input: I) -> Option<i32> {
         // todo: do not collect
         let items = input

@@ -4,7 +4,7 @@ use std::collections::BinaryHeap;
 
 pub struct Day01;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day01 {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day01 {
     fn part1(input: I) -> Option<i32> {
         Calories::new(input).max()
     }

@@ -1,21 +1,16 @@
 use super::Day;
-use std::ops::RangeInclusive;
 
 pub struct Day04;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day04 {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day04 {
     fn part1(input: I) -> Option<i32> {
         let mut containing_assignment_pairs = 0;
         for line in input {
-            let vec = line.split(',').collect::<Vec<_>>();
-            let vec = vec
-                .into_iter()
+            let vec = line
+                .split(',')
                 .map(|range| range.split('-').collect::<Vec<_>>())
-                .collect::<Vec<_>>();
-            let vec = vec
-                .into_iter()
                 .map(|range| {
-                    let start = range.get(0).unwrap().parse::<i32>().unwrap();
+                    let start = range.first().unwrap().parse::<i32>().unwrap();
                     let end = range.get(1).unwrap().parse::<i32>().unwrap();
                     start..=end
                 })
@@ -63,15 +58,11 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I> for Day04 {
     fn part2(input: I) -> Option<i32> {
         let mut overlapping_assignment_pairs = 0;
         for line in input {
-            let vec = line.split(',').collect::<Vec<_>>();
-            let vec = vec
-                .into_iter()
+            let vec = line
+                .split(',')
                 .map(|range| range.split('-').collect::<Vec<_>>())
-                .collect::<Vec<_>>();
-            let vec = vec
-                .into_iter()
                 .map(|range| {
-                    let start = range.get(0).unwrap().parse::<i32>().unwrap();
+                    let start = range.first().unwrap().parse::<i32>().unwrap();
                     let end = range.get(1).unwrap().parse::<i32>().unwrap();
                     start..=end
                 })
