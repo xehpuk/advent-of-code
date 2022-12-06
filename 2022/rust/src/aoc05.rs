@@ -4,54 +4,74 @@ use std::collections::VecDeque;
 
 pub struct Day05;
 
+enum Crane {
+    CargoMover9000,
+    CargoMover9001,
+}
+
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, String> for Day05 {
-    fn part1(mut input: I) -> Option<String> {
-        let mut stacks = Vec::new();
-        for row in input
-            .borrow_mut()
-            .take_while(|line| !line.is_empty())
-            .map(|line| line.chars().skip(1).step_by(4).enumerate())
-        {
-            for (stack, _crate) in row {
-                if _crate.is_alphabetic() {
-                    while stacks.len() <= stack {
-                        stacks.push(VecDeque::new());
-                    }
-                    stacks.get_mut(stack)?.push_back(_crate);
+    fn part1(input: I) -> Option<String> {
+        solve(input, Crane::CargoMover9000)
+    }
+
+    fn part2(input: I) -> Option<String> {
+        solve(input, Crane::CargoMover9001)
+    }
+}
+
+fn solve<'a, I: Clone + Iterator<Item = &'a str>>(mut input: I, crane: Crane) -> Option<String> {
+    let mut stacks = Vec::new();
+    for row in input
+        .borrow_mut()
+        .take_while(|line| !line.is_empty())
+        .map(|line| line.chars().skip(1).step_by(4).enumerate())
+    {
+        for (stack, _crate) in row {
+            if _crate.is_alphabetic() {
+                while stacks.len() <= stack {
+                    stacks.push(VecDeque::new());
+                }
+                stacks.get_mut(stack)?.push_back(_crate);
+            }
+        }
+    }
+    for mut instruction in input.map(str::chars) {
+        let mut parse = |skip: &str| {
+            instruction
+                .borrow_mut()
+                .skip(skip.chars().count())
+                .take_while(char::is_ascii_digit)
+                .collect::<String>()
+                .parse::<usize>()
+                .ok()
+        };
+
+        let count = parse("move ")?;
+        let from = parse("from ")?.checked_sub(1)?;
+        let to = parse("to ")?.checked_sub(1)?;
+
+        match crane {
+            Crane::CargoMover9000 => {
+                for _ in 0..count {
+                    let _crate = stacks.get_mut(from)?.pop_front()?;
+                    stacks.get_mut(to)?.push_front(_crate);
                 }
             }
-        }
-        for mut instruction in input.map(str::chars) {
-            let mut parse = |skip: &str| {
-                instruction
-                    .borrow_mut()
-                    .skip(skip.chars().count())
-                    .take_while(char::is_ascii_digit)
-                    .collect::<String>()
-                    .parse::<usize>()
-                    .ok()
-            };
-
-            let count = parse("move ")?;
-            let from = parse("from ")?.checked_sub(1)?;
-            let to = parse("to ")?.checked_sub(1)?;
-
-            for _ in 0..count {
-                let _crate = stacks.get_mut(from)?.pop_front()?;
-                stacks.get_mut(to)?.push_front(_crate);
+            Crane::CargoMover9001 => {
+                let source = stacks.get_mut(from)?;
+                let mut split = source.drain(0..count).collect::<VecDeque<_>>();
+                let destination = stacks.get_mut(to)?;
+                split.append(destination);
+                *destination = split;
             }
         }
-        Some(
-            stacks
-                .iter()
-                .map(|stack| stack.front().unwrap_or(&' '))
-                .collect::<String>(),
-        )
     }
-
-    fn part2(_input: I) -> Option<String> {
-        todo!()
-    }
+    Some(
+        stacks
+            .iter()
+            .map(|stack| stack.front().unwrap_or(&' '))
+            .collect::<String>(),
+    )
 }
 
 #[cfg(test)]
