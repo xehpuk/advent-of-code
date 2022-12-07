@@ -1,11 +1,20 @@
 use super::Day;
+use std::collections::HashSet;
 
 pub struct Day06;
 
+const LEN: usize = 4;
+
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day06 {
-    fn part1(_input: I) -> Option<i32> {
-        // regex: (.)((?!\1).)((?!\1|\2).)((?!\1|\2|\3).)
-        todo!()
+    fn part1(mut input: I) -> Option<i32> {
+        for (i, window) in input.next()?.as_bytes().windows(LEN).enumerate() {
+            let array: [u8; LEN] = window.try_into().ok()?;
+            let set = HashSet::from(array);
+            if set.len() == LEN {
+                return (i + LEN).try_into().ok();
+            }
+        }
+        None
     }
 
     fn part2(_input: I) -> Option<i32> {
