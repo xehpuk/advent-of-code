@@ -1,32 +1,41 @@
-use super::Day;
+use std::collections::hash_map::RandomState;
 use std::collections::HashSet;
+
+use super::Day;
 
 pub struct Day06;
 
-const LEN: usize = 4;
+const LEN1: usize = 4;
+const LEN2: usize = 14;
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day06 {
     fn part1(mut input: I) -> Option<i32> {
-        for (i, window) in input.next()?.as_bytes().windows(LEN).enumerate() {
-            let array: [u8; LEN] = window.try_into().ok()?;
+        for (i, window) in input.next()?.as_bytes().windows(LEN1).enumerate() {
+            let array: [u8; LEN1] = window.try_into().ok()?;
             let set = HashSet::from(array);
-            if set.len() == LEN {
-                return (i + LEN).try_into().ok();
+            if set.len() == LEN1 {
+                return (i + LEN1).try_into().ok();
             }
         }
         None
     }
 
-    fn part2(_input: I) -> Option<i32> {
-        // regex: (.)((?!\1).)((?!\1|\2).)((?!\1|\2|\3).)((?!\1|\2|\3|\4).)((?!\1|\2|\3|\4|\5).)((?!\1|\2|\3|\4|\5|\6).)((?!\1|\2|\3|\4|\5|\6|\7).)((?!\1|\2|\3|\4|\5|\6|\7|\8).)(?<A>(?!\1|\2|\3|\4|\5|\6|\7|\8|\9).)(?<B>(?!\1|\2|\3|\4|\5|\6|\7|\8|\9|\k<A>).)(?<C>(?!\1|\2|\3|\4|\5|\6|\7|\8|\9|\k<A>|\k<B>).)(?<D>(?!\1|\2|\3|\4|\5|\6|\7|\8|\9|\k<A>|\k<B>|\k<C>).)(?<E>(?!\1|\2|\3|\4|\5|\6|\7|\8|\9|\k<A>|\k<B>|\k<C>|\k<D>).)
-        todo!()
+    fn part2(mut input: I) -> Option<i32> {
+        for (i, window) in input.next()?.as_bytes().windows(LEN2).enumerate() {
+            let set = HashSet::<_, RandomState>::from_iter(window.iter());
+            if set.len() == LEN2 {
+                return (i + LEN2).try_into().ok();
+            }
+        }
+        None
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day06};
     use std::str::Lines;
+
+    use super::{Day, Day06};
 
     const INPUT: [&str; 5] = [
         "mjqjpqmgbljsphdztnvjfqwrcgsmlb",
