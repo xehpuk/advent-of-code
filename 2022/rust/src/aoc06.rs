@@ -65,26 +65,26 @@ mod tests {
 
     #[test]
     fn test2a() {
-        assert_eq!(None, test_part2(INPUT[0])); // todo replace expected value
+        assert_eq!(Some(19), test_part2(INPUT[0]));
     }
 
     #[test]
     fn test2b() {
-        assert_eq!(None, test_part2(INPUT[1])); // todo replace expected value
+        assert_eq!(Some(23), test_part2(INPUT[1]));
     }
 
     #[test]
     fn test2c() {
-        assert_eq!(None, test_part2(INPUT[2])); // todo replace expected value
+        assert_eq!(Some(23), test_part2(INPUT[2]));
     }
 
     #[test]
     fn test2d() {
-        assert_eq!(None, test_part2(INPUT[3])); // todo replace expected value
+        assert_eq!(Some(29), test_part2(INPUT[3]));
     }
 
     #[test]
     fn test2e() {
-        assert_eq!(None, test_part2(INPUT[4])); // todo replace expected value
+        assert_eq!(Some(26), test_part2(INPUT[4]));
     }
 }
