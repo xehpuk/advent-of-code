@@ -8,6 +8,7 @@ use aoc03::Day03;
 use aoc04::Day04;
 use aoc05::Day05;
 use aoc06::Day06;
+use aoc07::Day07;
 
 mod aoc01;
 mod aoc02;
@@ -15,8 +16,9 @@ mod aoc03;
 mod aoc04;
 mod aoc05;
 mod aoc06;
+mod aoc07;
 
-const LATEST_DAY: u8 = 6;
+const LATEST_DAY: u8 = 7;
 
 trait Day<'a, I: Clone + Iterator<Item = &'a str>, T: Display> {
     fn part1(input: I) -> Option<T>;
@@ -47,6 +49,7 @@ fn main() -> Result<(), Error> {
         4 => Day04::solve(lines),
         5 => Day05::solve(lines),
         6 => Day06::solve(lines),
+        7 => Day07::solve(lines),
         _ => unreachable!(),
     }
 
