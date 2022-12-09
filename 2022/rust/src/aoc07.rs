@@ -27,11 +27,20 @@ impl Element {
             Break(_) => None,
         }
     }
+
+    fn size(&self) -> u64 {
+        match self {
+            Directory { children } => children.values().map(Element::size).sum(),
+            File { size } => *size,
+        }
+    }
 }
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, u64> for Day07 {
     fn part1(input: I) -> Option<u64> {
-        println!("{:#?}", parse_terminal_output(input)?);
+        let element = parse_terminal_output(input)?;
+        println!("{:#?}", element);
+        println!("{}", element.size());
         todo!()
     }
 
@@ -92,6 +101,7 @@ fn parse_terminal_output<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<El
 
 #[cfg(test)]
 mod tests {
+    use crate::aoc07::parse_terminal_output;
     use std::str::Lines;
 
     use super::{Day, Day07};
@@ -111,8 +121,16 @@ mod tests {
     }
 
     #[test]
+    fn test_size() {
+        assert_eq!(
+            Some(48381165),
+            parse_terminal_output(test_input(INPUT)).map(|element| element.size())
+        );
+    }
+
+    #[test]
     fn test1() {
-        assert_eq!(Some(95437), test_part1(INPUT)); // todo replace expected value
+        assert_eq!(Some(95437), test_part1(INPUT));
     }
 
     #[test]
