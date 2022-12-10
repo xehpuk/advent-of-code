@@ -3,8 +3,39 @@ use super::Day;
 pub struct Day08;
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day08 {
-    fn part1(_input: I) -> Option<i32> {
-        todo!()
+    fn part1(input: I) -> Option<i32> {
+        let forest = input
+            .map(|line| {
+                line.chars()
+                    .map(|tree| tree.to_digit(10).map(|tree| tree as u8))
+                    .collect()
+            })
+            .collect::<Option<Vec<Vec<_>>>>()?;
+
+        let mut trees = 0;
+        for (row, columns) in forest.iter().enumerate() {
+            for (column, &tree) in columns.iter().enumerate() {
+                if !(columns
+                    .iter()
+                    .take(column)
+                    .any(|&neighbor| neighbor >= tree)
+                    && columns
+                        .iter()
+                        .skip(column + 1)
+                        .any(|&neighbor| neighbor >= tree)
+                    && (0..row)
+                        .map(|row| &forest[row])
+                        .any(|row| row[column] >= tree)
+                    && (row + 1..forest.len())
+                        .map(|row| &forest[row])
+                        .any(|row| row[column] >= tree))
+                {
+                    trees += 1;
+                }
+            }
+        }
+
+        Some(trees)
     }
 
     fn part2(_input: I) -> Option<i32> {
