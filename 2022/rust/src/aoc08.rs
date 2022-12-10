@@ -4,13 +4,7 @@ pub struct Day08;
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
     fn part1(input: I) -> Option<usize> {
-        let forest = input
-            .map(|line| {
-                line.chars()
-                    .map(|tree| tree.to_digit(10).map(|tree| tree as u8))
-                    .collect()
-            })
-            .collect::<Option<Vec<Vec<_>>>>()?;
+        let forest = parse_forest(input)?;
 
         Some(
             forest
@@ -47,6 +41,16 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
     }
 }
 
+fn parse_forest<'a, I: Iterator<Item = &'a str>>(input: I) -> Option<Vec<Vec<u8>>> {
+    input
+        .map(|line| {
+            line.chars()
+                .map(|tree| tree.to_digit(10).map(|tree| tree as u8))
+                .collect()
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Day, Day08};
@@ -78,6 +82,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(8), test_part2(INPUT));
     }
 }
