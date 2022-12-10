@@ -2,8 +2,8 @@ use super::Day;
 
 pub struct Day08;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day08 {
-    fn part1(input: I) -> Option<i32> {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
+    fn part1(input: I) -> Option<usize> {
         let forest = input
             .map(|line| {
                 line.chars()
@@ -14,31 +14,32 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day08 {
 
         let mut trees = 0;
         for (row, columns) in forest.iter().enumerate() {
-            for (column, &tree) in columns.iter().enumerate() {
-                if !(columns
-                    .iter()
-                    .take(column)
-                    .any(|&neighbor| neighbor >= tree)
-                    && columns
+            trees += columns
+                .iter()
+                .enumerate()
+                .filter(|&(column, &tree)| {
+                    !(columns
                         .iter()
-                        .skip(column + 1)
+                        .take(column)
                         .any(|&neighbor| neighbor >= tree)
-                    && (0..row)
-                        .map(|row| &forest[row])
-                        .any(|row| row[column] >= tree)
-                    && (row + 1..forest.len())
-                        .map(|row| &forest[row])
-                        .any(|row| row[column] >= tree))
-                {
-                    trees += 1;
-                }
-            }
+                        && columns
+                            .iter()
+                            .skip(column + 1)
+                            .any(|&neighbor| neighbor >= tree)
+                        && (0..row)
+                            .map(|row| &forest[row])
+                            .any(|row| row[column] >= tree)
+                        && (row + 1..forest.len())
+                            .map(|row| &forest[row])
+                            .any(|row| row[column] >= tree))
+                })
+                .count();
         }
 
         Some(trees)
     }
 
-    fn part2(_input: I) -> Option<i32> {
+    fn part2(_input: I) -> Option<usize> {
         todo!()
     }
 }
@@ -59,11 +60,11 @@ mod tests {
         input.lines()
     }
 
-    fn test_part1(input: &str) -> Option<i32> {
+    fn test_part1(input: &str) -> Option<usize> {
         Day08::part1(test_input(input))
     }
 
-    fn test_part2(input: &str) -> Option<i32> {
+    fn test_part2(input: &str) -> Option<usize> {
         Day08::part2(test_input(input))
     }
 
