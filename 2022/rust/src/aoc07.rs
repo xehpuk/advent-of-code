@@ -34,6 +34,26 @@ impl Element {
             File { size } => *size,
         }
     }
+
+    fn sizes(&self) -> Vec<u64> {
+        fn helper(cwd: &Element, sizes: &mut Vec<u64>) -> u64 {
+            match cwd {
+                Directory { children } => {
+                    let size = children
+                        .values()
+                        .map(|element| helper(element, sizes))
+                        .sum();
+                    sizes.push(size);
+
+                    size
+                }
+                File { size } => *size,
+            }
+        }
+        let mut elements = vec![];
+        helper(self, &mut elements);
+        elements
+    }
 }
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, u64> for Day07 {
@@ -41,7 +61,9 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, u64> for Day07 {
         let element = parse_terminal_output(input)?;
         println!("{:#?}", element);
         println!("{}", element.size());
-        todo!()
+        let sizes = element.sizes();
+        println!("{:#?}", sizes);
+        Some(sizes.iter().filter(|&&size| size <= 100_000).sum())
     }
 
     fn part2(_input: I) -> Option<u64> {
