@@ -12,31 +12,34 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
             })
             .collect::<Option<Vec<Vec<_>>>>()?;
 
-        let mut trees = 0;
-        for (row, columns) in forest.iter().enumerate() {
-            trees += columns
+        Some(
+            forest
                 .iter()
                 .enumerate()
-                .filter(|&(column, &tree)| {
-                    !(columns
+                .map(|(row, columns)| {
+                    columns
                         .iter()
-                        .take(column)
-                        .any(|&neighbor| neighbor >= tree)
-                        && columns
-                            .iter()
-                            .skip(column + 1)
-                            .any(|&neighbor| neighbor >= tree)
-                        && (0..row)
-                            .map(|row| &forest[row])
-                            .any(|row| row[column] >= tree)
-                        && (row + 1..forest.len())
-                            .map(|row| &forest[row])
-                            .any(|row| row[column] >= tree))
+                        .enumerate()
+                        .filter(|&(column, &tree)| {
+                            !(columns
+                                .iter()
+                                .take(column)
+                                .any(|&neighbor| neighbor >= tree)
+                                && columns
+                                    .iter()
+                                    .skip(column + 1)
+                                    .any(|&neighbor| neighbor >= tree)
+                                && (0..row)
+                                    .map(|row| &forest[row])
+                                    .any(|row| row[column] >= tree)
+                                && (row + 1..forest.len())
+                                    .map(|row| &forest[row])
+                                    .any(|row| row[column] >= tree))
+                        })
+                        .count()
                 })
-                .count();
-        }
-
-        Some(trees)
+                .sum(),
+        )
     }
 
     fn part2(_input: I) -> Option<usize> {
