@@ -1,5 +1,7 @@
 use super::Day;
 
+use std::cmp::max;
+
 pub struct Day08;
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
@@ -36,8 +38,51 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day08 {
         )
     }
 
-    fn part2(_input: I) -> Option<usize> {
-        todo!()
+    fn part2(input: I) -> Option<usize> {
+        let forest = parse_forest(input)?;
+
+        let mut highest_scenic_score = 0;
+        for (row, columns) in forest.iter().enumerate() {
+            for (column, &tree) in columns.iter().enumerate() {
+                let mut up = 0;
+                for neighbor in (0..row)
+                    .rev()
+                    .map(|row| &forest[row])
+                    .map(|row| row[column])
+                {
+                    up += 1;
+                    if neighbor >= tree {
+                        break;
+                    }
+                }
+                let mut left = 0;
+                for neighbor in (0..column).rev().map(|column| columns[column]) {
+                    left += 1;
+                    if neighbor >= tree {
+                        break;
+                    }
+                }
+                let mut down = 0;
+                for neighbor in (row + 1..forest.len())
+                    .map(|row| &forest[row])
+                    .map(|row| row[column])
+                {
+                    down += 1;
+                    if neighbor >= tree {
+                        break;
+                    }
+                }
+                let mut right = 0;
+                for &neighbor in columns.iter().skip(column + 1) {
+                    right += 1;
+                    if neighbor >= tree {
+                        break;
+                    }
+                }
+                highest_scenic_score = max(highest_scenic_score, up * left * down * right);
+            }
+        }
+        Some(highest_scenic_score)
     }
 }
 
