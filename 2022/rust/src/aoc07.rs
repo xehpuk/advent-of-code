@@ -66,8 +66,13 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, u64> for Day07 {
         Some(sizes.iter().filter(|&&size| size <= 100_000).sum())
     }
 
-    fn part2(_input: I) -> Option<u64> {
-        todo!()
+    fn part2(input: I) -> Option<u64> {
+        let sizes = parse_terminal_output(input)?.sizes();
+        let max = sizes.iter().max()?;
+        let available = 70_000_000 - max;
+        let needed = 30_000_000u64.checked_sub(available)?;
+
+        sizes.into_iter().filter(|&size| size >= needed).min()
     }
 }
 
@@ -157,6 +162,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(24933642), test_part2(INPUT));
     }
 }
