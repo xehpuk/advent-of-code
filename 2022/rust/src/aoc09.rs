@@ -11,6 +11,7 @@ struct Motion {
     steps: i32,
 }
 
+#[derive(Copy, Clone)]
 enum Direction {
     Left,
     Right,
@@ -54,16 +55,49 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day09 {
     fn part1(input: I) -> Option<usize> {
         let mut head = (0, 0);
         let mut tail = (0, 0);
-        let mut tail_positions: HashSet<(i32, i32)> = HashSet::new();
+        let mut tail_positions = HashSet::new();
+
+        tail_positions.insert(tail);
+
+        let mut step = |direction: Direction| match direction {
+            Left => {
+                if tail.0 > head.0 {
+                    tail = (tail.0 - 1, head.1);
+                    tail_positions.insert(tail);
+                }
+                head.0 -= 1;
+            }
+            Right => {
+                if tail.0 < head.0 {
+                    tail = (tail.0 + 1, head.1);
+                    tail_positions.insert(tail);
+                }
+                head.0 += 1;
+            }
+            Up => {
+                if tail.1 < head.1 {
+                    tail = (head.0, tail.1 + 1);
+                    tail_positions.insert(tail);
+                }
+                head.1 += 1;
+            }
+            Down => {
+                if tail.1 > head.1 {
+                    tail = (head.0, tail.1 - 1);
+                    tail_positions.insert(tail);
+                }
+                head.1 -= 1;
+            }
+        };
+
         for motion in input.map(str::parse::<Motion>) {
-            match motion.ok()?.direction {
-                Left => {}
-                Right => {}
-                Up => {}
-                Down => {}
+            let Motion { direction, steps } = motion.ok()?;
+            for _ in 0..steps {
+                step(direction);
             }
         }
-        todo!()
+
+        Some(tail_positions.len())
     }
 
     fn part2(_input: I) -> Option<usize> {
