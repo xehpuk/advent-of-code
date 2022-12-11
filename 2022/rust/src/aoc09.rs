@@ -11,7 +11,7 @@ struct Motion {
     steps: i32,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 enum Direction {
     Left,
     Right,
@@ -108,53 +108,21 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day09 {
         tail_positions.insert(start);
 
         let mut step = |direction: Direction| {
-            let mut head = *rope.first().unwrap();
-            for (i, knot) in rope.iter_mut().enumerate() {
-                match direction {
-                    Left => {
-                        if i == 0 {
-                            knot.0 -= 1;
-                        } else {
-                            let new_x = knot.0 - 1;
-                            if head.0 < new_x {
-                                *knot = (new_x, head.1);
-                            }
-                        }
-                    }
-                    Right => {
-                        if i == 0 {
-                            knot.0 += 1;
-                        } else {
-                            let new_x = knot.0 + 1;
-                            if head.0 > new_x {
-                                *knot = (new_x, head.1);
-                            }
-                        }
-                    }
-                    Up => {
-                        if i == 0 {
-                            knot.1 += 1;
-                        } else {
-                            let new_y = knot.1 + 1;
-                            if head.1 > new_y {
-                                *knot = (head.0, new_y);
-                            }
-                        }
-                    }
-                    Down => {
-                        if i == 0 {
-                            knot.1 -= 1;
-                        } else {
-                            let new_y = knot.1 - 1;
-                            if head.1 < new_y {
-                                *knot = (head.0, new_y);
-                            }
-                        }
-                    }
-                }
-                head = *knot;
+            let mut iter = rope.iter_mut();
+            let mut head = iter.next().unwrap();
+            match direction {
+                Left => head.0 -= 1,
+                Right => head.0 += 1,
+                Up => head.1 += 1,
+                Down => head.1 -= 1,
             }
-            tail_positions.insert(head);
+            for knot in iter {
+                if !are_touching(head, knot) {
+                    *knot = follow(head, knot);
+                }
+                head = knot;
+            }
+            tail_positions.insert(*head);
         };
 
         for motion in input.map(str::parse::<Motion>) {
@@ -164,15 +132,36 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day09 {
             }
         }
 
-        println!("positions: {:?}", tail_positions);
-
         Some(tail_positions.len())
     }
 }
 
+fn are_touching(head: &(i32, i32), tail: &(i32, i32)) -> bool {
+    (head.0 - tail.0).abs() <= 1 && (head.1 - tail.1).abs() <= 1
+}
+
+fn follow(head: &(i32, i32), tail: &(i32, i32)) -> (i32, i32) {
+    let new_x = if head.0 > tail.0 {
+        tail.0 + 1
+    } else if head.0 < tail.0 {
+        tail.0 - 1
+    } else {
+        tail.0
+    };
+    let new_y = if head.1 > tail.1 {
+        tail.1 + 1
+    } else if head.1 < tail.1 {
+        tail.1 - 1
+    } else {
+        tail.1
+    };
+    (new_x, new_y)
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day09};
+    use super::{follow, Day, Day09};
+    use crate::aoc09::are_touching;
     use std::str::Split;
 
     const INPUT1: &str = "R 4,U 4,L 3,D 1,R 4,D 1,L 5,R 2";
@@ -198,5 +187,52 @@ mod tests {
     #[test]
     fn test2() {
         assert_eq!(Some(36), test_part2(INPUT2));
+    }
+
+    #[test]
+    fn test_are_touching() {
+        assert_eq!(false, are_touching(&(2, 2), &(0, 0)));
+        assert_eq!(false, are_touching(&(2, 1), &(0, 0)));
+        assert_eq!(false, are_touching(&(1, 2), &(0, 0)));
+        assert_eq!(false, are_touching(&(-2, -2), &(0, 0)));
+        assert_eq!(false, are_touching(&(-2, -1), &(0, 0)));
+        assert_eq!(false, are_touching(&(-1, -2), &(0, 0)));
+
+        assert_eq!(true, are_touching(&(0, 0), &(0, 0)));
+        assert_eq!(true, are_touching(&(0, 1), &(0, 0)));
+        assert_eq!(true, are_touching(&(1, 0), &(0, 0)));
+        assert_eq!(true, are_touching(&(1, 1), &(0, 0)));
+        assert_eq!(true, are_touching(&(0, -1), &(0, 0)));
+        assert_eq!(true, are_touching(&(-1, 0), &(0, 0)));
+        assert_eq!(true, are_touching(&(-1, -1), &(0, 0)));
+
+        assert_eq!(true, are_touching(&(0, 0), &(-1, -1)));
+        assert_eq!(true, are_touching(&(0, -1), &(-1, -1)));
+        assert_eq!(true, are_touching(&(-1, 0), &(-1, -1)));
+        assert_eq!(true, are_touching(&(-1, -1), &(-1, -1)));
+        assert_eq!(true, are_touching(&(-2, -1), &(-1, -1)));
+        assert_eq!(true, are_touching(&(-1, -2), &(-1, -1)));
+        assert_eq!(true, are_touching(&(-2, -2), &(-1, -1)));
+    }
+
+    #[test]
+    fn test_follow() {
+        assert_eq!((1, 1), follow(&(2, 2), &(0, 0)));
+        assert_eq!((1, 1), follow(&(2, 1), &(0, 0)));
+        assert_eq!((1, 1), follow(&(1, 2), &(0, 0)));
+
+        assert_eq!((-1, -1), follow(&(-2, -2), &(0, 0)));
+        assert_eq!((-1, -1), follow(&(-2, -1), &(0, 0)));
+        assert_eq!((-1, -1), follow(&(-1, -2), &(0, 0)));
+
+        assert_eq!((0, 0), follow(&(1, 1), &(-1, -1)));
+        assert_eq!((0, 0), follow(&(1, 0), &(-1, -1)));
+        assert_eq!((0, 0), follow(&(0, 1), &(-1, -1)));
+
+        assert_eq!((-2, -2), follow(&(-3, -3), &(-1, -1)));
+        assert_eq!((-2, -2), follow(&(-3, -2), &(-1, -1)));
+        assert_eq!((-2, -2), follow(&(-2, -3), &(-1, -1)));
+
+        assert_eq!((-10, -4), follow(&(-11, -4), &(-9, -5)));
     }
 }
