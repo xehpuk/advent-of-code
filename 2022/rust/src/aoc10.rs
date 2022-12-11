@@ -81,8 +81,40 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day10 {
         Some(sum_of_signal_strengths)
     }
 
-    fn part2(_input: I) -> Option<i32> {
-        todo!()
+    fn part2(input: I) -> Option<i32> {
+        let mut x = 1;
+        let mut cycles = 0;
+        let mut crt = "".to_string();
+
+        fn tick<F: FnOnce(&mut i32)>(cycles: &mut i32, crt: &mut String, x: &mut i32, op: F) {
+            *cycles %= 40;
+            *crt += if (*x - 1..=*x + 1).contains(cycles) {
+                "▓"
+            } else {
+                "░"
+            };
+            *cycles += 1;
+            if *cycles == 40 {
+                *crt += "\n";
+            }
+            op(x);
+        }
+
+        for instruction in input.map(str::parse::<Instruction>).map(Result::ok) {
+            match instruction? {
+                Addx(v) => {
+                    tick(&mut cycles, &mut crt, &mut x, noop);
+                    tick(&mut cycles, &mut crt, &mut x, add(v));
+                }
+                Noop => {
+                    tick(&mut cycles, &mut crt, &mut x, noop);
+                }
+            }
+        }
+
+        println!("{}", crt);
+
+        None // todo too lazy to change to String, for now
     }
 }
 
@@ -143,5 +175,12 @@ mod tests {
     #[test]
     fn test2() {
         assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+
+        // ##..##..##..##..##..##..##..##..##..##..
+        // ###...###...###...###...###...###...###.
+        // ####....####....####....####....####....
+        // #####.....#####.....#####.....#####.....
+        // ######......######......######......####
+        // #######.......#######.......#######.....
     }
 }
