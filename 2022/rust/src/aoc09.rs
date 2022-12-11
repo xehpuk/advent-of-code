@@ -100,8 +100,73 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day09 {
         Some(tail_positions.len())
     }
 
-    fn part2(_input: I) -> Option<usize> {
-        todo!()
+    fn part2(input: I) -> Option<usize> {
+        let start = (0, 0);
+        let mut rope = Vec::from([start; 10]);
+        let mut tail_positions: HashSet<(i32, i32)> = HashSet::new();
+
+        tail_positions.insert(start);
+
+        let mut step = |direction: Direction| {
+            let mut head = *rope.first().unwrap();
+            for (i, knot) in rope.iter_mut().enumerate() {
+                match direction {
+                    Left => {
+                        if i == 0 {
+                            knot.0 -= 1;
+                        } else {
+                            let new_x = knot.0 - 1;
+                            if head.0 < new_x {
+                                *knot = (new_x, head.1);
+                            }
+                        }
+                    }
+                    Right => {
+                        if i == 0 {
+                            knot.0 += 1;
+                        } else {
+                            let new_x = knot.0 + 1;
+                            if head.0 > new_x {
+                                *knot = (new_x, head.1);
+                            }
+                        }
+                    }
+                    Up => {
+                        if i == 0 {
+                            knot.1 += 1;
+                        } else {
+                            let new_y = knot.1 + 1;
+                            if head.1 > new_y {
+                                *knot = (head.0, new_y);
+                            }
+                        }
+                    }
+                    Down => {
+                        if i == 0 {
+                            knot.1 -= 1;
+                        } else {
+                            let new_y = knot.1 - 1;
+                            if head.1 < new_y {
+                                *knot = (head.0, new_y);
+                            }
+                        }
+                    }
+                }
+                head = *knot;
+            }
+            tail_positions.insert(head);
+        };
+
+        for motion in input.map(str::parse::<Motion>) {
+            let Motion { direction, steps } = motion.ok()?;
+            for _ in 0..steps {
+                step(direction);
+            }
+        }
+
+        println!("positions: {:?}", tail_positions);
+
+        Some(tail_positions.len())
     }
 }
 
