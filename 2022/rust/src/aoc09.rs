@@ -110,7 +110,8 @@ mod tests {
     use super::{Day, Day09};
     use std::str::Split;
 
-    const INPUT: &str = "R 4,U 4,L 3,D 1,R 4,D 1,L 5,R 2";
+    const INPUT1: &str = "R 4,U 4,L 3,D 1,R 4,D 1,L 5,R 2";
+    const INPUT2: &str = "R 5,U 8,L 8,D 3,R 17,D 10,L 25,U 20";
 
     fn test_input(input: &str) -> Split<char> {
         input.split(',')
@@ -126,11 +127,11 @@ mod tests {
 
     #[test]
     fn test1() {
-        assert_eq!(Some(13), test_part1(INPUT));
+        assert_eq!(Some(13), test_part1(INPUT1));
     }
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(36), test_part2(INPUT2));
     }
 }
