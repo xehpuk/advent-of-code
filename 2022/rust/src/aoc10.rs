@@ -48,13 +48,48 @@ impl FromStr for Instruction {
 }
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day10 {
-    fn part1(_input: I) -> Option<i32> {
-        todo!()
+    fn part1(input: I) -> Option<i32> {
+        let mut x = 1;
+        let mut cycles = 0;
+        let mut sum_of_signal_strengths = 0;
+
+        fn tick<F: FnOnce(&mut i32)>(
+            cycles: &mut i32,
+            sum_of_signal_strengths: &mut i32,
+            x: &mut i32,
+            op: F,
+        ) {
+            *cycles += 1;
+            if *cycles % 40 == 20 {
+                *sum_of_signal_strengths += *cycles * *x;
+            }
+            op(x);
+        }
+
+        for instruction in input.map(str::parse::<Instruction>).map(Result::ok) {
+            match instruction? {
+                Addx(v) => {
+                    tick(&mut cycles, &mut sum_of_signal_strengths, &mut x, noop);
+                    tick(&mut cycles, &mut sum_of_signal_strengths, &mut x, add(v));
+                }
+                Noop => {
+                    tick(&mut cycles, &mut sum_of_signal_strengths, &mut x, noop);
+                }
+            }
+        }
+
+        Some(sum_of_signal_strengths)
     }
 
     fn part2(_input: I) -> Option<i32> {
         todo!()
     }
+}
+
+fn noop(_: &mut i32) {}
+
+fn add(v: i32) -> impl Fn(&mut i32) {
+    move |x| *x += v
 }
 
 #[cfg(test)]
