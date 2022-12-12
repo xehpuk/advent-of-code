@@ -101,13 +101,30 @@ impl FromStr for Monkey {
 }
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day11 {
-    fn part1(_input: I) -> Option<i32> {
+    fn part1(mut input: I) -> Option<i32> {
+        let monkeys = parse_monkeys(&mut input).ok()?;
+
         todo!()
     }
 
     fn part2(_input: I) -> Option<i32> {
         todo!()
     }
+}
+
+fn parse_monkeys<'a>(iter: &mut impl Iterator<Item = &'a str>) -> Result<Vec<Monkey>, MonkeyError> {
+    let mut monkeys = vec![];
+    loop {
+        let monkey_string = iter
+            .take_while(|line| !line.is_empty())
+            .map(|line| line.to_string() + "\n")
+            .collect::<String>();
+        if monkey_string.is_empty() {
+            break;
+        }
+        monkeys.push(monkey_string.parse()?);
+    }
+    Ok(monkeys)
 }
 
 #[cfg(test)]
