@@ -1,4 +1,6 @@
 use super::Day;
+
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::str::FromStr;
 
@@ -141,19 +143,15 @@ fn are_touching(head: &(i32, i32), tail: &(i32, i32)) -> bool {
 }
 
 fn follow(head: &(i32, i32), tail: &(i32, i32)) -> (i32, i32) {
-    let new_x = if head.0 > tail.0 {
-        tail.0 + 1
-    } else if head.0 < tail.0 {
-        tail.0 - 1
-    } else {
-        tail.0
+    let new_x = match head.0.cmp(&tail.0) {
+        Ordering::Less => tail.0 - 1,
+        Ordering::Equal => tail.0,
+        Ordering::Greater => tail.0 + 1,
     };
-    let new_y = if head.1 > tail.1 {
-        tail.1 + 1
-    } else if head.1 < tail.1 {
-        tail.1 - 1
-    } else {
-        tail.1
+    let new_y = match head.1.cmp(&tail.1) {
+        Ordering::Less => tail.1 - 1,
+        Ordering::Equal => tail.1,
+        Ordering::Greater => tail.1 + 1,
     };
     (new_x, new_y)
 }
@@ -191,28 +189,28 @@ mod tests {
 
     #[test]
     fn test_are_touching() {
-        assert_eq!(false, are_touching(&(2, 2), &(0, 0)));
-        assert_eq!(false, are_touching(&(2, 1), &(0, 0)));
-        assert_eq!(false, are_touching(&(1, 2), &(0, 0)));
-        assert_eq!(false, are_touching(&(-2, -2), &(0, 0)));
-        assert_eq!(false, are_touching(&(-2, -1), &(0, 0)));
-        assert_eq!(false, are_touching(&(-1, -2), &(0, 0)));
+        assert!(!are_touching(&(2, 2), &(0, 0)));
+        assert!(!are_touching(&(2, 1), &(0, 0)));
+        assert!(!are_touching(&(1, 2), &(0, 0)));
+        assert!(!are_touching(&(-2, -2), &(0, 0)));
+        assert!(!are_touching(&(-2, -1), &(0, 0)));
+        assert!(!are_touching(&(-1, -2), &(0, 0)));
 
-        assert_eq!(true, are_touching(&(0, 0), &(0, 0)));
-        assert_eq!(true, are_touching(&(0, 1), &(0, 0)));
-        assert_eq!(true, are_touching(&(1, 0), &(0, 0)));
-        assert_eq!(true, are_touching(&(1, 1), &(0, 0)));
-        assert_eq!(true, are_touching(&(0, -1), &(0, 0)));
-        assert_eq!(true, are_touching(&(-1, 0), &(0, 0)));
-        assert_eq!(true, are_touching(&(-1, -1), &(0, 0)));
+        assert!(are_touching(&(0, 0), &(0, 0)));
+        assert!(are_touching(&(0, 1), &(0, 0)));
+        assert!(are_touching(&(1, 0), &(0, 0)));
+        assert!(are_touching(&(1, 1), &(0, 0)));
+        assert!(are_touching(&(0, -1), &(0, 0)));
+        assert!(are_touching(&(-1, 0), &(0, 0)));
+        assert!(are_touching(&(-1, -1), &(0, 0)));
 
-        assert_eq!(true, are_touching(&(0, 0), &(-1, -1)));
-        assert_eq!(true, are_touching(&(0, -1), &(-1, -1)));
-        assert_eq!(true, are_touching(&(-1, 0), &(-1, -1)));
-        assert_eq!(true, are_touching(&(-1, -1), &(-1, -1)));
-        assert_eq!(true, are_touching(&(-2, -1), &(-1, -1)));
-        assert_eq!(true, are_touching(&(-1, -2), &(-1, -1)));
-        assert_eq!(true, are_touching(&(-2, -2), &(-1, -1)));
+        assert!(are_touching(&(0, 0), &(-1, -1)));
+        assert!(are_touching(&(0, -1), &(-1, -1)));
+        assert!(are_touching(&(-1, 0), &(-1, -1)));
+        assert!(are_touching(&(-1, -1), &(-1, -1)));
+        assert!(are_touching(&(-2, -1), &(-1, -1)));
+        assert!(are_touching(&(-1, -2), &(-1, -1)));
+        assert!(are_touching(&(-2, -2), &(-1, -1)));
     }
 
     #[test]
