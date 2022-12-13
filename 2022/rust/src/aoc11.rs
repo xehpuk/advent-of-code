@@ -11,7 +11,7 @@ struct MonkeyError;
 
 #[derive(Debug, PartialEq)]
 enum Operand {
-    Int(i32),
+    Int(i64),
     Old,
 }
 
@@ -64,9 +64,9 @@ impl FromStr for Operation {
 
 #[derive(Debug, PartialEq)]
 struct Monkey {
-    items: Vec<i32>,
+    items: Vec<i64>,
     operation: Operation,
-    test: i32,
+    test: i64,
     if_true: usize,
     if_false: usize,
 }
@@ -79,7 +79,7 @@ impl FromStr for Monkey {
         let items = lines.next().ok_or(MonkeyError)?["  Starting items: ".len()..]
             .split(", ")
             .map(str::parse)
-            .collect::<Result<Vec<i32>, _>>()
+            .collect::<Result<Vec<i64>, _>>()
             .or(Err(MonkeyError))?;
         let operation = lines.next().ok_or(MonkeyError)?.parse::<Operation>()?;
         let test = lines.next().ok_or(MonkeyError)?["  Test: divisible by ".len()..]
@@ -102,8 +102,8 @@ impl FromStr for Monkey {
     }
 }
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day11 {
-    fn part1(mut input: I) -> Option<i32> {
+impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, usize> for Day11 {
+    fn part1(mut input: I) -> Option<usize> {
         let mut monkeys = parse_monkeys(&mut input).ok()?;
         let mut inspections = vec![0; monkeys.len()];
 
@@ -142,16 +142,53 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day11 {
 
         inspections.sort_unstable();
 
-        let mut iter = inspections
-            .iter()
-            .rev()
-            .flat_map(|&inspection| i32::try_from(inspection));
+        let mut iter = inspections.iter().rev();
 
         Some(iter.next()? * iter.next()?)
     }
 
-    fn part2(_input: I) -> Option<i32> {
-        todo!()
+    fn part2(mut input: I) -> Option<usize> {
+        let mut monkeys = parse_monkeys(&mut input).ok()?;
+        let modulo: i64 = monkeys.iter().map(|monkey| monkey.test).product();
+        let mut inspections = vec![0; monkeys.len()];
+
+        for _ in 0..10_000 {
+            for i in 0..monkeys.len() {
+                inspections[i] += monkeys[i].items.len();
+                for mut item in monkeys[i].items.drain(..).collect::<Vec<_>>() {
+                    item = match &monkeys[i].operation {
+                        Operation {
+                            operator: Add {},
+                            operand: Int(summand),
+                        } => item + *summand,
+                        Operation {
+                            operator: Add {},
+                            operand: Old {},
+                        } => item + item,
+                        Operation {
+                            operator: Mul {},
+                            operand: Int(factor),
+                        } => item * *factor,
+                        Operation {
+                            operator: Mul {},
+                            operand: Old {},
+                        } => item * item,
+                    } % modulo;
+                    let test = if item % monkeys[i].test == 0 {
+                        monkeys[i].if_true
+                    } else {
+                        monkeys[i].if_false
+                    };
+                    monkeys[test].items.push(item);
+                }
+            }
+        }
+
+        inspections.sort_unstable();
+
+        let mut iter = inspections.iter().rev();
+
+        Some(iter.next()? * iter.next()?)
     }
 }
 
@@ -182,11 +219,11 @@ mod tests {
         input.lines()
     }
 
-    fn test_part1(input: &str) -> Option<i32> {
+    fn test_part1(input: &str) -> Option<usize> {
         Day11::part1(test_input(input))
     }
 
-    fn test_part2(input: &str) -> Option<i32> {
+    fn test_part2(input: &str) -> Option<usize> {
         Day11::part2(test_input(input))
     }
 
@@ -309,6 +346,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(2713310158), test_part2(INPUT));
     }
 }
