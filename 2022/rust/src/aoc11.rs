@@ -1,6 +1,8 @@
 use super::Day;
 
 use std::str::FromStr;
+use Operand::{Int, Old};
+use Operator::{Add, Mul};
 
 pub struct Day11;
 
@@ -18,8 +20,8 @@ impl FromStr for Operand {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "old" => Ok(Self::Old),
-            _ => Ok(Self::Int(s.parse().or(Err(MonkeyError))?)),
+            "old" => Ok(Old),
+            _ => Ok(Int(s.parse().or(Err(MonkeyError))?)),
         }
     }
 }
@@ -35,8 +37,8 @@ impl FromStr for Operator {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "+" => Ok(Self::Add),
-            "*" => Ok(Self::Mul),
+            "+" => Ok(Add),
+            "*" => Ok(Mul),
             _ => Err(MonkeyError),
         }
     }
@@ -65,8 +67,8 @@ struct Monkey {
     items: Vec<i32>,
     operation: Operation,
     test: i32,
-    if_true: i32,
-    if_false: i32,
+    if_true: usize,
+    if_false: usize,
 }
 
 impl FromStr for Monkey {
@@ -102,9 +104,50 @@ impl FromStr for Monkey {
 
 impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day11 {
     fn part1(mut input: I) -> Option<i32> {
-        let monkeys = parse_monkeys(&mut input).ok()?;
+        let mut monkeys = parse_monkeys(&mut input).ok()?;
+        let mut inspections = vec![0; monkeys.len()];
 
-        todo!()
+        for _ in 0..20 {
+            for i in 0..monkeys.len() {
+                inspections[i] += monkeys[i].items.len();
+                for mut item in monkeys[i].items.drain(..).collect::<Vec<_>>() {
+                    item = match &monkeys[i].operation {
+                        Operation {
+                            operator: Add {},
+                            operand: Int(summand),
+                        } => item + summand,
+                        Operation {
+                            operator: Add {},
+                            operand: Old {},
+                        } => item + item,
+                        Operation {
+                            operator: Mul {},
+                            operand: Int(factor),
+                        } => item * factor,
+                        Operation {
+                            operator: Mul {},
+                            operand: Old {},
+                        } => item * item,
+                    };
+                    item /= 3;
+                    let test = if item % monkeys[i].test == 0 {
+                        monkeys[i].if_true
+                    } else {
+                        monkeys[i].if_false
+                    };
+                    monkeys[test].items.push(item);
+                }
+            }
+        }
+
+        inspections.sort_unstable();
+
+        let mut iter = inspections
+            .iter()
+            .rev()
+            .flat_map(|&inspection| i32::try_from(inspection));
+
+        Some(iter.next()? * iter.next()?)
     }
 
     fn part2(_input: I) -> Option<i32> {
