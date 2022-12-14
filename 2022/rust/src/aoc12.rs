@@ -57,9 +57,67 @@ impl Heightmap {
 
         path.reverse();
 
-        println!("{path:?}");
-
         Some(path.len() as i32)
+    }
+
+    fn get_possible_starting_positions(&self) -> Vec<Position> {
+        self.grid
+            .iter()
+            .filter(|(_, node)| node.height == 0)
+            .map(|(position, _)| *position)
+            .collect()
+    }
+
+    fn find_shortest_path(&mut self) -> Option<i32> {
+        let mut open_set = Vec::new();
+        let mut closed_set = HashSet::new();
+        open_set.push(self.start);
+
+        while !open_set.is_empty() {
+            let current = open_set[0];
+            let mut current_node = self.grid.get(&current)?;
+            for i in 1..open_set.len() {
+                let next = open_set[i];
+                let next_node = self.grid.get(&next)?;
+                if next_node.f_cost() < current_node.f_cost()
+                    || next_node.f_cost() == current_node.f_cost()
+                        && next_node.h_cost < current_node.h_cost
+                {
+                    current_node = next_node;
+                }
+            }
+            let current = current_node.position;
+            open_set.retain(|&node| node != current);
+            closed_set.insert(current);
+
+            if current == self.end {
+                return self.retrace_path();
+            }
+
+            let current_g_cost = current_node.g_cost;
+            for neighbour in self.get_neighbours(current) {
+                if closed_set.contains(&neighbour) {
+                    continue;
+                }
+
+                let new_movement_cost_to_neighbour =
+                    current_g_cost + get_distance(current, neighbour);
+                let neighbour_node = self.grid.get_mut(&neighbour)?;
+
+                if new_movement_cost_to_neighbour < neighbour_node.g_cost
+                    || !open_set.contains(&neighbour)
+                {
+                    neighbour_node.g_cost = new_movement_cost_to_neighbour;
+                    neighbour_node.h_cost = get_distance(neighbour, self.end);
+                    neighbour_node.parent = Some(current);
+                    if !open_set.contains(&neighbour) {
+                        open_set.push(neighbour);
+                    }
+                }
+            }
+        }
+
+        None
     }
 }
 
@@ -132,62 +190,29 @@ impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, i32> for Day12 {
     /// https://youtu.be/mZfyt03LDH4
     /// Sebastian Lague
     /// A* Pathfinding (E03: algorithm implementation)
+    /// todo: https://youtu.be/3Dw5d7PlcTM
     fn part1(input: I) -> Option<i32> {
         let mut heightmap = parse_heightmap(input)?;
 
-        let mut open_set = Vec::new();
-        let mut closed_set = HashSet::new();
-        open_set.push(heightmap.start);
+        heightmap.find_shortest_path()
+    }
 
-        while !open_set.is_empty() {
-            let current = open_set[0];
-            let mut current_node = heightmap.grid.get(&current)?;
-            for i in 1..open_set.len() {
-                let next = open_set[i];
-                let next_node = heightmap.grid.get(&next)?;
-                if next_node.f_cost() < current_node.f_cost()
-                    || next_node.f_cost() == current_node.f_cost()
-                        && next_node.h_cost < current_node.h_cost
-                {
-                    current_node = next_node;
-                }
-            }
-            let current = current_node.position;
-            open_set.retain(|&node| node != current);
-            closed_set.insert(current);
+    fn part2(input: I) -> Option<i32> {
+        let mut heightmap = parse_heightmap(input)?;
+        let mut fewest_steps: Option<i32> = None;
 
-            if current == heightmap.end {
-                return heightmap.retrace_path();
-            }
-
-            let current_g_cost = current_node.g_cost;
-            for neighbour in heightmap.get_neighbours(current) {
-                if closed_set.contains(&neighbour) {
-                    continue;
-                }
-
-                let new_movement_cost_to_neighbour =
-                    current_g_cost + get_distance(current, neighbour);
-                let neighbour_node = heightmap.grid.get_mut(&neighbour)?;
-
-                if new_movement_cost_to_neighbour < neighbour_node.g_cost
-                    || !open_set.contains(&neighbour)
-                {
-                    neighbour_node.g_cost = new_movement_cost_to_neighbour;
-                    neighbour_node.h_cost = get_distance(neighbour, heightmap.end);
-                    neighbour_node.parent = Some(current);
-                    if !open_set.contains(&neighbour) {
-                        open_set.push(neighbour);
-                    }
-                }
+        for start in heightmap.get_possible_starting_positions() {
+            heightmap.start = start;
+            if let Some(steps) = heightmap.find_shortest_path() {
+                fewest_steps = Some(if let Some(fewest) = fewest_steps {
+                    fewest.min(steps)
+                } else {
+                    steps
+                });
             }
         }
 
-        None
-    }
-
-    fn part2(_input: I) -> Option<i32> {
-        todo!()
+        fewest_steps
     }
 }
 
