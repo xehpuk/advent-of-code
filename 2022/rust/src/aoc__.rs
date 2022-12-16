@@ -2,7 +2,10 @@ use super::Day;
 
 pub struct Day__;
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, T> for Day__ {
+impl<'a, I> Day<'a, I, T> for Day__
+where
+    I: Clone + Iterator<Item = &'a str>,
+{
     // todo specify T
     fn part1(_input: I) -> Option<T> {
         todo!()
