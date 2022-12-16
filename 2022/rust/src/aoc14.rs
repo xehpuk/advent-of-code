@@ -120,11 +120,11 @@ where
         for i in 0.. {
             let mut sand = SAND_START;
             loop {
-                let current = sand;
-                sand.1 += 1;
-                if sand.1 > coordinates.y_max {
+                if sand.1 >= coordinates.y_max {
                     return Some(i);
                 }
+                let current = sand;
+                sand.1 += 1;
                 if !coordinates.inner.contains(&sand) {
                     continue;
                 }
@@ -144,8 +144,38 @@ where
         unreachable!()
     }
 
-    fn part2(_input: I) -> Option<u32> {
-        todo!()
+    fn part2(input: I) -> Option<u32> {
+        let mut coordinates = parse_scan(input);
+
+        for i in 0.. {
+            let mut sand = SAND_START;
+            loop {
+                if coordinates.inner.contains(&sand) {
+                    return Some(i);
+                }
+                if sand.1 >= coordinates.y_max + 1 {
+                    coordinates.inner.insert(sand);
+                    break;
+                }
+                let current = sand;
+                sand.1 += 1;
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                sand.0 -= 1;
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                sand.0 += 2;
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                coordinates.inner.insert(current);
+                break;
+            }
+        }
+
+        unreachable!()
     }
 }
 
