@@ -1,4 +1,6 @@
+use std::cmp::{max, min};
 use std::collections::HashSet;
+use std::iter::zip;
 use std::num::ParseIntError;
 use std::str::Split;
 
@@ -8,6 +10,7 @@ pub struct Day14;
 
 type Coordinate = (u32, u32);
 
+#[derive(Clone)]
 struct Path<'a, I>(I)
 where
     I: Iterator<Item = &'a str>;
@@ -46,7 +49,8 @@ where
     I: Clone + Iterator<Item = &'a str>,
 {
     fn part1(input: I) -> Option<u32> {
-        let _coordinates = parse_scan(input);
+        let coordinates = parse_scan(input);
+        println!("{coordinates:?}");
 
         todo!()
     }
@@ -60,13 +64,23 @@ fn parse_scan<'a, I>(input: I) -> HashSet<Coordinate>
 where
     I: Iterator<Item = &'a str>,
 {
-    let coordinates = HashSet::new();
+    let mut coordinates = HashSet::new();
 
     for path in input.map(Path::new) {
-        for point in path.flat_map(Result::ok) {
-            print!("{point:?}")
+        let coordinates_iter = path.flat_map(Result::ok);
+        for ((from_x, from_y), (to_x, to_y)) in
+            zip(coordinates_iter.clone(), coordinates_iter.skip(1))
+        {
+            if from_x == to_x {
+                for y in min(from_y, to_y)..=max(from_y, to_y) {
+                    coordinates.insert((from_x, y));
+                }
+            } else {
+                for x in min(from_x, to_x)..=max(from_x, to_x) {
+                    coordinates.insert((x, from_y));
+                }
+            }
         }
-        println!()
     }
 
     coordinates
