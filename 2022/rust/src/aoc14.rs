@@ -54,11 +54,23 @@ impl Display for Coordinates {
         if self.0.is_empty() {
             return Ok(());
         }
+
         let x_min = self.0.iter().map(|c| c.0).min().unwrap();
         let x_max = self.0.iter().map(|c| c.0).max().unwrap();
         let y_max = self.0.iter().map(|c| c.1).max().unwrap();
 
+        let x_length = number_of_digits(x_max);
         let y_length = number_of_digits(y_max);
+
+        let padding = " ".repeat(y_length + 1);
+
+        for x_i in (0..x_length).map(|i| i as u32).rev() {
+            f.write_str(&padding)?;
+            for x in x_min..=x_max {
+                f.write_char((b'0' + digit_i(x, x_i)) as char)?;
+            }
+            f.write_char('\n')?;
+        }
 
         for y in 0..=y_max {
             f.write_str(&format!("{:>y_length$} ", y))?;
@@ -122,14 +134,18 @@ where
 }
 
 fn number_of_digits(n: u32) -> usize {
-    successors(Some(n), |&n| (n >= 10).then(|| n / 10)).count()
+    successors(Some(n), |&n| (n >= 10).then_some(n / 10)).count()
+}
+
+fn digit_i(n: u32, i: u32) -> u8 {
+    (n % 10u32.pow(i + 1) / 10u32.pow(i)) as u8
 }
 
 #[cfg(test)]
 mod tests {
     use std::str::Lines;
 
-    use super::{number_of_digits, Day, Day14};
+    use super::{digit_i, number_of_digits, Day, Day14};
 
     const INPUT: &str = "\
 498,4 -> 498,6 -> 496,6
@@ -161,6 +177,26 @@ mod tests {
         assert_eq!(4, number_of_digits(1000));
         assert_eq!(4, number_of_digits(1001));
         assert_eq!(10, number_of_digits(u32::MAX));
+    }
+
+    #[test]
+    fn test_digit_i() {
+        assert_eq!(0, digit_i(0, 0));
+        assert_eq!(1, digit_i(1, 0));
+        assert_eq!(9, digit_i(9, 0));
+        assert_eq!(0, digit_i(9, 1));
+
+        assert_eq!(4, digit_i(1234, 0));
+        assert_eq!(3, digit_i(1234, 1));
+        assert_eq!(2, digit_i(1234, 2));
+        assert_eq!(1, digit_i(1234, 3));
+        assert_eq!(0, digit_i(1234, 4));
+
+        assert_eq!(1, digit_i(4321, 0));
+        assert_eq!(2, digit_i(4321, 1));
+        assert_eq!(3, digit_i(4321, 2));
+        assert_eq!(4, digit_i(4321, 3));
+        assert_eq!(0, digit_i(4321, 4));
     }
 
     #[test]
