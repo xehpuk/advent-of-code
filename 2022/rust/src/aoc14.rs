@@ -11,6 +11,8 @@ pub struct Day14;
 
 type Coordinate = (u32, u32);
 
+const SAND_START: Coordinate = (500, 0);
+
 #[derive(Clone)]
 struct Path<'a, I>(I)
 where
@@ -61,7 +63,14 @@ impl Display for Coordinates {
         for y in 0..=y_max {
             f.write_str(&format!("{:>y_length$} ", y))?;
             for x in x_min..=x_max {
-                f.write_char(if self.0.contains(&(x, y)) { '#' } else { '.' })?;
+                let coordinate = (x, y);
+                f.write_char(if coordinate == SAND_START {
+                    '+'
+                } else if self.0.contains(&coordinate) {
+                    '#'
+                } else {
+                    '.'
+                })?;
             }
             f.write_char('\n')?;
         }
