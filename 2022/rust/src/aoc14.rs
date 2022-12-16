@@ -1,9 +1,12 @@
+use std::collections::HashSet;
 use std::num::ParseIntError;
 use std::str::Split;
 
 use super::Day;
 
 pub struct Day14;
+
+type Coordinate = (u32, u32);
 
 struct Path<'a, I>(I)
 where
@@ -19,7 +22,7 @@ impl<'a, I> Iterator for Path<'a, I>
 where
     I: Iterator<Item = &'a str>,
 {
-    type Item = Result<(u32, u32), ParseIntError>;
+    type Item = Result<Coordinate, ParseIntError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut inner = self.0.next()?.split(',');
@@ -38,20 +41,35 @@ where
     }
 }
 
-impl<'a, I: Clone + Iterator<Item = &'a str>> Day<'a, I, u32> for Day14 {
+impl<'a, I> Day<'a, I, u32> for Day14
+where
+    I: Clone + Iterator<Item = &'a str>,
+{
     fn part1(input: I) -> Option<u32> {
-        for path in input.map(Path::new) {
-            for point in path.flat_map(Result::ok) {
-                print!("{point:?}")
-            }
-            println!()
-        }
+        let _coordinates = parse_scan(input);
+
         todo!()
     }
 
     fn part2(_input: I) -> Option<u32> {
         todo!()
     }
+}
+
+fn parse_scan<'a, I>(input: I) -> HashSet<Coordinate>
+where
+    I: Iterator<Item = &'a str>,
+{
+    let coordinates = HashSet::new();
+
+    for path in input.map(Path::new) {
+        for point in path.flat_map(Result::ok) {
+            print!("{point:?}")
+        }
+        println!()
+    }
+
+    coordinates
 }
 
 #[cfg(test)]
