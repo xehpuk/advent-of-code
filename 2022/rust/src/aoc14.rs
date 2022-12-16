@@ -153,7 +153,7 @@ where
                 if coordinates.inner.contains(&sand) {
                     return Some(i);
                 }
-                if sand.1 >= coordinates.y_max + 1 {
+                if sand.1 > coordinates.y_max {
                     coordinates.inner.insert(sand);
                     break;
                 }
