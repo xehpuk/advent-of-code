@@ -47,38 +47,57 @@ where
     }
 }
 
-struct Coordinates(HashSet<Coordinate>);
+struct Coordinates {
+    inner: HashSet<Coordinate>,
+    x_min: u32,
+    x_max: u32,
+    y_max: u32,
+}
+
+impl Coordinates {
+    fn new(inner: HashSet<Coordinate>) -> Self {
+        let x_min = inner.iter().map(|c| c.0).min().unwrap();
+        let x_max = inner.iter().map(|c| c.0).max().unwrap();
+        let y_max = inner.iter().map(|c| c.1).max().unwrap();
+
+        Coordinates {
+            inner,
+            x_min,
+            x_max,
+            y_max,
+        }
+    }
+}
 
 impl Display for Coordinates {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.0.is_empty() {
-            return Ok(());
-        }
+        let Self {
+            inner,
+            x_min,
+            x_max,
+            y_max,
+        } = self;
 
-        let x_min = self.0.iter().map(|c| c.0).min().unwrap();
-        let x_max = self.0.iter().map(|c| c.0).max().unwrap();
-        let y_max = self.0.iter().map(|c| c.1).max().unwrap();
-
-        let x_length = number_of_digits(x_max);
-        let y_length = number_of_digits(y_max);
+        let x_length = number_of_digits(*x_max);
+        let y_length = number_of_digits(*y_max);
 
         let padding = " ".repeat(y_length + 1);
 
         for x_i in (0..x_length).map(|i| i as u32).rev() {
             f.write_str(&padding)?;
-            for x in x_min..=x_max {
+            for x in *x_min..=*x_max {
                 f.write_char((b'0' + digit_i(x, x_i)) as char)?;
             }
             f.write_char('\n')?;
         }
 
-        for y in 0..=y_max {
+        for y in 0..=*y_max {
             f.write_str(&format!("{:>y_length$} ", y))?;
-            for x in x_min..=x_max {
+            for x in *x_min..=*x_max {
                 let coordinate = (x, y);
                 f.write_char(if coordinate == SAND_START {
                     '+'
-                } else if self.0.contains(&coordinate) {
+                } else if inner.contains(&coordinate) {
                     '#'
                 } else {
                     '.'
@@ -96,10 +115,34 @@ where
     I: Clone + Iterator<Item = &'a str>,
 {
     fn part1(input: I) -> Option<u32> {
-        let coordinates = parse_scan(input);
+        let mut coordinates = parse_scan(input);
         println!("{coordinates}");
 
-        todo!()
+        for i in 0.. {
+            let mut sand = SAND_START;
+            loop {
+                let current = sand;
+                sand.1 += 1;
+                if sand.1 > coordinates.y_max {
+                    return Some(i);
+                }
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                sand.0 -= 1;
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                sand.0 += 2;
+                if !coordinates.inner.contains(&sand) {
+                    continue;
+                }
+                coordinates.inner.insert(current);
+                break;
+            }
+        }
+
+        unreachable!()
     }
 
     fn part2(_input: I) -> Option<u32> {
@@ -130,7 +173,7 @@ where
         }
     }
 
-    Coordinates(coordinates)
+    Coordinates::new(coordinates)
 }
 
 fn number_of_digits(n: u32) -> usize {
