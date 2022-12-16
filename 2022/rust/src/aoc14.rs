@@ -184,6 +184,7 @@ mod tests {
         assert_eq!(0, digit_i(0, 0));
         assert_eq!(1, digit_i(1, 0));
         assert_eq!(9, digit_i(9, 0));
+        assert_eq!(0, digit_i(0, 1));
         assert_eq!(0, digit_i(9, 1));
 
         assert_eq!(4, digit_i(1234, 0));
