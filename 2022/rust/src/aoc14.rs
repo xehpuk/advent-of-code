@@ -116,7 +116,6 @@ where
 {
     fn part1(input: I) -> Option<u32> {
         let mut coordinates = parse_scan(input);
-        println!("{coordinates}");
 
         for i in 0.. {
             let mut sand = SAND_START;
@@ -250,6 +249,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(93), test_part2(INPUT));
     }
 }
