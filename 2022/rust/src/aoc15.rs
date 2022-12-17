@@ -1,10 +1,9 @@
+use std::collections::HashSet;
 use std::str::FromStr;
 
 use super::Day;
 
 pub struct Day15;
-
-const Y: i32 = if cfg!(test) { 10 } else { 2_000_000 };
 
 type Position = (i32, i32);
 
@@ -44,6 +43,13 @@ impl FromStr for Reading {
     }
 }
 
+impl Day15 {
+    // part 1
+    const Y: i32 = if cfg!(test) { 10 } else { 2_000_000 };
+    // part 2
+    const MAX: i32 = if cfg!(test) { 20 } else { 4_000_000 };
+}
+
 impl<'a, I> Day<'a, I, usize> for Day15
 where
     I: Clone + Iterator<Item = &'a str>,
@@ -55,14 +61,19 @@ where
             .map(|r| r.map(|r| (manhattan_distance(&r.sensor, &r.beacon), r)))
             .collect::<Option<Vec<_>>>()?;
 
+        let beacons = readings
+            .iter()
+            .map(|(_, r)| r.beacon)
+            .collect::<HashSet<_>>();
+
         let x_min = readings.iter().map(|(d, r)| r.sensor.0 - *d as i32).min()?;
         let x_max = readings.iter().map(|(d, r)| r.sensor.0 + *d as i32).max()?;
 
         Some(
             (x_min..=x_max)
-                .map(|x| (x, Y) as Position)
+                .map(|x| (x, Self::Y) as Position)
                 .filter(|p| {
-                    readings.iter().all(|(_, r)| *p != r.beacon)
+                    !beacons.contains(p)
                         && readings
                             .iter()
                             .any(|(d, r)| manhattan_distance(p, &r.sensor) <= *d)
@@ -71,8 +82,23 @@ where
         )
     }
 
-    fn part2(_input: I) -> Option<usize> {
-        todo!()
+    fn part2(input: I) -> Option<usize> {
+        let readings = input
+            .map(str::parse::<Reading>)
+            .map(Result::ok)
+            .map(|r| r.map(|r| (manhattan_distance(&r.sensor, &r.beacon), r)))
+            .collect::<Option<Vec<_>>>()?;
+
+        // O(x * y * r), too slow
+        let beacon = (0..=Self::MAX)
+            .flat_map(|x| (0..=Self::MAX).map(move |y| (x, y) as Position))
+            .find(|p| {
+                readings
+                    .iter()
+                    .all(|(d, r)| manhattan_distance(p, &r.sensor) > *d)
+            })?;
+
+        Some((beacon.0 * 4_000_000 + beacon.1) as usize)
     }
 }
 
@@ -164,6 +190,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(56000011), test_part2(INPUT));
     }
 }
