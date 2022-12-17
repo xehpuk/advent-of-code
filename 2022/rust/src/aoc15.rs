@@ -42,15 +42,33 @@ impl FromStr for Reading {
     }
 }
 
-impl<'a, I> Day<'a, I, u32> for Day15
+impl<'a, I> Day<'a, I, usize> for Day15
 where
     I: Clone + Iterator<Item = &'a str>,
 {
-    fn part1(_input: I) -> Option<u32> {
-        todo!()
+    fn part1(input: I) -> Option<usize> {
+        let readings = input
+            .map(str::parse::<Reading>)
+            .map(Result::ok)
+            .map(|r| r.map(|r| (manhattan_distance(&r.sensor, &r.beacon), r)))
+            .collect::<Option<Vec<_>>>()?;
+
+        let x_min = readings.iter().map(|(d, r)| r.sensor.0 - *d as i32).min()?;
+        let x_max = readings.iter().map(|(d, r)| r.sensor.0 + *d as i32).max()?;
+
+        Some(
+            (x_min..=x_max)
+                .map(|x| (x, 10) as Position)
+                .filter(|p| {
+                    readings
+                        .iter()
+                        .all(|(d, r)| *p != r.beacon && manhattan_distance(p, &r.sensor) <= *d)
+                })
+                .count(),
+        )
     }
 
-    fn part2(_input: I) -> Option<u32> {
+    fn part2(_input: I) -> Option<usize> {
         todo!()
     }
 }
@@ -71,11 +89,11 @@ mod tests {
         input.lines()
     }
 
-    fn test_part1(input: &str) -> Option<u32> {
+    fn test_part1(input: &str) -> Option<usize> {
         Day15::part1(test_input(input))
     }
 
-    fn test_part2(input: &str) -> Option<u32> {
+    fn test_part2(input: &str) -> Option<usize> {
         Day15::part2(test_input(input))
     }
 
