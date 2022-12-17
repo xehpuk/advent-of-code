@@ -4,6 +4,8 @@ use super::Day;
 
 pub struct Day15;
 
+const Y: i32 = if cfg!(test) { 10 } else { 2_000_000 };
+
 type Position = (i32, i32);
 
 #[derive(Debug, PartialEq)]
@@ -58,11 +60,12 @@ where
 
         Some(
             (x_min..=x_max)
-                .map(|x| (x, 10) as Position)
+                .map(|x| (x, Y) as Position)
                 .filter(|p| {
-                    readings
-                        .iter()
-                        .all(|(d, r)| *p != r.beacon && manhattan_distance(p, &r.sensor) <= *d)
+                    readings.iter().all(|(_, r)| *p != r.beacon)
+                        && readings
+                            .iter()
+                            .any(|(d, r)| manhattan_distance(p, &r.sensor) <= *d)
                 })
                 .count(),
         )
