@@ -1,3 +1,4 @@
+use std::cmp::{max, min};
 use std::collections::HashSet;
 use std::str::FromStr;
 
@@ -86,19 +87,60 @@ where
         let readings = input
             .map(str::parse::<Reading>)
             .map(Result::ok)
-            .map(|r| r.map(|r| (manhattan_distance(&r.sensor, &r.beacon), r)))
+            .map(|r| r.map(|r| (manhattan_distance(&r.sensor, &r.beacon), r.sensor)))
             .collect::<Option<Vec<_>>>()?;
 
-        // O(x * y * r), too slow
-        let beacon = (0..=Self::MAX)
-            .flat_map(|x| (0..=Self::MAX).map(move |y| (x, y) as Position))
-            .find(|p| {
-                readings
-                    .iter()
-                    .all(|(d, r)| manhattan_distance(p, &r.sensor) > *d)
-            })?;
+        let check = |x, y| {
+            let p = (x, y);
+            if readings.iter().all(|(d, r)| manhattan_distance(r, &p) > *d) {
+                return Some(p.0 as usize * 4_000_000 + p.1 as usize);
+            }
+            None
+        };
 
-        Some((beacon.0 * 4_000_000 + beacon.1) as usize)
+        for (distance, sensor) in &readings {
+            let distance = *distance as i32;
+            for x in max(0, sensor.0)..=min(Self::MAX, sensor.0 + 1 + distance) {
+                let x_i = x - sensor.0;
+
+                let y_min = sensor.1 + x_i - 1 - distance;
+                if y_min < 0 {
+                    continue;
+                }
+                if let Some(result) = check(x, y_min) {
+                    return Some(result);
+                }
+
+                let y_max = sensor.1 - x_i + 1 + distance;
+                if y_max > Self::MAX {
+                    break;
+                }
+                if let Some(result) = check(x, y_max) {
+                    return Some(result);
+                }
+            }
+            for x in max(0, sensor.0 - distance - 1)..=min(Self::MAX, sensor.0 - 1) {
+                let x_i = x - (sensor.0 - distance - 1);
+
+                let y_min = sensor.1 - x_i;
+                if y_min < 0 {
+                    continue;
+                }
+                if let Some(result) = check(x, y_min) {
+                    return Some(result);
+                }
+
+                let y_max = sensor.1 + x_i;
+                if y_max > Self::MAX {
+                    break;
+                }
+                if let Some(result) = check(x, y_max) {
+                    return Some(result);
+                }
+            }
+        }
+
+        None
     }
 }
 
