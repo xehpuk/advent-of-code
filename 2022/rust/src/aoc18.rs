@@ -14,6 +14,14 @@ struct LavaDroplet {
 
 struct LavaDropletError;
 
+impl LavaDroplet {
+    fn touches(&self, other: &LavaDroplet) -> bool {
+        self.x == other.x && self.y == other.y && self.z.abs_diff(other.z) == 1
+            || self.x == other.x && self.z == other.z && self.y.abs_diff(other.y) == 1
+            || self.y == other.y && self.z == other.z && self.x.abs_diff(other.x) == 1
+    }
+}
+
 impl TryFrom<&[u8]> for LavaDroplet {
     type Error = LavaDropletError;
 
@@ -54,8 +62,17 @@ where
             .map(Result::ok)
             .collect::<Option<HashSet<_>>>()?;
 
-        println!("{lava_droplets:?}");
-        todo!()
+        Some(
+            lava_droplets
+                .iter()
+                .map(|lava_droplet| {
+                    6 - lava_droplets
+                        .iter()
+                        .filter(|other| lava_droplet.touches(other))
+                        .count()
+                })
+                .sum(),
+        )
     }
 
     fn part2(_input: I) -> Option<usize> {
