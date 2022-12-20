@@ -1,12 +1,60 @@
+use std::collections::HashSet;
+use std::str::FromStr;
+
 use super::Day;
 
 pub struct Day18;
+
+#[derive(Debug, Eq, Hash, PartialEq)]
+struct LavaDroplet {
+    x: u8,
+    y: u8,
+    z: u8,
+}
+
+struct LavaDropletError;
+
+impl TryFrom<&[u8]> for LavaDroplet {
+    type Error = LavaDropletError;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        if value.len() != 3 {
+            return Err(LavaDropletError);
+        }
+
+        Ok(Self {
+            x: value[0],
+            y: value[1],
+            z: value[2],
+        })
+    }
+}
+
+impl FromStr for LavaDroplet {
+    type Err = LavaDropletError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let droplet_parts = s
+            .splitn(3, ',')
+            .map(|s| s.parse::<u8>())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| LavaDropletError)?;
+
+        droplet_parts.as_slice().try_into()
+    }
+}
 
 impl<'a, I> Day<'a, I, usize> for Day18
 where
     I: Clone + Iterator<Item = &'a str>,
 {
-    fn part1(_input: I) -> Option<usize> {
+    fn part1(input: I) -> Option<usize> {
+        let lava_droplets = input
+            .map(str::parse::<LavaDroplet>)
+            .map(Result::ok)
+            .collect::<Option<HashSet<_>>>()?;
+
+        println!("{lava_droplets:?}");
         todo!()
     }
 
