@@ -104,9 +104,9 @@ where
                 .iter()
                 .map(LavaDroplet::neighbors)
                 .map(|neighbors| {
-                    6 - neighbors
+                    neighbors
                         .iter()
-                        .filter(|neighbor| lava_droplets.contains(neighbor))
+                        .filter(|neighbor| !lava_droplets.contains(neighbor))
                         .count()
                 })
                 .sum(),
