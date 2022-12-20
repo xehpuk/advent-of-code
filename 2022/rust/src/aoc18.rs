@@ -15,10 +15,47 @@ struct LavaDroplet {
 struct LavaDropletError;
 
 impl LavaDroplet {
-    fn touches(&self, other: &LavaDroplet) -> bool {
+    fn _touches(&self, other: &LavaDroplet) -> bool {
         self.x == other.x && self.y == other.y && self.z.abs_diff(other.z) == 1
             || self.x == other.x && self.z == other.z && self.y.abs_diff(other.y) == 1
             || self.y == other.y && self.z == other.z && self.x.abs_diff(other.x) == 1
+    }
+
+    fn neighbors(&self) -> Vec<Self> {
+        let mut neighbors = Vec::with_capacity(6);
+
+        neighbors.push(Self {
+            z: self.z + 1,
+            ..*self
+        });
+        neighbors.push(Self {
+            y: self.y + 1,
+            ..*self
+        });
+        neighbors.push(Self {
+            x: self.x + 1,
+            ..*self
+        });
+        if self.z > 0 {
+            neighbors.push(Self {
+                z: self.z - 1,
+                ..*self
+            });
+        }
+        if self.y > 0 {
+            neighbors.push(Self {
+                y: self.y - 1,
+                ..*self
+            });
+        }
+        if self.x > 0 {
+            neighbors.push(Self {
+                x: self.x - 1,
+                ..*self
+            });
+        }
+
+        neighbors
     }
 }
 
@@ -65,10 +102,11 @@ where
         Some(
             lava_droplets
                 .iter()
-                .map(|lava_droplet| {
-                    6 - lava_droplets
+                .map(LavaDroplet::neighbors)
+                .map(|neighbors| {
+                    6 - neighbors
                         .iter()
-                        .filter(|other| lava_droplet.touches(other))
+                        .filter(|neighbor| lava_droplets.contains(neighbor))
                         .count()
                 })
                 .sum(),
