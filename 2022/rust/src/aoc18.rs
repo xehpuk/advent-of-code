@@ -170,14 +170,33 @@ where
 
         let mut exterior_air_cubes = HashSet::<Cube>::new();
         let mut queue = vec![lava_droplet.cube_min.clone()];
+
         while !queue.is_empty() {
             let current = queue.pop()?;
             let neighbors = current.neighbors();
             exterior_air_cubes.insert(current);
-            todo!()
+
+            for neighbor in neighbors {
+                if exterior_air_cubes.contains(&neighbor)
+                    || lava_droplet.cubes.contains(&neighbor)
+                    || !(neighbor >= lava_droplet.cube_min)
+                    || !(neighbor <= lava_droplet.cube_max)
+                {
+                    continue;
+                }
+                exterior_air_cubes.insert(neighbor.clone());
+                queue.push(neighbor);
+            }
         }
 
-        todo!()
+        Some(
+            lava_droplet
+                .cubes
+                .iter()
+                .flat_map(Cube::neighbors)
+                .filter(|neighbor| exterior_air_cubes.contains(neighbor))
+                .count(),
+        )
     }
 }
 
