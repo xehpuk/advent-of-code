@@ -7,9 +7,9 @@ pub struct Day18;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
 struct LavaDroplet {
-    x: u8,
-    y: u8,
-    z: u8,
+    x: i8,
+    y: i8,
+    z: i8,
 }
 
 struct LavaDropletError;
@@ -36,33 +36,27 @@ impl LavaDroplet {
             x: self.x + 1,
             ..*self
         });
-        if self.z > 0 {
-            neighbors.push(Self {
-                z: self.z - 1,
-                ..*self
-            });
-        }
-        if self.y > 0 {
-            neighbors.push(Self {
-                y: self.y - 1,
-                ..*self
-            });
-        }
-        if self.x > 0 {
-            neighbors.push(Self {
-                x: self.x - 1,
-                ..*self
-            });
-        }
+        neighbors.push(Self {
+            z: self.z - 1,
+            ..*self
+        });
+        neighbors.push(Self {
+            y: self.y - 1,
+            ..*self
+        });
+        neighbors.push(Self {
+            x: self.x - 1,
+            ..*self
+        });
 
         neighbors
     }
 }
 
-impl TryFrom<&[u8]> for LavaDroplet {
+impl TryFrom<&[i8]> for LavaDroplet {
     type Error = LavaDropletError;
 
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(value: &[i8]) -> Result<Self, Self::Error> {
         if value.len() != 3 {
             return Err(LavaDropletError);
         }
@@ -81,7 +75,7 @@ impl FromStr for LavaDroplet {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let droplet_parts = s
             .splitn(3, ',')
-            .map(|s| s.parse::<u8>())
+            .map(|s| s.parse::<i8>())
             .collect::<Result<Vec<_>, _>>()
             .map_err(|_| LavaDropletError)?;
 
@@ -94,28 +88,30 @@ where
     I: Clone + Iterator<Item = &'a str>,
 {
     fn part1(input: I) -> Option<usize> {
-        let lava_droplets = input
-            .map(str::parse::<LavaDroplet>)
-            .map(Result::ok)
-            .collect::<Option<HashSet<_>>>()?;
+        let lava_droplets = parse_lava_droplets(input)?;
 
         Some(
             lava_droplets
                 .iter()
-                .map(LavaDroplet::neighbors)
-                .map(|neighbors| {
-                    neighbors
-                        .iter()
-                        .filter(|neighbor| !lava_droplets.contains(neighbor))
-                        .count()
-                })
-                .sum(),
+                .flat_map(LavaDroplet::neighbors)
+                .filter(|neighbor| !lava_droplets.contains(neighbor))
+                .count(),
         )
     }
 
     fn part2(_input: I) -> Option<usize> {
         todo!()
     }
+}
+
+fn parse_lava_droplets<'a, I>(input: I) -> Option<HashSet<LavaDroplet>>
+where
+    I: Clone + Iterator<Item = &'a str>,
+{
+    input
+        .map(str::parse::<LavaDroplet>)
+        .map(Result::ok)
+        .collect()
 }
 
 #[cfg(test)]
