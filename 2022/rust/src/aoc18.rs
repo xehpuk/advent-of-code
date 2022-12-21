@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::str::FromStr;
 
@@ -5,7 +6,7 @@ use super::Day;
 
 pub struct Day18;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Cube {
     x: i8,
     y: i8,
@@ -95,6 +96,21 @@ impl FromStr for Cube {
     }
 }
 
+impl PartialOrd for Cube {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.x == other.x && self.y == other.y && self.z == other.z {
+            return Some(Ordering::Equal);
+        }
+        if self.x <= other.x && self.y <= other.y && self.z <= other.z {
+            return Some(Ordering::Less);
+        }
+        if self.x >= other.x && self.y >= other.y && self.z >= other.z {
+            return Some(Ordering::Greater);
+        }
+        None
+    }
+}
+
 impl<'a, I> TryFrom<InputWrapper<'a, I>> for LavaDroplet
 where
     I: Iterator<Item = &'a str>,
@@ -115,12 +131,12 @@ where
         };
         for cube in value.0.map(str::parse::<Cube>) {
             let cube = cube?;
-            cube_min.x = cube_min.x.min(cube.x);
-            cube_min.y = cube_min.y.min(cube.y);
-            cube_min.z = cube_min.z.min(cube.z);
-            cube_max.x = cube_max.x.max(cube.x);
-            cube_max.y = cube_max.y.max(cube.y);
-            cube_max.z = cube_max.z.max(cube.z);
+            cube_min.x = cube_min.x.min(cube.x - 1);
+            cube_min.y = cube_min.y.min(cube.y - 1);
+            cube_min.z = cube_min.z.min(cube.z - 1);
+            cube_max.x = cube_max.x.max(cube.x + 1);
+            cube_max.y = cube_max.y.max(cube.y + 1);
+            cube_max.z = cube_max.z.max(cube.z + 1);
             cubes.insert(cube);
         }
 
@@ -149,14 +165,26 @@ where
         )
     }
 
-    fn part2(_input: I) -> Option<usize> {
+    fn part2(input: I) -> Option<usize> {
+        let lava_droplet: LavaDroplet = InputWrapper(input).try_into().ok()?;
+
+        let mut exterior_air_cubes = HashSet::<Cube>::new();
+        let mut queue = vec![lava_droplet.cube_min.clone()];
+        while !queue.is_empty() {
+            let current = queue.pop()?;
+            let neighbors = current.neighbors();
+            exterior_air_cubes.insert(current);
+            todo!()
+        }
+
         todo!()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day18};
+    use super::{Cube, Day, Day18};
+    use std::cmp::Ordering;
     use std::str::Lines;
 
     const INPUT: &str = include_str!("../../18_test.txt");
@@ -171,6 +199,74 @@ mod tests {
 
     fn test_part2(input: &str) -> Option<usize> {
         Day18::part2(test_input(input))
+    }
+
+    #[test]
+    fn test_partial_cmp() {
+        assert_eq!(
+            Some(Ordering::Equal),
+            Cube { x: 0, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Equal),
+            Cube { x: 1, y: 0, z: 0 }.partial_cmp(&Cube { x: 1, y: 0, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Equal),
+            Cube { x: 0, y: 1, z: 0 }.partial_cmp(&Cube { x: 0, y: 1, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Equal),
+            Cube { x: 0, y: 0, z: 1 }.partial_cmp(&Cube { x: 0, y: 0, z: 1 })
+        );
+        assert_eq!(
+            Some(Ordering::Less),
+            Cube { x: 0, y: 0, z: 0 }.partial_cmp(&Cube { x: 1, y: 0, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Less),
+            Cube { x: 0, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 1, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Less),
+            Cube { x: 0, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 1 })
+        );
+        assert_eq!(
+            Some(Ordering::Greater),
+            Cube { x: 1, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Greater),
+            Cube { x: 0, y: 1, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 0 })
+        );
+        assert_eq!(
+            Some(Ordering::Greater),
+            Cube { x: 0, y: 0, z: 1 }.partial_cmp(&Cube { x: 0, y: 0, z: 0 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 1, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 1, z: 0 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 1, y: 0, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 1 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 0, y: 1, z: 0 }.partial_cmp(&Cube { x: 1, y: 0, z: 0 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 0, y: 1, z: 0 }.partial_cmp(&Cube { x: 0, y: 0, z: 1 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 0, y: 0, z: 1 }.partial_cmp(&Cube { x: 1, y: 0, z: 0 })
+        );
+        assert_eq!(
+            None,
+            Cube { x: 0, y: 0, z: 1 }.partial_cmp(&Cube { x: 0, y: 1, z: 0 })
+        );
     }
 
     #[test]
