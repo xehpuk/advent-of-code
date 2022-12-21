@@ -6,16 +6,28 @@ use super::Day;
 pub struct Day18;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
-struct LavaDroplet {
+struct Cube {
     x: i8,
     y: i8,
     z: i8,
 }
 
+#[derive(Debug)]
+struct LavaDroplet {
+    cubes: HashSet<Cube>,
+    cube_min: Cube,
+    cube_max: Cube,
+}
+
+/// https://github.com/rust-lang/rust/issues/50133
+struct InputWrapper<'a, I>(I)
+where
+    I: Iterator<Item = &'a str>;
+
 struct LavaDropletError;
 
-impl LavaDroplet {
-    fn _touches(&self, other: &LavaDroplet) -> bool {
+impl Cube {
+    fn _touches(&self, other: &Cube) -> bool {
         self.x == other.x && self.y == other.y && self.z.abs_diff(other.z) == 1
             || self.x == other.x && self.z == other.z && self.y.abs_diff(other.y) == 1
             || self.y == other.y && self.z == other.z && self.x.abs_diff(other.x) == 1
@@ -53,7 +65,7 @@ impl LavaDroplet {
     }
 }
 
-impl TryFrom<&[i8]> for LavaDroplet {
+impl TryFrom<&[i8]> for Cube {
     type Error = LavaDropletError;
 
     fn try_from(value: &[i8]) -> Result<Self, Self::Error> {
@@ -69,7 +81,7 @@ impl TryFrom<&[i8]> for LavaDroplet {
     }
 }
 
-impl FromStr for LavaDroplet {
+impl FromStr for Cube {
     type Err = LavaDropletError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -83,18 +95,56 @@ impl FromStr for LavaDroplet {
     }
 }
 
+impl<'a, I> TryFrom<InputWrapper<'a, I>> for LavaDroplet
+where
+    I: Iterator<Item = &'a str>,
+{
+    type Error = LavaDropletError;
+
+    fn try_from(value: InputWrapper<'a, I>) -> Result<Self, Self::Error> {
+        let mut cubes = HashSet::new();
+        let mut cube_min = Cube {
+            x: i8::MAX,
+            y: i8::MAX,
+            z: i8::MAX,
+        };
+        let mut cube_max = Cube {
+            x: i8::MIN,
+            y: i8::MIN,
+            z: i8::MIN,
+        };
+        for cube in value.0.map(str::parse::<Cube>) {
+            let cube = cube?;
+            cube_min.x = cube_min.x.min(cube.x);
+            cube_min.y = cube_min.y.min(cube.y);
+            cube_min.z = cube_min.z.min(cube.z);
+            cube_max.x = cube_max.x.max(cube.x);
+            cube_max.y = cube_max.y.max(cube.y);
+            cube_max.z = cube_max.z.max(cube.z);
+            cubes.insert(cube);
+        }
+
+        Ok(LavaDroplet {
+            cubes,
+            cube_min,
+            cube_max,
+        })
+    }
+}
+
 impl<'a, I> Day<'a, I, usize> for Day18
 where
     I: Clone + Iterator<Item = &'a str>,
 {
     fn part1(input: I) -> Option<usize> {
-        let lava_droplets = parse_lava_droplets(input)?;
+        let lava_droplet: LavaDroplet = InputWrapper(input).try_into().ok()?;
 
         Some(
-            lava_droplets
+            lava_droplet
+                .cubes
                 .iter()
-                .flat_map(LavaDroplet::neighbors)
-                .filter(|neighbor| !lava_droplets.contains(neighbor))
+                .flat_map(Cube::neighbors)
+                .filter(|neighbor| !lava_droplet.cubes.contains(neighbor))
                 .count(),
         )
     }
@@ -102,16 +152,6 @@ where
     fn part2(_input: I) -> Option<usize> {
         todo!()
     }
-}
-
-fn parse_lava_droplets<'a, I>(input: I) -> Option<HashSet<LavaDroplet>>
-where
-    I: Clone + Iterator<Item = &'a str>,
-{
-    input
-        .map(str::parse::<LavaDroplet>)
-        .map(Result::ok)
-        .collect()
 }
 
 #[cfg(test)]
