@@ -32,8 +32,39 @@ where
         .collect()
 }
 
-fn decrypt_numbers(_numbers: &mut Vec<IndexedNumber>) {
-    todo!()
+fn decrypt_numbers(numbers: &mut [IndexedNumber]) {
+    let len = numbers.len();
+    for i in 0..len {
+        let (i_old, shift) = numbers[i];
+        if shift == 0 {
+            continue;
+        }
+        let mut i_new = i_old as i32 + shift;
+        // element wraps around
+        if i_new <= 0 {
+            i_new -= 1;
+        } else if i_new >= len as i32 {
+            i_new += 1;
+        }
+        let i_new = i_new.rem_euclid(len as i32) as usize;
+        if i_new < i_old {
+            // element moved to front; move others backward
+            for n in numbers.iter_mut() {
+                if (i_new..i_old).contains(&n.0) {
+                    n.0 += 1;
+                }
+            }
+        } else {
+            // element moved to back; move others forward
+            for n in numbers.iter_mut() {
+                if (i_old + 1..=i_new).contains(&n.0) {
+                    n.0 -= 1;
+                }
+            }
+        }
+        // last but not least: set new position of element itself
+        numbers[i].0 = i_new;
+    }
 }
 
 fn unenumerate<T, K>(numbers: &[(K, T)]) -> Vec<T>
