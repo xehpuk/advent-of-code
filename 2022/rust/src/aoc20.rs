@@ -36,8 +36,10 @@ fn decrypt_numbers(_numbers: &mut Vec<IndexedNumber>) {
     todo!()
 }
 
-fn unenumerate(_numbers: &[IndexedNumber]) -> Vec<i32> {
-    todo!()
+fn unenumerate(numbers: &[IndexedNumber]) -> Vec<i32> {
+    let mut numbers = numbers.to_vec();
+    numbers.sort_by_key(|n| n.0);
+    numbers.into_iter().map(|n| n.1).collect()
 }
 
 fn find_grove_coordinates(_numbers: &[i32]) -> Option<i32> {
