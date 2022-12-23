@@ -46,8 +46,16 @@ where
     numbers.into_iter().map(|n| n.1).collect()
 }
 
-fn find_grove_coordinates(_numbers: &[i32]) -> Option<i32> {
-    todo!()
+fn find_grove_coordinates(numbers: &[i32]) -> Option<i32> {
+    let zero_index = numbers.iter().position(|&n| n == 0)?;
+
+    Some(
+        [1000, 2000, 3000]
+            .map(|i| (zero_index + i) % numbers.len())
+            .map(|i| numbers[i])
+            .into_iter()
+            .sum(),
+    )
 }
 
 #[cfg(test)]
