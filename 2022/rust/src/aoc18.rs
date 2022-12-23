@@ -29,34 +29,32 @@ struct LavaDropletError;
 
 impl Cube {
     fn neighbors(&self) -> Vec<Self> {
-        let mut neighbors = Vec::with_capacity(6);
-
-        neighbors.push(Self {
-            z: self.z + 1,
-            ..*self
-        });
-        neighbors.push(Self {
-            y: self.y + 1,
-            ..*self
-        });
-        neighbors.push(Self {
-            x: self.x + 1,
-            ..*self
-        });
-        neighbors.push(Self {
-            z: self.z - 1,
-            ..*self
-        });
-        neighbors.push(Self {
-            y: self.y - 1,
-            ..*self
-        });
-        neighbors.push(Self {
-            x: self.x - 1,
-            ..*self
-        });
-
-        neighbors
+        vec![
+            Self {
+                z: self.z + 1,
+                ..*self
+            },
+            Self {
+                y: self.y + 1,
+                ..*self
+            },
+            Self {
+                x: self.x + 1,
+                ..*self
+            },
+            Self {
+                z: self.z - 1,
+                ..*self
+            },
+            Self {
+                y: self.y - 1,
+                ..*self
+            },
+            Self {
+                x: self.x - 1,
+                ..*self
+            },
+        ]
     }
 }
 
