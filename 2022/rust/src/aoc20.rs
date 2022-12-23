@@ -36,9 +36,13 @@ fn decrypt_numbers(_numbers: &mut Vec<IndexedNumber>) {
     todo!()
 }
 
-fn unenumerate(numbers: &[IndexedNumber]) -> Vec<i32> {
+fn unenumerate<T, K>(numbers: &[(K, T)]) -> Vec<T>
+where
+    T: Clone,
+    K: Clone + Ord,
+{
     let mut numbers = numbers.to_vec();
-    numbers.sort_by_key(|n| n.0);
+    numbers.sort_unstable_by_key(|n| n.0.clone());
     numbers.into_iter().map(|n| n.1).collect()
 }
 
