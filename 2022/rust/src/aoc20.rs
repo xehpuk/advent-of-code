@@ -33,38 +33,42 @@ where
 }
 
 fn decrypt_numbers(numbers: &mut [IndexedNumber]) {
-    let len = numbers.len();
-    for i in 0..len {
-        let (i_old, shift) = numbers[i];
-        if shift == 0 {
-            continue;
-        }
-        let mut i_new = i_old as i32 + shift;
-        // element wraps around
-        if i_new <= 0 {
-            i_new -= 1;
-        } else if i_new >= len as i32 {
-            i_new += 1;
-        }
-        let i_new = i_new.rem_euclid(len as i32) as usize;
-        if i_new < i_old {
-            // element moved to front; move others backward
-            for n in numbers.iter_mut() {
-                if (i_new..i_old).contains(&n.0) {
-                    n.0 += 1;
-                }
-            }
-        } else {
-            // element moved to back; move others forward
-            for n in numbers.iter_mut() {
-                if (i_old + 1..=i_new).contains(&n.0) {
-                    n.0 -= 1;
-                }
-            }
-        }
-        // last but not least: set new position of element itself
-        numbers[i].0 = i_new;
+    for i in 0..numbers.len() {
+        decrypt_number_at(numbers, i);
     }
+}
+
+fn decrypt_number_at(numbers: &mut [IndexedNumber], i: usize) {
+    let len = numbers.len();
+    let (i_old, shift) = numbers[i];
+    if shift == 0 {
+        return;
+    }
+    let mut i_new = i_old as i32 + shift;
+    // element wraps around
+    if i_new <= 0 {
+        i_new -= 1;
+    } else if i_new >= len as i32 {
+        i_new += 1;
+    }
+    let i_new = i_new.rem_euclid(len as i32) as usize;
+    if i_new < i_old {
+        // element moved to front; move others backward
+        for n in numbers.iter_mut() {
+            if (i_new..i_old).contains(&n.0) {
+                n.0 += 1;
+            }
+        }
+    } else {
+        // element moved to back; move others forward
+        for n in numbers.iter_mut() {
+            if (i_old + 1..=i_new).contains(&n.0) {
+                n.0 -= 1;
+            }
+        }
+    }
+    // last but not least: set new position of element itself
+    numbers[i].0 = i_new;
 }
 
 fn unenumerate<T, K>(numbers: &[(K, T)]) -> Vec<T>
@@ -91,7 +95,10 @@ fn find_grove_coordinates(numbers: &[i32]) -> Option<i32> {
 
 #[cfg(test)]
 mod tests {
-    use super::{decrypt_numbers, find_grove_coordinates, parse_numbers, unenumerate, Day, Day20};
+    use super::{
+        decrypt_number_at, decrypt_numbers, find_grove_coordinates, parse_numbers, unenumerate,
+        Day, Day20,
+    };
     use std::str::Split;
 
     const INPUT: &str = "1,2,-3,3,-2,0,4";
@@ -118,6 +125,25 @@ mod tests {
     fn test_decrypt_numbers() {
         let mut numbers = parse_numbers(test_input(INPUT)).expect("Input unparsable!");
         decrypt_numbers(&mut numbers);
+        assert_eq!(vec![1, 2, -3, 4, 0, 3, -2], unenumerate(&numbers));
+    }
+
+    #[test]
+    fn test_decrypt_number_at() {
+        let mut numbers = parse_numbers(test_input(INPUT)).expect("Input unparsable!");
+        decrypt_number_at(&mut numbers, 0);
+        assert_eq!(vec![2, 1, -3, 3, -2, 0, 4], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 1);
+        assert_eq!(vec![1, -3, 2, 3, -2, 0, 4], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 2);
+        assert_eq!(vec![1, 2, 3, -2, -3, 0, 4], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 3);
+        assert_eq!(vec![1, 2, -2, -3, 0, 3, 4], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 4);
+        assert_eq!(vec![1, 2, -3, 0, 3, 4, -2], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 5);
+        assert_eq!(vec![1, 2, -3, 0, 3, 4, -2], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 6);
         assert_eq!(vec![1, 2, -3, 4, 0, 3, -2], unenumerate(&numbers));
     }
 
