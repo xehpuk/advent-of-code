@@ -48,7 +48,7 @@ fn decrypt_number_at(numbers: &mut [IndexedNumber], i: usize) {
     // element wraps around
     if i_new <= 0 {
         i_new -= 1;
-    } else if i_new >= len as i32 {
+    } else if i_new + 1 >= len as i32 {
         i_new += 1;
     }
     let i_new = i_new.rem_euclid(len as i32) as usize;
@@ -145,6 +145,30 @@ mod tests {
         assert_eq!(vec![1, 2, -3, 0, 3, 4, -2], unenumerate(&numbers));
         decrypt_number_at(&mut numbers, 6);
         assert_eq!(vec![1, 2, -3, 4, 0, 3, -2], unenumerate(&numbers));
+
+        numbers = parse_numbers(test_input("3")).unwrap();
+        decrypt_number_at(&mut numbers, 0);
+        assert_eq!(vec![3], unenumerate(&numbers));
+
+        numbers = parse_numbers(test_input("-3")).unwrap();
+        decrypt_number_at(&mut numbers, 0);
+        assert_eq!(vec![-3], unenumerate(&numbers));
+
+        numbers = parse_numbers(test_input("-3,-2,-1,0,1,2,3")).unwrap();
+        decrypt_number_at(&mut numbers, 0);
+        assert_eq!(vec![-2, -1, 0, -3, 1, 2, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 1);
+        assert_eq!(vec![-1, 0, -3, 1, -2, 2, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 2);
+        assert_eq!(vec![0, -3, 1, -2, 2, -1, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 3);
+        assert_eq!(vec![0, -3, 1, -2, 2, -1, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 4);
+        assert_eq!(vec![0, -3, -2, 1, 2, -1, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 5);
+        assert_eq!(vec![2, 0, -3, -2, 1, -1, 3], unenumerate(&numbers));
+        decrypt_number_at(&mut numbers, 6);
+        assert_eq!(vec![2, 0, -3, 3, -2, 1, -1], unenumerate(&numbers));
     }
 
     #[test]
