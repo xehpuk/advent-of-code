@@ -11,6 +11,7 @@ where
     fn part1(input: I) -> Option<i32> {
         let mut numbers = parse_numbers(input)?;
         decrypt_numbers(&mut numbers);
+        let numbers = unenumerate(&numbers);
         find_grove_coordinates(&numbers)
     }
 
@@ -35,13 +36,17 @@ fn decrypt_numbers(_numbers: &mut Vec<IndexedNumber>) {
     todo!()
 }
 
-fn find_grove_coordinates(_numbers: &[IndexedNumber]) -> Option<i32> {
+fn unenumerate(_numbers: &[IndexedNumber]) -> Vec<i32> {
+    todo!()
+}
+
+fn find_grove_coordinates(_numbers: &[i32]) -> Option<i32> {
     todo!()
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day20};
+    use super::{decrypt_numbers, find_grove_coordinates, parse_numbers, unenumerate, Day, Day20};
     use std::str::Split;
 
     const INPUT: &str = "1,2,-3,3,-2,0,4";
@@ -56,6 +61,27 @@ mod tests {
 
     fn test_part2(input: &str) -> Option<i32> {
         Day20::part2(test_input(input))
+    }
+
+    #[test]
+    fn test_unenumerate() {
+        let numbers = parse_numbers(test_input(INPUT)).expect("Input unparsable!");
+        assert_eq!(vec![1, 2, -3, 3, -2, 0, 4], unenumerate(&numbers));
+    }
+
+    #[test]
+    fn test_decrypt_numbers() {
+        let mut numbers = parse_numbers(test_input(INPUT)).expect("Input unparsable!");
+        decrypt_numbers(&mut numbers);
+        assert_eq!(vec![1, 2, -3, 4, 0, 3, -2], unenumerate(&numbers));
+    }
+
+    #[test]
+    fn test_find_grove_coordinates() {
+        assert_eq!(
+            Some(3),
+            find_grove_coordinates(&vec![1, 2, -3, 4, 0, 3, -2])
+        );
     }
 
     #[test]
