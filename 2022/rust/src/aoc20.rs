@@ -2,17 +2,41 @@ use super::Day;
 
 pub struct Day20;
 
+type IndexedNumber = (usize, i32);
+
 impl<'a, I> Day<'a, I, i32> for Day20
 where
     I: Clone + Iterator<Item = &'a str>,
 {
-    fn part1(_input: I) -> Option<i32> {
-        todo!()
+    fn part1(input: I) -> Option<i32> {
+        let mut numbers = parse_numbers(input)?;
+        decrypt_numbers(&mut numbers);
+        find_grove_coordinates(&numbers)
     }
 
     fn part2(_input: I) -> Option<i32> {
         todo!()
     }
+}
+
+fn parse_numbers<'a, I>(input: I) -> Option<Vec<IndexedNumber>>
+where
+    I: Clone + Iterator<Item = &'a str>,
+{
+    input
+        .map(str::parse::<i32>)
+        .map(Result::ok)
+        .enumerate()
+        .map(|(i, n)| n.map(|n| (i, n)))
+        .collect()
+}
+
+fn decrypt_numbers(_numbers: &mut Vec<IndexedNumber>) {
+    todo!()
+}
+
+fn find_grove_coordinates(_numbers: &[IndexedNumber]) -> Option<i32> {
+    todo!()
 }
 
 #[cfg(test)]
