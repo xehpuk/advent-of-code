@@ -28,12 +28,6 @@ where
 struct LavaDropletError;
 
 impl Cube {
-    fn _touches(&self, other: &Cube) -> bool {
-        self.x == other.x && self.y == other.y && self.z.abs_diff(other.z) == 1
-            || self.x == other.x && self.z == other.z && self.y.abs_diff(other.y) == 1
-            || self.y == other.y && self.z == other.z && self.x.abs_diff(other.x) == 1
-    }
-
     fn neighbors(&self) -> Vec<Self> {
         let mut neighbors = Vec::with_capacity(6);
 
