@@ -2,20 +2,21 @@ use super::Day;
 
 pub struct Day20;
 
-type IndexedNumber = (usize, i32);
+type Number = i32;
+type IndexedNumber = (usize, Number);
 
-impl<'a, I> Day<'a, I, i32> for Day20
+impl<'a, I> Day<'a, I, Number> for Day20
 where
     I: Clone + Iterator<Item = &'a str>,
 {
-    fn part1(input: I) -> Option<i32> {
+    fn part1(input: I) -> Option<Number> {
         let mut numbers = parse_numbers(input)?;
         decrypt_numbers(&mut numbers);
         let numbers = unenumerate(&numbers);
         find_grove_coordinates(&numbers)
     }
 
-    fn part2(_input: I) -> Option<i32> {
+    fn part2(_input: I) -> Option<Number> {
         todo!()
     }
 }
@@ -25,7 +26,7 @@ where
     I: Clone + Iterator<Item = &'a str>,
 {
     input
-        .map(str::parse::<i32>)
+        .map(str::parse::<Number>)
         .map(Result::ok)
         .enumerate()
         .map(|(i, n)| n.map(|n| (i, n)))
@@ -44,7 +45,7 @@ fn decrypt_number_at(numbers: &mut [IndexedNumber], i: usize) {
     if shift == 0 {
         return;
     }
-    let i_new = (i_old as i32 + shift).rem_euclid(len as i32 - 1) as usize;
+    let i_new = (i_old as Number + shift).rem_euclid(len as Number - 1) as usize;
     if i_new < i_old {
         // element moved to front; move others backward
         for n in numbers.iter_mut() {
@@ -74,7 +75,7 @@ where
     numbers.into_iter().map(|n| n.1).collect()
 }
 
-fn find_grove_coordinates(numbers: &[i32]) -> Option<i32> {
+fn find_grove_coordinates(numbers: &[Number]) -> Option<Number> {
     let zero_index = numbers.iter().position(|&n| n == 0)?;
 
     Some(
@@ -90,7 +91,7 @@ fn find_grove_coordinates(numbers: &[i32]) -> Option<i32> {
 mod tests {
     use super::{
         decrypt_number_at, decrypt_numbers, find_grove_coordinates, parse_numbers, unenumerate,
-        Day, Day20,
+        Day, Day20, Number,
     };
     use std::str::Split;
 
@@ -100,11 +101,11 @@ mod tests {
         input.split(',')
     }
 
-    fn test_part1(input: &str) -> Option<i32> {
+    fn test_part1(input: &str) -> Option<Number> {
         Day20::part1(test_input(input))
     }
 
-    fn test_part2(input: &str) -> Option<i32> {
+    fn test_part2(input: &str) -> Option<Number> {
         Day20::part2(test_input(input))
     }
 
@@ -195,6 +196,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(1623178306), test_part2(INPUT));
     }
 }
