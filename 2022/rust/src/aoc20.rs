@@ -2,8 +2,10 @@ use super::Day;
 
 pub struct Day20;
 
-type Number = i32;
+type Number = i64;
 type IndexedNumber = (usize, Number);
+
+const DECRYPTION_KEY: Number = 811_589_153;
 
 impl<'a, I> Day<'a, I, Number> for Day20
 where
@@ -16,8 +18,14 @@ where
         find_grove_coordinates(&numbers)
     }
 
-    fn part2(_input: I) -> Option<Number> {
-        todo!()
+    fn part2(input: I) -> Option<Number> {
+        let mut numbers = parse_numbers(input)?;
+        multiply_numbers(&mut numbers);
+        for _ in 0..10 {
+            decrypt_numbers(&mut numbers);
+        }
+        let numbers = unenumerate(&numbers);
+        find_grove_coordinates(&numbers)
     }
 }
 
@@ -31,6 +39,12 @@ where
         .enumerate()
         .map(|(i, n)| n.map(|n| (i, n)))
         .collect()
+}
+
+fn multiply_numbers(numbers: &mut [IndexedNumber]) {
+    for n in numbers.iter_mut() {
+        n.1 *= DECRYPTION_KEY;
+    }
 }
 
 fn decrypt_numbers(numbers: &mut [IndexedNumber]) {
