@@ -44,8 +44,10 @@ where
     fn part2(input: I) -> Option<Number> {
         let monkeys = parse_monkeys(input)?;
 
+        // todo: improve performance by making "contains" return the call chain (or empty)
+        // but it's ~15ms for the whole day anyway
         match monkeys.get(ROOT_NAME)? {
-            Job::Const(_) => return None,
+            Job::Const(_) => None,
             Job::Expr(operation) => {
                 let (known_operand, unknown_operand) = {
                     if contains(&monkeys, &operation.first_operand, MY_NAME) {
@@ -54,12 +56,11 @@ where
                         (&operation.first_operand, &operation.second_operand)
                     }
                 };
-                println!("known: {known_operand}");
-                println!("unknown: {unknown_operand}");
-            }
-        };
+                let known_job = do_job(&monkeys, known_operand)?;
 
-        todo!()
+                find_unknown(&monkeys, unknown_operand, known_job)
+            }
+        }
     }
 }
 
@@ -124,6 +125,46 @@ fn contains(monkeys: &HashMap<String, Job>, monkey: &str, needle: &str) -> bool 
                     || contains(monkeys, &operation.second_operand, needle)
             }
             None => false,
+        }
+    }
+}
+
+fn find_unknown(
+    monkeys: &HashMap<String, Job>,
+    monkey: &str,
+    needed_job: Number,
+) -> Option<Number> {
+    match monkeys.get(monkey)? {
+        Job::Const(_) => Some(needed_job),
+        Job::Expr(operation) => {
+            let (known_operand, unknown_operand) = {
+                if contains(&monkeys, &operation.first_operand, MY_NAME) {
+                    (&operation.second_operand, &operation.first_operand)
+                } else {
+                    (&operation.first_operand, &operation.second_operand)
+                }
+            };
+            let known_job = do_job(&monkeys, known_operand)?;
+            let needed_job = match operation.operator {
+                Operator::Add => needed_job - known_job,
+                Operator::Sub => {
+                    if known_operand == &operation.first_operand {
+                        known_job - needed_job
+                    } else {
+                        needed_job + known_job
+                    }
+                }
+                Operator::Mul => needed_job / known_job,
+                Operator::Div => {
+                    if known_operand == &operation.first_operand {
+                        known_job / needed_job
+                    } else {
+                        needed_job * known_job
+                    }
+                }
+            };
+
+            find_unknown(&monkeys, unknown_operand, needed_job)
         }
     }
 }
