@@ -4,7 +4,7 @@ use super::Day;
 
 pub struct Day21;
 
-type Number = i32;
+type Number = i64;
 
 const NAME_LEN: usize = 4;
 
@@ -36,9 +36,7 @@ where
     fn part1(input: I) -> Option<Number> {
         let monkeys = parse_monkeys(input)?;
 
-        println!("{monkeys:#?}");
-
-        todo!()
+        do_job(&monkeys, "root")
     }
 
     fn part2(_input: I) -> Option<Number> {
@@ -80,6 +78,22 @@ fn parse_monkey(s: &str) -> Option<(String, Job)> {
         let number = s.parse::<Number>().ok()?;
         Some((name, Job::Const(number)))
     }
+}
+
+fn do_job(monkeys: &HashMap<String, Job>, monkey: &str) -> Option<Number> {
+    Some(match monkeys.get(monkey)? {
+        Job::Const(number) => *number,
+        Job::Expr(operation) => {
+            let first_job = do_job(monkeys, &operation.first_operand)?;
+            let second_job = do_job(monkeys, &operation.second_operand)?;
+            match operation.operator {
+                Operator::Add => first_job + second_job,
+                Operator::Sub => first_job - second_job,
+                Operator::Mul => first_job * second_job,
+                Operator::Div => first_job / second_job,
+            }
+        }
+    })
 }
 
 #[cfg(test)]
