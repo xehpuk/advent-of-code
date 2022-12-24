@@ -7,6 +7,8 @@ pub struct Day21;
 type Number = i64;
 
 const NAME_LEN: usize = 4;
+const ROOT_NAME: &str = "root";
+const MY_NAME: &str = "humn";
 
 #[derive(Debug)]
 enum Job {
@@ -36,10 +38,27 @@ where
     fn part1(input: I) -> Option<Number> {
         let monkeys = parse_monkeys(input)?;
 
-        do_job(&monkeys, "root")
+        do_job(&monkeys, ROOT_NAME)
     }
 
-    fn part2(_input: I) -> Option<Number> {
+    fn part2(input: I) -> Option<Number> {
+        let monkeys = parse_monkeys(input)?;
+
+        match monkeys.get(ROOT_NAME)? {
+            Job::Const(_) => return None,
+            Job::Expr(operation) => {
+                let (known_operand, unknown_operand) = {
+                    if contains(&monkeys, &operation.first_operand, MY_NAME) {
+                        (&operation.second_operand, &operation.first_operand)
+                    } else {
+                        (&operation.first_operand, &operation.second_operand)
+                    }
+                };
+                println!("known: {known_operand}");
+                println!("unknown: {unknown_operand}");
+            }
+        };
+
         todo!()
     }
 }
@@ -96,9 +115,22 @@ fn do_job(monkeys: &HashMap<String, Job>, monkey: &str) -> Option<Number> {
     })
 }
 
+fn contains(monkeys: &HashMap<String, Job>, monkey: &str, needle: &str) -> bool {
+    monkey == needle || {
+        match monkeys.get(monkey) {
+            Some(Job::Const(_)) => false,
+            Some(Job::Expr(operation)) => {
+                contains(monkeys, &operation.first_operand, needle)
+                    || contains(monkeys, &operation.second_operand, needle)
+            }
+            None => false,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day21, Number};
+    use super::{contains, parse_monkeys, Day, Day21, Number, MY_NAME, ROOT_NAME};
     use std::str::Lines;
 
     const INPUT: &str = include_str!("../../21_test.txt");
@@ -118,6 +150,27 @@ mod tests {
     #[test]
     fn test1() {
         assert_eq!(Some(152), test_part1(INPUT));
+    }
+
+    #[test]
+    fn test_contains() {
+        let monkeys = parse_monkeys(test_input(INPUT)).expect("Input unparsable!");
+
+        assert!(contains(&monkeys, ROOT_NAME, MY_NAME));
+        assert!(!contains(&monkeys, "sjmn", MY_NAME));
+        assert!(!contains(&monkeys, "drzm", MY_NAME));
+        assert!(!contains(&monkeys, "hmdt", MY_NAME));
+        assert!(!contains(&monkeys, "zczc", MY_NAME));
+        assert!(!contains(&monkeys, "dbpl", MY_NAME));
+        assert!(contains(&monkeys, "pppw", MY_NAME));
+        assert!(contains(&monkeys, "cczh", MY_NAME));
+        assert!(!contains(&monkeys, "sllz", MY_NAME));
+        assert!(contains(&monkeys, "lgvd", MY_NAME));
+        assert!(!contains(&monkeys, "ljgn", MY_NAME));
+        assert!(contains(&monkeys, "ptdq", MY_NAME));
+        assert!(contains(&monkeys, "humn", MY_NAME));
+        assert!(!contains(&monkeys, "dvpt", MY_NAME));
+        assert!(!contains(&monkeys, "lfqf", MY_NAME));
     }
 
     #[test]
