@@ -122,6 +122,6 @@ mod tests {
 
     #[test]
     fn test2() {
-        assert_eq!(None, test_part2(INPUT)); // todo replace expected value
+        assert_eq!(Some(301), test_part2(INPUT));
     }
 }
