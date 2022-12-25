@@ -78,11 +78,20 @@ fn y_max(elves: &HashSet<Elf>) -> Option<Coord> {
 
 #[cfg(test)]
 mod tests {
-    use super::{count_empty_tiles, parse_elves, Day, Day23, Number};
+    use super::{count_empty_tiles, parse_elves, spread_out, Day, Day23, Number};
     use std::collections::HashSet;
     use std::str::Lines;
 
     const INPUT: &str = include_str!("../../23_test.txt");
+    const INPUTS: [&str; 7] = [
+        include_str!("../../23_test.00.txt"),
+        include_str!("../../23_test.01.txt"),
+        include_str!("../../23_test.02.txt"),
+        include_str!("../../23_test.03.txt"),
+        include_str!("../../23_test.04.txt"),
+        include_str!("../../23_test.05.txt"),
+        include_str!("../../23_test.10.txt"),
+    ];
 
     fn test_input(input: &str) -> Lines {
         input.lines()
@@ -125,6 +134,27 @@ mod tests {
             ])),
             parse_elves(test_input(INPUT))
         );
+    }
+
+    #[test]
+    fn test_spread_out() {
+        let mut elves = parse_elves(test_input(INPUTS[0])).unwrap();
+        spread_out(&mut elves, 0);
+        assert_eq!(parse_elves(test_input(INPUTS[1])).unwrap(), elves);
+        spread_out(&mut elves, 1);
+        assert_eq!(parse_elves(test_input(INPUTS[2])).unwrap(), elves);
+        spread_out(&mut elves, 2);
+        assert_eq!(parse_elves(test_input(INPUTS[3])).unwrap(), elves);
+        spread_out(&mut elves, 3);
+        assert_eq!(parse_elves(test_input(INPUTS[4])).unwrap(), elves);
+        spread_out(&mut elves, 4);
+        assert_eq!(parse_elves(test_input(INPUTS[5])).unwrap(), elves);
+        spread_out(&mut elves, 5);
+        spread_out(&mut elves, 6);
+        spread_out(&mut elves, 7);
+        spread_out(&mut elves, 8);
+        spread_out(&mut elves, 9);
+        assert_eq!(parse_elves(test_input(INPUTS[6])).unwrap(), elves);
     }
 
     #[test]
