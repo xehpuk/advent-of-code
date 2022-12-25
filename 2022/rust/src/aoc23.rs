@@ -1,4 +1,6 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
+use std::fmt::Write;
 
 use super::Day;
 
@@ -8,6 +10,7 @@ type Number = usize;
 type Coord = i32;
 type Elf = (Coord, Coord);
 
+#[derive(Debug)]
 enum Direction {
     North,
     South,
@@ -21,6 +24,24 @@ const DIRECTIONS: [Direction; 4] = [
     Direction::West,
     Direction::East,
 ];
+
+struct Elves<'a>(&'a HashSet<Elf>);
+
+impl<'a> Display for Elves<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let (Some(x_min), Some(x_max), Some(y_min), Some(y_max)) =
+            (x_min(self.0), x_max(self.0), y_min(self.0), y_max(self.0))
+        {
+            for y in y_min..=y_max {
+                for x in x_min..=x_max {
+                    f.write_char(if self.0.contains(&(x, y)) { '#' } else { '.' })?;
+                }
+                f.write_char('\n')?;
+            }
+        }
+        Ok(())
+    }
+}
 
 impl<'a, I> Day<'a, I, Number> for Day23
 where
@@ -60,7 +81,25 @@ where
 }
 
 fn spread_out(elves: &mut HashSet<Elf>, round: usize) {
-    todo!()
+    let mut propositions = HashMap::<Elf, Vec<_>>::new();
+    for elf in elves.iter().filter(|elf| has_neighbor(elves, elf)) {
+        for direction in (0..DIRECTIONS.len())
+            .map(|d| (d + round) % DIRECTIONS.len())
+            .map(|d| &DIRECTIONS[d])
+        {
+            let new_position = new_position(elves, elf, direction);
+            if &new_position != elf {
+                propositions.entry(new_position).or_default().push(*elf);
+                break;
+            }
+        }
+    }
+    for (proposition, candidates) in propositions {
+        if candidates.len() == 1 {
+            elves.remove(&candidates[0]);
+            elves.insert(proposition);
+        }
+    }
 }
 
 fn has_neighbor(elves: &HashSet<Elf>, elf: &Elf) -> bool {
@@ -70,11 +109,43 @@ fn has_neighbor(elves: &HashSet<Elf>, elf: &Elf) -> bool {
         .any(|neighbor| elves.contains(&neighbor))
 }
 
+fn new_position(elves: &HashSet<Elf>, elf: &Elf, direction: &Direction) -> Elf {
+    if !match direction {
+        // "have" to collect, or else:
+        // error[E0308]: `match` arms have incompatible types
+        //    = note: no two closures, even if identical, have the same type
+        //    = help: consider boxing your closure and/or using it as a trait object
+        Direction::North => (elf.0 - 1..=elf.0 + 1)
+            .map(|x| (x, elf.1 - 1))
+            .collect::<Vec<_>>(),
+        Direction::South => (elf.0 - 1..=elf.0 + 1)
+            .map(|x| (x, elf.1 + 1))
+            .collect::<Vec<_>>(),
+        Direction::West => (elf.1 - 1..=elf.1 + 1)
+            .map(|y| (elf.0 - 1, y))
+            .collect::<Vec<_>>(),
+        Direction::East => (elf.1 - 1..=elf.1 + 1)
+            .map(|y| (elf.0 + 1, y))
+            .collect::<Vec<_>>(),
+    }
+    .iter()
+    .any(|neighbor| elves.contains(neighbor))
+    {
+        match direction {
+            Direction::North => (elf.0, elf.1 - 1),
+            Direction::South => (elf.0, elf.1 + 1),
+            Direction::West => (elf.0 - 1, elf.1),
+            Direction::East => (elf.0 + 1, elf.1),
+        }
+    } else {
+        *elf
+    }
+}
+
 fn count_empty_tiles(elves: &HashSet<Elf>) -> usize {
     if let (Some(x_min), Some(x_max), Some(y_min), Some(y_max)) =
         (x_min(elves), x_max(elves), y_min(elves), y_max(elves))
     {
-        println!("({x_min}, {y_min}), ({x_max}, {y_max})");
         ((x_max - x_min + 1) * (y_max - y_min + 1)) as usize - elves.len()
     } else {
         0
