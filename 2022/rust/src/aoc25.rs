@@ -11,7 +11,7 @@ where
     fn part1(input: I) -> Option<Snafu> {
         input
             .map(snafu_to_decimal)
-            .sum::<Option<i32>>()
+            .sum::<Option<i64>>()
             .map(decimal_to_snafu)
     }
 
@@ -20,7 +20,7 @@ where
     }
 }
 
-fn snafu_to_decimal(snafu: &str) -> Option<i32> {
+fn snafu_to_decimal(snafu: &str) -> Option<i64> {
     let mut n = 0;
     for digit in snafu.chars().map(|digit| {
         Some(match digit {
@@ -41,8 +41,29 @@ fn snafu_to_decimal(snafu: &str) -> Option<i32> {
     Some(n)
 }
 
-fn decimal_to_snafu(n: i32) -> Snafu {
-    todo!()
+fn decimal_to_snafu(mut n: i64) -> Snafu {
+    if n == 0 {
+        return "0".to_string();
+    }
+    let mut snafu = "".to_string();
+    while n != 0 {
+        let (carry, current) = match n % 5 {
+            -4 => (-1, "1"),
+            -3 => (-1, "2"),
+            -2 => (0, "="),
+            -1 => (0, "-"),
+            0 => (0, "0"),
+            1 => (0, "1"),
+            2 => (0, "2"),
+            3 => (1, "="),
+            4 => (1, "-"),
+            _ => unreachable!(),
+        };
+        snafu = current.to_owned() + &snafu;
+        n /= 5;
+        n += carry;
+    }
+    snafu
 }
 
 #[cfg(test)]
@@ -68,6 +89,26 @@ mod tests {
     fn test_snafu_to_decimal() {
         assert_eq!(Some(976), snafu_to_decimal("2=-01"));
 
+        assert_eq!(Some(-20), snafu_to_decimal("-10"));
+        assert_eq!(Some(-19), snafu_to_decimal("-11"));
+        assert_eq!(Some(-18), snafu_to_decimal("-12"));
+        assert_eq!(Some(-17), snafu_to_decimal("-2="));
+        assert_eq!(Some(-16), snafu_to_decimal("-2-"));
+        assert_eq!(Some(-15), snafu_to_decimal("-20"));
+        assert_eq!(Some(-14), snafu_to_decimal("-21"));
+        assert_eq!(Some(-13), snafu_to_decimal("-22"));
+        assert_eq!(Some(-12), snafu_to_decimal("=="));
+        assert_eq!(Some(-11), snafu_to_decimal("=-"));
+        assert_eq!(Some(-10), snafu_to_decimal("=0"));
+        assert_eq!(Some(-9), snafu_to_decimal("=1"));
+        assert_eq!(Some(-8), snafu_to_decimal("=2"));
+        assert_eq!(Some(-7), snafu_to_decimal("-="));
+        assert_eq!(Some(-6), snafu_to_decimal("--"));
+        assert_eq!(Some(-5), snafu_to_decimal("-0"));
+        assert_eq!(Some(-4), snafu_to_decimal("-1"));
+        assert_eq!(Some(-3), snafu_to_decimal("-2"));
+        assert_eq!(Some(-2), snafu_to_decimal("="));
+        assert_eq!(Some(-1), snafu_to_decimal("-"));
         assert_eq!(Some(0), snafu_to_decimal("0"));
         assert_eq!(Some(1), snafu_to_decimal("1"));
         assert_eq!(Some(2), snafu_to_decimal("2"));
@@ -110,6 +151,26 @@ mod tests {
     fn test_decimal_to_snafu() {
         assert_eq!(decimal_to_snafu(976), "2=-01".to_string());
 
+        assert_eq!(decimal_to_snafu(-20), "-10".to_string());
+        assert_eq!(decimal_to_snafu(-19), "-11".to_string());
+        assert_eq!(decimal_to_snafu(-18), "-12".to_string());
+        assert_eq!(decimal_to_snafu(-17), "-2=".to_string());
+        assert_eq!(decimal_to_snafu(-16), "-2-".to_string());
+        assert_eq!(decimal_to_snafu(-15), "-20".to_string());
+        assert_eq!(decimal_to_snafu(-14), "-21".to_string());
+        assert_eq!(decimal_to_snafu(-13), "-22".to_string());
+        assert_eq!(decimal_to_snafu(-12), "==".to_string());
+        assert_eq!(decimal_to_snafu(-11), "=-".to_string());
+        assert_eq!(decimal_to_snafu(-10), "=0".to_string());
+        assert_eq!(decimal_to_snafu(-9), "=1".to_string());
+        assert_eq!(decimal_to_snafu(-8), "=2".to_string());
+        assert_eq!(decimal_to_snafu(-7), "-=".to_string());
+        assert_eq!(decimal_to_snafu(-6), "--".to_string());
+        assert_eq!(decimal_to_snafu(-5), "-0".to_string());
+        assert_eq!(decimal_to_snafu(-4), "-1".to_string());
+        assert_eq!(decimal_to_snafu(-3), "-2".to_string());
+        assert_eq!(decimal_to_snafu(-2), "=".to_string());
+        assert_eq!(decimal_to_snafu(-1), "-".to_string());
         assert_eq!(decimal_to_snafu(0), "0".to_string());
         assert_eq!(decimal_to_snafu(1), "1".to_string());
         assert_eq!(decimal_to_snafu(2), "2".to_string());

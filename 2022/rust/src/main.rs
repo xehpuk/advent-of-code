@@ -85,7 +85,7 @@ fn main() -> Result<(), Error> {
         20 => Day20::solve(lines),
         21 => Day21::solve(lines),
         23 => Day23::solve(lines),
-        25 => Day23::solve(lines),
+        25 => Day25::solve(lines),
         _ => unreachable!(),
     }
 
