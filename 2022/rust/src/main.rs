@@ -20,6 +20,7 @@ use aoc18::Day18;
 use aoc20::Day20;
 use aoc21::Day21;
 use aoc23::Day23;
+use aoc25::Day25;
 
 mod aoc01;
 mod aoc02;
@@ -39,8 +40,9 @@ mod aoc18;
 mod aoc20;
 mod aoc21;
 mod aoc23;
+mod aoc25;
 
-const LATEST_DAY: u8 = 23;
+const LATEST_DAY: u8 = 25;
 
 trait Day<'a, I: Clone + Iterator<Item = &'a str>, T: Display> {
     fn part1(input: I) -> Option<T>;
@@ -83,6 +85,7 @@ fn main() -> Result<(), Error> {
         20 => Day20::solve(lines),
         21 => Day21::solve(lines),
         23 => Day23::solve(lines),
+        25 => Day23::solve(lines),
         _ => unreachable!(),
     }
 
