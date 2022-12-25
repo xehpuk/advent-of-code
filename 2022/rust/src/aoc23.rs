@@ -50,7 +50,32 @@ fn spread_out(elves: &mut HashSet<Elf>, round: i32) {
 }
 
 fn count_empty_tiles(elves: &HashSet<Elf>) -> usize {
-    todo!()
+    if let (Some(x_min), Some(x_max), Some(y_min), Some(y_max)) =
+        (x_min(elves), x_max(elves), y_min(elves), y_max(elves))
+    {
+        (x_min..=x_max)
+            .flat_map(|x| (y_min..=y_max).map(move |y| (x, y)))
+            .filter(|tile| !elves.contains(tile))
+            .count()
+    } else {
+        0
+    }
+}
+
+fn x_min(elves: &HashSet<Elf>) -> Option<Coord> {
+    elves.iter().map(|elf| elf.0).min()
+}
+
+fn x_max(elves: &HashSet<Elf>) -> Option<Coord> {
+    elves.iter().map(|elf| elf.0).max()
+}
+
+fn y_min(elves: &HashSet<Elf>) -> Option<Coord> {
+    elves.iter().map(|elf| elf.1).min()
+}
+
+fn y_max(elves: &HashSet<Elf>) -> Option<Coord> {
+    elves.iter().map(|elf| elf.1).max()
 }
 
 #[cfg(test)]
