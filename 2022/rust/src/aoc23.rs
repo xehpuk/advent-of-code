@@ -76,7 +76,9 @@ where
         .flat_map(|(y, s)| s.chars().enumerate().map(move |(x, c)| (x, y, c)))
     {
         match tile.2 {
-            '#' => drop(elves.insert((tile.0 as Coord, tile.1 as Coord))),
+            '#' => {
+                elves.insert((tile.0 as Coord, tile.1 as Coord));
+            }
             '.' => {}
             _ => {
                 return None;

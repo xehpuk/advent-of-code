@@ -138,13 +138,13 @@ fn find_unknown(
         Job::Const(_) => Some(needed_job),
         Job::Expr(operation) => {
             let (known_operand, unknown_operand) = {
-                if contains(&monkeys, &operation.first_operand, MY_NAME) {
+                if contains(monkeys, &operation.first_operand, MY_NAME) {
                     (&operation.second_operand, &operation.first_operand)
                 } else {
                     (&operation.first_operand, &operation.second_operand)
                 }
             };
-            let known_job = do_job(&monkeys, known_operand)?;
+            let known_job = do_job(monkeys, known_operand)?;
             let needed_job = match operation.operator {
                 Operator::Add => needed_job - known_job,
                 Operator::Sub => {
@@ -164,7 +164,7 @@ fn find_unknown(
                 }
             };
 
-            find_unknown(&monkeys, unknown_operand, needed_job)
+            find_unknown(monkeys, unknown_operand, needed_job)
         }
     }
 }

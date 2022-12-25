@@ -169,6 +169,7 @@ where
             exterior_air_cubes.insert(current);
 
             for neighbor in neighbors {
+                #[allow(clippy::neg_cmp_op_on_partial_ord)]
                 if exterior_air_cubes.contains(&neighbor)
                     || lava_droplet.cubes.contains(&neighbor)
                     || !(neighbor >= lava_droplet.cube_min)
