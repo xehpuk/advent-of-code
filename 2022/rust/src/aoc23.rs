@@ -53,10 +53,8 @@ fn count_empty_tiles(elves: &HashSet<Elf>) -> usize {
     if let (Some(x_min), Some(x_max), Some(y_min), Some(y_max)) =
         (x_min(elves), x_max(elves), y_min(elves), y_max(elves))
     {
-        (x_min..=x_max)
-            .flat_map(|x| (y_min..=y_max).map(move |y| (x, y)))
-            .filter(|tile| !elves.contains(tile))
-            .count()
+        println!("({x_min}, {y_min}), ({x_max}, {y_max})");
+        ((x_max - x_min + 1) * (y_max - y_min + 1)) as usize - elves.len()
     } else {
         0
     }
