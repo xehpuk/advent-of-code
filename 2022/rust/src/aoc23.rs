@@ -5,7 +5,8 @@ use super::Day;
 pub struct Day23;
 
 type Number = usize;
-type Elf = (i32, i32);
+type Coord = i32;
+type Elf = (Coord, Coord);
 
 impl<'a, I> Day<'a, I, Number> for Day23
 where
@@ -28,7 +29,20 @@ fn parse_elves<'a, I>(input: I) -> Option<HashSet<Elf>>
 where
     I: Iterator<Item = &'a str>,
 {
-    todo!()
+    let mut elves = HashSet::new();
+    for tile in input
+        .enumerate()
+        .flat_map(|(y, s)| s.chars().enumerate().map(move |(x, c)| (x, y, c)))
+    {
+        match tile.2 {
+            '#' => drop(elves.insert((tile.0 as Coord, tile.1 as Coord))),
+            '.' => {}
+            _ => {
+                return None;
+            }
+        }
+    }
+    Some(elves)
 }
 
 fn spread_out(elves: &mut HashSet<Elf>, round: i32) {
