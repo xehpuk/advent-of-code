@@ -55,8 +55,14 @@ where
         Some(count_empty_tiles(&elves))
     }
 
-    fn part2(_input: I) -> Option<Number> {
-        todo!()
+    fn part2(input: I) -> Option<Number> {
+        let mut elves = parse_elves(input)?;
+        for round in 0.. {
+            if !spread_out(&mut elves, round) {
+                return Some(round + 1);
+            }
+        }
+        unreachable!()
     }
 }
 
@@ -80,7 +86,7 @@ where
     Some(elves)
 }
 
-fn spread_out(elves: &mut HashSet<Elf>, round: usize) {
+fn spread_out(elves: &mut HashSet<Elf>, round: usize) -> bool {
     let mut propositions = HashMap::<Elf, Vec<_>>::new();
     for elf in elves.iter().filter(|elf| has_neighbor(elves, elf)) {
         for direction in (0..DIRECTIONS.len())
@@ -94,12 +100,15 @@ fn spread_out(elves: &mut HashSet<Elf>, round: usize) {
             }
         }
     }
+    let mut positions_changed = false;
     for (proposition, candidates) in propositions {
         if candidates.len() == 1 {
             elves.remove(&candidates[0]);
             elves.insert(proposition);
+            positions_changed = true;
         }
     }
+    positions_changed
 }
 
 fn has_neighbor(elves: &HashSet<Elf>, elf: &Elf) -> bool {
