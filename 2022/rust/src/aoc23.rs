@@ -64,7 +64,10 @@ fn spread_out(elves: &mut HashSet<Elf>, round: usize) {
 }
 
 fn has_neighbor(elves: &HashSet<Elf>, elf: &Elf) -> bool {
-    todo!()
+    (elf.0 - 1..=elf.0 + 1)
+        .flat_map(|x| (elf.1 - 1..=elf.1 + 1).map(move |y| (x, y)))
+        .filter(|neighbor| neighbor != elf)
+        .any(|neighbor| elves.contains(&neighbor))
 }
 
 fn count_empty_tiles(elves: &HashSet<Elf>) -> usize {
