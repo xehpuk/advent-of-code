@@ -8,6 +8,20 @@ type Number = usize;
 type Coord = i32;
 type Elf = (Coord, Coord);
 
+enum Direction {
+    North,
+    South,
+    West,
+    East,
+}
+
+const DIRECTIONS: [Direction; 4] = [
+    Direction::North,
+    Direction::South,
+    Direction::West,
+    Direction::East,
+];
+
 impl<'a, I> Day<'a, I, Number> for Day23
 where
     I: Clone + Iterator<Item = &'a str>,
@@ -45,7 +59,11 @@ where
     Some(elves)
 }
 
-fn spread_out(elves: &mut HashSet<Elf>, round: i32) {
+fn spread_out(elves: &mut HashSet<Elf>, round: usize) {
+    todo!()
+}
+
+fn has_neighbor(elves: &HashSet<Elf>, elf: &Elf) -> bool {
     todo!()
 }
 
@@ -78,7 +96,7 @@ fn y_max(elves: &HashSet<Elf>) -> Option<Coord> {
 
 #[cfg(test)]
 mod tests {
-    use super::{count_empty_tiles, parse_elves, spread_out, Day, Day23, Number};
+    use super::{count_empty_tiles, has_neighbor, parse_elves, spread_out, Day, Day23, Number};
     use std::collections::HashSet;
     use std::str::Lines;
 
@@ -155,6 +173,76 @@ mod tests {
         spread_out(&mut elves, 8);
         spread_out(&mut elves, 9);
         assert_eq!(parse_elves(test_input(INPUTS[6])).unwrap(), elves);
+    }
+
+    #[test]
+    fn test_has_neighbor() {
+        assert_eq!(false, has_neighbor(&HashSet::from([(0, 0)]), &(0, 0)));
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (-2, -1)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (-2, 0)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (-2, 1)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (2, -1)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (2, 0)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (2, 1)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (0, -2)]), &(0, 0))
+        );
+        assert_eq!(
+            false,
+            has_neighbor(&HashSet::from([(0, 0), (0, 2)]), &(0, 0))
+        );
+
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (0, 1)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (-1, 1)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (-1, 0)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (-1, -1)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (0, -1)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (1, -1)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (1, 0)]), &(0, 0))
+        );
+        assert_eq!(
+            true,
+            has_neighbor(&HashSet::from([(0, 0), (1, 1)]), &(0, 0))
+        );
     }
 
     #[test]
