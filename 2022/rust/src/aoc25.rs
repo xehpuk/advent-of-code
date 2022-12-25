@@ -21,7 +21,24 @@ where
 }
 
 fn snafu_to_decimal(snafu: &str) -> Option<i32> {
-    todo!()
+    let mut n = 0;
+    for digit in snafu.chars().map(|digit| {
+        Some(match digit {
+            '2' => 2,
+            '1' => 1,
+            '0' => 0,
+            '-' => -1,
+            '=' => -2,
+            _ => {
+                return None;
+            }
+        })
+    }) {
+        let digit = digit?;
+        n *= 5;
+        n += digit;
+    }
+    Some(n)
 }
 
 fn decimal_to_snafu(n: i32) -> Snafu {
