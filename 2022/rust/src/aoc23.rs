@@ -41,8 +41,8 @@ fn count_empty_tiles(elves: &HashSet<Elf>) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{Day, Day23, Number};
-    use std::str::Lines;
+    use super::{parse_elves, Day, Day23, Number};
+    use std::{collections::HashSet, str::Lines};
 
     const INPUT: &str = include_str!("../../23_test.txt");
 
@@ -56,6 +56,37 @@ mod tests {
 
     fn test_part2(input: &str) -> Option<Number> {
         Day23::part2(test_input(input))
+    }
+
+    #[test]
+    fn test_parse_elves() {
+        assert_eq!(
+            Some(HashSet::from([
+                (4, 0),
+                (2, 1),
+                (3, 1),
+                (4, 1),
+                (6, 1),
+                (0, 2),
+                (4, 2),
+                (6, 2),
+                (1, 3),
+                (5, 3),
+                (6, 3),
+                (0, 4),
+                (2, 4),
+                (3, 4),
+                (4, 4),
+                (0, 5),
+                (1, 5),
+                (3, 5),
+                (5, 5),
+                (6, 5),
+                (1, 6),
+                (4, 6),
+            ])),
+            parse_elves(test_input(INPUT))
+        );
     }
 
     #[test]
