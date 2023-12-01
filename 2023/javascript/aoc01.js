@@ -53,7 +53,7 @@ function part2() {
     }
 
     function parseLine(line) {
-        return Array.from(line.matchAll(digitRegex), m => parseDigit(m[1]))
+        return Array.from(line.matchAll(digitRegex), match => parseDigit(match[1]))
     }
 
     return solve(parseLine)
