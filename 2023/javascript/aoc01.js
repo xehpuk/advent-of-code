@@ -1,18 +1,4 @@
-import { open } from 'node:fs/promises'
-import { join } from 'node:path'
-
-async function withLines(fileName, handleLine, initialValue) {
-    const file = await open(join('..', `${fileName}.txt`))
-    try {
-        let value = initialValue
-        for await (const line of file.readLines()) {
-            value = handleLine(value, line)
-        }
-        return value
-    } finally {
-        await file.close()
-    }
-}
+import { withLines } from './utils.js';
 
 function solve(fileName, parseLine) {
     return withLines(fileName, (value, line) => value + calculateCalibrationValue(parseLine(line)), 0)
