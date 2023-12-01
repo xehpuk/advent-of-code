@@ -4,12 +4,12 @@ import { join } from 'node:path'
 console.log(await part1())
 console.log(await part2())
 
-async function withLines(fileName, lineHandler, initialValue) {
+async function withLines(fileName, handleLine, initialValue) {
     const file = await open(join('..', `${fileName}.txt`))
     try {
         let value = initialValue
         for await (const line of file.readLines()) {
-            value = lineHandler(value, line)
+            value = handleLine(value, line)
         }
         return value
     } finally {
@@ -17,24 +17,23 @@ async function withLines(fileName, lineHandler, initialValue) {
     }
 }
 
-function solve(calculator) {
-    return withLines('01', (value, line) => value + calculator(line), 0)
+function solve(parseLine) {
+    return withLines('01', (value, line) => value + calculateCalibrationValue(parseLine(line)), 0)
 }
 
-function calculateCalibrationValueFromDigits(digits) {
+function calculateCalibrationValue(digits) {
     return 10 * digits[0] + digits[digits.length - 1]
 }
 
 function part1() {
-    function calculateCalibrationValue(line) {
-        const digits = Array.from(line.matchAll(/\d/g), match => Number.parseInt(match[0]))
-        return calculateCalibrationValueFromDigits(digits)
+    function parseLine(line) {
+        return Array.from(line.matchAll(/\d/g), match => Number.parseInt(match[0]))
     }
 
-    return solve(calculateCalibrationValue)
+    return solve(parseLine)
 }
 
-async function part2() {
+function part2() {
     const digits = {
         one: 1,
         two: 2,
@@ -53,10 +52,9 @@ async function part2() {
         return digits[digit] ?? Number.parseInt(digit)
     }
 
-    function calculateCalibrationValue(line) {
-        const digits = Array.from(line.matchAll(digitRegex), m => parseDigit(m[1]))
-        return calculateCalibrationValueFromDigits(digits)
+    function parseLine(line) {
+        return Array.from(line.matchAll(digitRegex), m => parseDigit(m[1]))
     }
 
-    return solve(calculateCalibrationValue)
+    return solve(parseLine)
 }
