@@ -1,9 +1,6 @@
 import { open } from 'node:fs/promises'
 import { join } from 'node:path'
 
-console.log(await part1('01'))
-console.log(await part2('01'))
-
 async function withLines(fileName, handleLine, initialValue) {
     const file = await open(join('..', `${fileName}.txt`))
     try {
@@ -25,7 +22,7 @@ function calculateCalibrationValue(digits) {
     return 10 * digits[0] + digits[digits.length - 1]
 }
 
-export function part1(fileName) {
+export function part1(fileName = '01') {
     function parseLine(line) {
         return Array.from(line.matchAll(/\d/g), match => Number.parseInt(match[0]))
     }
@@ -33,7 +30,7 @@ export function part1(fileName) {
     return solve(fileName, parseLine)
 }
 
-export function part2(fileName) {
+export function part2(fileName = '01') {
     const digits = {
         one: 1,
         two: 2,

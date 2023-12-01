@@ -1,9 +1,14 @@
 {
+  "name": "@xehpuk/advent-of-code-2023",
+  "author": {
+    "name": "xehpuk"
+  },
   "engines": {
     "node": ">= 18.11.0"
   },
   "type": "module",
   "scripts": {
+    "start": "node index.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "jest": {
