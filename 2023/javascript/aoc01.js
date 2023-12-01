@@ -1,8 +1,8 @@
 import { open } from 'node:fs/promises'
 import { join } from 'node:path'
 
-console.log(await part1())
-console.log(await part2())
+console.log(await part1('01'))
+console.log(await part2('01'))
 
 async function withLines(fileName, handleLine, initialValue) {
     const file = await open(join('..', `${fileName}.txt`))
@@ -17,23 +17,23 @@ async function withLines(fileName, handleLine, initialValue) {
     }
 }
 
-function solve(parseLine) {
-    return withLines('01', (value, line) => value + calculateCalibrationValue(parseLine(line)), 0)
+function solve(fileName, parseLine) {
+    return withLines(fileName, (value, line) => value + calculateCalibrationValue(parseLine(line)), 0)
 }
 
 function calculateCalibrationValue(digits) {
     return 10 * digits[0] + digits[digits.length - 1]
 }
 
-function part1() {
+export function part1(fileName) {
     function parseLine(line) {
         return Array.from(line.matchAll(/\d/g), match => Number.parseInt(match[0]))
     }
 
-    return solve(parseLine)
+    return solve(fileName, parseLine)
 }
 
-function part2() {
+export function part2(fileName) {
     const digits = {
         one: 1,
         two: 2,
@@ -56,5 +56,5 @@ function part2() {
         return Array.from(line.matchAll(digitRegex), match => parseDigit(match[1]))
     }
 
-    return solve(parseLine)
+    return solve(fileName, parseLine)
 }
