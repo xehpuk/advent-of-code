@@ -1,5 +1,11 @@
-.idea/
+.idea
 *.iml
+
+.vscode
+*.code-workspace
+
 *.exe
 *.pdb
 */rust/target
+
+node_modules
