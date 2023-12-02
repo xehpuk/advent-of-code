@@ -6,5 +6,6 @@ test('day 02, part 1', async () => {
 });
 
 test('day 02, part 2', async () => {
-    expect('TODO').toBeFalsy()
+    const received = await part2('02_test')
+    expect(received).toBe(2286);
 });
