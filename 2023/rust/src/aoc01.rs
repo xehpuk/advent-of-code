@@ -2,6 +2,19 @@ use anyhow::Result;
 use thiserror::Error;
 
 const INPUT: &str = include_str!("../../01.txt");
+static DIGITS: [Digit; 9] = [
+    Digit(1, "one"),
+    Digit(2, "two"),
+    Digit(3, "three"),
+    Digit(4, "four"),
+    Digit(5, "five"),
+    Digit(6, "six"),
+    Digit(7, "seven"),
+    Digit(8, "eight"),
+    Digit(9, "nine"),
+];
+
+struct Digit(i32, &'static str);
 
 pub fn solve() {
     println!("day 01, part 1: {}", part1(INPUT).unwrap());
@@ -29,11 +42,45 @@ fn part1(input: &str) -> Result<i32> {
         Ok(10 * first_digit + last_digit)
     }
 
-    input.lines().map(parse_line).sum::<Result<_>>()
+    input.lines().map(parse_line).sum()
 }
 
 fn part2(input: &str) -> Result<i32> {
-    todo!()
+    fn parse_line(line: &str) -> Result<i32> {
+        let first_digit: i32 = line
+            .char_indices()
+            .find_map(|(i, c)| {
+                c.to_digit(10).map(|d| d as i32).or_else(|| {
+                    DIGITS.iter().find_map(|&Digit(figure, numeral)| {
+                        if line[i..].starts_with(numeral) {
+                            Some(figure)
+                        } else {
+                            None
+                        }
+                    })
+                })
+            })
+            .ok_or(AocError::NoDigitFound)?;
+        let last_digit = line
+            .char_indices()
+            .rev()
+            .find_map(|(i, c)| {
+                c.to_digit(10).map(|d| d as i32).or_else(|| {
+                    DIGITS.iter().find_map(|&Digit(figure, numeral)| {
+                        if line[..(i + c.len_utf8())].ends_with(numeral) {
+                            Some(figure)
+                        } else {
+                            None
+                        }
+                    })
+                })
+            })
+            .unwrap();
+
+        Ok(10 * first_digit + last_digit)
+    }
+
+    input.lines().map(parse_line).sum()
 }
 
 #[cfg(test)]
