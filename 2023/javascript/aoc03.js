@@ -1,4 +1,4 @@
-import {withLines} from './utils.js';
+import {withLines} from './utils.js'
 
 function createHandleLine(regex) {
     return ({partNumbers, symbolPositions}, line) => {
@@ -20,7 +20,7 @@ function createHandleLine(regex) {
             partNumbers: [...partNumbers, foundPartNumbers],
             symbolPositions: [...symbolPositions, foundSymbolPositions]
         }
-    };
+    }
 }
 
 export async function part1(fileName = '03') {

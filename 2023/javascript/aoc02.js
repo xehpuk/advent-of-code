@@ -1,4 +1,4 @@
-import { withLines } from './utils.js';
+import {withLines} from './utils.js'
 
 function parseLine(line) {
     const [game, semicolonSeparatedListOfSubsetsOfCubes] = line.split(': ')

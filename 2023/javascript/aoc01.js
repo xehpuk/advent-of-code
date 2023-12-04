@@ -1,4 +1,4 @@
-import { withLines } from './utils.js';
+import {withLines} from './utils.js'
 
 function solve(fileName, parseLine) {
     return withLines(fileName, (value, line) => value + calculateCalibrationValue(parseLine(line)), 0)
