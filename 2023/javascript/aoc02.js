@@ -8,7 +8,7 @@ function parseLine(line) {
     const cubes = subsetsOfCubes.map(subsetOfCubes => subsetOfCubes.split(' '))
         .reduce((cubes, [count, color]) => ({
             ...cubes,
-            [color]: Math.max((cubes[color] ?? 0), Number.parseInt(count))
+            [color]: Math.max(cubes[color] ?? 0, Number.parseInt(count))
         }), {})
 
     return {
