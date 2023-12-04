@@ -1,11 +1,11 @@
 import {withLines} from './utils.js';
 
-export async function part1(fileName = '03') {
-    const engineSchematic = await withLines(fileName, ({partNumbers, symbolPositions}, line) => {
+function createHandleLine(regex) {
+    return ({partNumbers, symbolPositions}, line) => {
         const foundPartNumbers = []
         const foundSymbolPositions = []
 
-        for (const match of line.matchAll(/(\d+)|[^.]/g)) {
+        for (const match of line.matchAll(regex)) {
             if (match[1]) {
                 foundPartNumbers.push({
                     n: match[1],
@@ -20,7 +20,11 @@ export async function part1(fileName = '03') {
             partNumbers: [...partNumbers, foundPartNumbers],
             symbolPositions: [...symbolPositions, foundSymbolPositions]
         }
-    }, {
+    };
+}
+
+export async function part1(fileName = '03') {
+    const engineSchematic = await withLines(fileName, createHandleLine(/(\d+)|[^.]/g), {
         partNumbers: [],
         symbolPositions: [],
     })
@@ -37,37 +41,18 @@ export async function part1(fileName = '03') {
 }
 
 export async function part2(fileName = '03') {
-    const engineSchematic = await withLines(fileName, ({potentialPartNumbers, potentialGearPositions}, line) => {
-        const foundPotentialPartNumbers = []
-        const foundPotentialGearPositions = []
-
-        for (const match of line.matchAll(/(\d+)|\*/g)) {
-            if (match[1]) {
-                foundPotentialPartNumbers.push({
-                    n: match[1],
-                    i: match.index,
-                })
-            } else {
-                foundPotentialGearPositions.push(match.index)
-            }
-        }
-
-        return {
-            potentialPartNumbers: [...potentialPartNumbers, foundPotentialPartNumbers],
-            potentialGearPositions: [...potentialGearPositions, foundPotentialGearPositions]
-        }
-    }, {
-        potentialPartNumbers: [],
-        potentialGearPositions: [],
+    const engineSchematic = await withLines(fileName, createHandleLine(/(\d+)|\*/g), {
+        partNumbers: [],
+        symbolPositions: [],
     })
 
-    return engineSchematic.potentialGearPositions
-        .flatMap((potentialGearPositions, j) =>
-            potentialGearPositions.map(potentialGearPosition => {
+    return engineSchematic.symbolPositions
+        .flatMap((symbolPositions, j) =>
+            symbolPositions.map(symbolPosition => {
                 const adjacentPartNumbers = [
-                    ...engineSchematic.potentialPartNumbers[j].filter(({n, i}) => i + n.length === potentialGearPosition || i === potentialGearPosition + 1),
-                    ...(engineSchematic.potentialPartNumbers[j - 1] ?? []).filter(({n, i}) => i <= potentialGearPosition + 1 && potentialGearPosition - 1 < i + n.length),
-                    ...(engineSchematic.potentialPartNumbers[j + 1] ?? []).filter(({n, i}) => i <= potentialGearPosition + 1 && potentialGearPosition - 1 < i + n.length),
+                    ...engineSchematic.partNumbers[j].filter(({n, i}) => i + n.length === symbolPosition || i === symbolPosition + 1),
+                    ...(engineSchematic.partNumbers[j - 1] ?? []).filter(({n, i}) => i <= symbolPosition + 1 && symbolPosition - 1 < i + n.length),
+                    ...(engineSchematic.partNumbers[j + 1] ?? []).filter(({n, i}) => i <= symbolPosition + 1 && symbolPosition - 1 < i + n.length),
                 ]
                 return adjacentPartNumbers.length === 2
                     ? adjacentPartNumbers[0].n * adjacentPartNumbers[1].n
