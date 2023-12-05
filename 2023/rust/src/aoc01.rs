@@ -1,7 +1,10 @@
 use anyhow::Result;
 use thiserror::Error;
 
-const INPUT: &str = include_str!("../../01.txt");
+const INPUT: &str = include_str!("../../_input/01.txt");
+
+struct Digit(i32, &'static str);
+
 static DIGITS: [Digit; 9] = [
     Digit(1, "one"),
     Digit(2, "two"),
@@ -13,8 +16,6 @@ static DIGITS: [Digit; 9] = [
     Digit(8, "eight"),
     Digit(9, "nine"),
 ];
-
-struct Digit(i32, &'static str);
 
 pub fn solve() {
     println!("day 01, part 1: {}", part1(INPUT).unwrap());
@@ -87,8 +88,8 @@ fn part2(input: &str) -> Result<i32> {
 mod tests {
     use super::{part1, part2};
 
-    const INPUT1: &str = include_str!("../../01_test1.txt");
-    const INPUT2: &str = include_str!("../../01_test2.txt");
+    const INPUT1: &str = include_str!("../../_input/01_test1.txt");
+    const INPUT2: &str = include_str!("../../_input/01_test2.txt");
 
     #[test]
     fn test1() {
