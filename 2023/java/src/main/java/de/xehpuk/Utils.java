@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 public class Utils {
@@ -16,7 +18,16 @@ public class Utils {
         }
     }
 
-    public static <U> U combine(U u1, U u2) {
-        throw new RuntimeException("Combiner");
+    @SuppressWarnings("unchecked")
+    public static <U> BinaryOperator<U> dummyCombiner() {
+        return (BinaryOperator<U>) DUMMY_COMBINER;
     }
+
+    public static LongStream infiniteLongStream() {
+        return LongStream.iterate(0, i -> i + 1);
+    }
+
+    private static final BinaryOperator<?> DUMMY_COMBINER = (_, _) -> {
+        throw new Error("combiner");
+    };
 }

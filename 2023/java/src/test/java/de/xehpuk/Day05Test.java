@@ -9,4 +9,9 @@ class Day05Test {
     void part1() {
         assertEquals(35L, Utils.withLines("05_test", Day05::part1));
     }
+
+    @Test
+    void part2() {
+        assertEquals(46L, Utils.withLines("05_test", Day05::part2));
+    }
 }

@@ -3,7 +3,6 @@ package de.xehpuk;
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 public class Day05 {
@@ -18,21 +17,45 @@ public class Day05 {
     public static long part1(Stream<String> lines) {
         Almanac almanac = parseAlmanac(lines);
 
-        return LongStream.iterate(0, i -> i + 1).filter(destinationId -> {
-            long seed = almanac.conversionMaps().reversed().stream().reduce(destinationId, (value, conversionMap) -> {
-                var conversion = conversionMap.floorEntry(value);
-                if (conversion == null) {
-                    return value;
-                }
-                long destinationStart = conversion.getKey();
-                long destinationEnd = destinationStart + conversion.getValue().length();
-                if (destinationEnd < value) {
-                    return value;
-                }
-                return value - destinationStart + conversion.getValue().source();
-            }, Utils::combine);
+        return Utils.infiniteLongStream().filter(destinationId -> {
+            long seed = findSource(destinationId, almanac);
             return almanac.seeds().contains(seed);
         }).findFirst().getAsLong();
+    }
+
+    public static long part2(Stream<String> lines) {
+        Almanac almanac = parseAlmanac(lines);
+
+        NavigableMap<Long, Long> seeds = new TreeMap<>();
+        {
+            Iterator<Long> iterator = almanac.seeds().iterator();
+            while (iterator.hasNext()) {
+                long start = iterator.next();
+                long length = iterator.next();
+                seeds.put(start, start + length);
+            }
+        }
+
+        return Utils.infiniteLongStream().filter(destinationId -> {
+            long seed = findSource(destinationId, almanac);
+            var seedRange = seeds.floorEntry(seed);
+            return seedRange != null && seed < seedRange.getValue();
+        }).findFirst().getAsLong();
+    }
+
+    private static Long findSource(long destinationId, Almanac almanac) {
+        return almanac.conversionMaps().reversed().stream().reduce(destinationId, (value, conversionMap) -> {
+            var conversion = conversionMap.floorEntry(value);
+            if (conversion == null) {
+                return value;
+            }
+            long destinationStart = conversion.getKey();
+            long destinationEnd = destinationStart + conversion.getValue().length();
+            if (destinationEnd < value) {
+                return value;
+            }
+            return value - destinationStart + conversion.getValue().source();
+        }, Utils.dummyCombiner());
     }
 
     private static Almanac parseAlmanac(Stream<String> lines) {
@@ -47,13 +70,13 @@ public class Day05 {
             if (line.endsWith(":")) {
                 return value;
             }
-            List<Long> ids = extractNumbers(line);
-            long destinationId = ids.get(0);
-            long sourceId = ids.get(1);
-            long rangeLength = ids.get(2);
+            List<Long> numbers = extractNumbers(line);
+            long destinationId = numbers.get(0);
+            long sourceId = numbers.get(1);
+            long rangeLength = numbers.get(2);
             value.conversionMaps().getLast().put(destinationId, new SourceAndLength(sourceId, rangeLength));
             return value;
-        }, Utils::combine);
+        }, Utils.dummyCombiner());
     }
 
     private static List<Long> extractNumbers(String line) {
