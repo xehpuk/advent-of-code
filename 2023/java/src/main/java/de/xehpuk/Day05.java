@@ -16,10 +16,11 @@ public class Day05 {
 
     public static long part1(Stream<String> lines) {
         Almanac almanac = parseAlmanac(lines);
+        var seeds = Set.copyOf(almanac.seeds());
 
         return Utils.infiniteLongStream().filter(destinationId -> {
             long seed = findSource(destinationId, almanac);
-            return almanac.seeds().contains(seed);
+            return seeds.contains(seed);
         }).findFirst().getAsLong();
     }
 
