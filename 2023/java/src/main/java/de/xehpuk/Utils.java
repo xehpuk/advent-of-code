@@ -24,7 +24,7 @@ public class Utils {
     }
 
     public static LongStream infiniteLongStream() {
-        return LongStream.iterate(0, i -> i + 1);
+        return LongStream.iterate(0, i -> i + 1).parallel();
     }
 
     private static final BinaryOperator<?> DUMMY_COMBINER = (_, _) -> {
