@@ -4,6 +4,9 @@ function createHandleLine(parseLine) {
     return (numbers, line) => [...numbers, parseLine(line)]
 }
 
+/**
+ * {@link https://www.wolframalpha.com/input?i=solve+d%3D%28t-x%29*x+for+x|WolframAlpha}
+ */
 function calcNumberOfWins(time, distance) {
     const z = Math.sqrt(time ** 2 - 4 * distance)
     const time0 = Math.floor((time - z) / 2 + 1)
