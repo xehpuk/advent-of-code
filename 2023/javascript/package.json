@@ -17,5 +17,8 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "lcm": "^0.0.3"
   }
 }
