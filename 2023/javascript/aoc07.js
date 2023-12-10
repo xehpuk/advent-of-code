@@ -1,7 +1,5 @@
 import {withLines} from './utils.js'
 
-const JOKER = 'J'
-
 const cards = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
 
 const handTypes = [
@@ -26,10 +24,8 @@ function calcHand(hand) {
 
 function calcTotalWinnings(hands) {
     return hands.toSorted((hand1, hand2) => {
-        const strength1 = hand1.strength
-        const strength2 = hand2.strength
-        for (let i = 0; i < strength1.length; i++) {
-            const cmp = strength2[i] - strength1[i]
+        for (let i = 0; i < hand1.strength.length; i++) {
+            const cmp = hand2.strength[i] - hand1.strength[i]
             if (cmp !== 0) {
                 return cmp
             }
@@ -43,7 +39,7 @@ function createHandleLine(calcHand, cardStrengths) {
         const [hand, bid] = line.split(' ')
         const strength = [
             calcHand(hand),
-            ...(Array.from(hand).map(card => cardStrengths.get(card))),
+            ...Array.from(hand).map(card => cardStrengths.get(card)),
         ]
         return [...hands, {strength, bid}]
     }
@@ -54,21 +50,23 @@ export function part1(fileName = '07') {
 }
 
 export function part2(fileName = '07') {
+    const joker = 'J'
     const cardStrengths = calcCardStrengths(cards
-        .filter(card => card !== JOKER)
-        .concat(JOKER))
+        .filter(card => card !== joker)
+        .concat(joker))
 
     function calcHand2(hand) {
-        if (!hand.includes(JOKER)) {
+        // performance optimization; same calculation as part 1
+        if (!hand.includes(joker)) {
             return calcHand(hand)
         }
         const [cardReplacement] = Object.entries(Array.from(hand)
-            .filter(card => card !== JOKER)
+            .filter(card => card !== joker)
             .reduce((cards, card) => ({
                 ...cards,
                 [card]: (cards[card] ?? 0) + 1,
-            }), {})).reduce((prev, curr) => prev[1] >= curr[1] ? prev : curr, [JOKER, 0])
-        return calcHand(hand.replaceAll(JOKER, cardReplacement))
+            }), {})).reduce((prev, curr) => prev[1] >= curr[1] ? prev : curr, [joker, 0])
+        return calcHand(hand.replaceAll(joker, cardReplacement))
     }
 
     return withLines(fileName, createHandleLine(calcHand2, cardStrengths), []).then(calcTotalWinnings)
