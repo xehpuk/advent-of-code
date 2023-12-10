@@ -6,6 +6,7 @@ import * as day06 from './aoc06.js'
 import * as day07 from './aoc07.js'
 import * as day08 from './aoc08.js'
 import * as day09 from './aoc09.js'
+import * as day10 from './aoc10.js'
 
 async function log(message, part) {
     console.time(message)
@@ -29,3 +30,5 @@ await log('day 08, part 1', day08.part1)
 await log('day 08, part 2', day08.part2)
 await log('day 09, part 1', day09.part1)
 await log('day 09, part 2', day09.part2)
+await log('day 10, part 1', day10.part1)
+await log('day 10, part 2', day10.part2)
