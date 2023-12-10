@@ -15,7 +15,7 @@ function parseNetwork(fileName, regex) {
                 nodes: [],
             }
         }
-        const [start, left, right] = Array.from(line.matchAll(regex), ([match]) => match)
+        const [start, left, right] = line.match(regex)
         return {
             ...network,
             nodes: [

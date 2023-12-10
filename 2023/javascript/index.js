@@ -5,18 +5,27 @@ import * as day04 from './aoc04.js'
 import * as day06 from './aoc06.js'
 import * as day07 from './aoc07.js'
 import * as day08 from './aoc08.js'
+import * as day09 from './aoc09.js'
 
-console.log('day 01, part 1:', await day01.part1())
-console.log('day 01, part 2:', await day01.part2())
-console.log('day 02, part 1:', await day02.part1())
-console.log('day 02, part 2:', await day02.part2())
-console.log('day 03, part 1:', await day03.part1())
-console.log('day 03, part 2:', await day03.part2())
-console.log('day 04, part 1:', await day04.part1())
-console.log('day 04, part 2:', await day04.part2())
-console.log('day 06, part 1:', await day06.part1())
-console.log('day 06, part 2:', await day06.part2())
-console.log('day 07, part 1:', await day07.part1())
-console.log('day 07, part 2:', await day07.part2())
-console.log('day 08, part 1:', await day08.part1())
-console.log('day 08, part 2:', await day08.part2())
+async function log(message, part) {
+    console.time(message)
+    console.log(`${message}: ${await part()}`)
+    console.timeEnd(message)
+}
+
+await log('day 01, part 1', day01.part1)
+await log('day 01, part 2', day01.part2)
+await log('day 02, part 1', day02.part1)
+await log('day 02, part 2', day02.part2)
+await log('day 03, part 1', day03.part1)
+await log('day 03, part 2', day03.part2)
+await log('day 04, part 1', day04.part1)
+await log('day 04, part 2', day04.part2)
+await log('day 06, part 1', day06.part1)
+await log('day 06, part 2', day06.part2)
+await log('day 07, part 1', day07.part1)
+await log('day 07, part 2', day07.part2)
+await log('day 08, part 1', day08.part1)
+await log('day 08, part 2', day08.part2)
+await log('day 09, part 1', day09.part1)
+await log('day 09, part 2', day09.part2)
