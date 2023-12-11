@@ -1,12 +1,11 @@
 import {withLines} from './utils.js'
 
-export function part1(fileName = '11') {
-    return withLines(fileName, (galaxies, line, index) => {
-        return [...galaxies, ...Array.from(line.matchAll(/#/g), match => ({
+function expandAndSumDistances(expansion) {
+    return fileName => withLines(fileName, (galaxies, line, index) =>
+        [...galaxies, ...Array.from(line.matchAll(/#/g), match => ({
             x: match.index,
             y: index,
-        }))]
-    }, []).then(galaxies => {
+        }))], []).then(galaxies => {
         function expand(dimension) {
             let i = galaxies.length - 1
             g: for (let coordinate = galaxies[galaxies.length - 1][dimension] - 1; coordinate >= 0; coordinate--) {
@@ -21,7 +20,7 @@ export function part1(fileName = '11') {
                     }
                 }
                 for (let j = i + 1; j < galaxies.length; j++) {
-                    galaxies[j][dimension]++
+                    galaxies[j][dimension] += expansion - 1
                 }
             }
         }
@@ -39,6 +38,10 @@ export function part1(fileName = '11') {
     })
 }
 
-export function part2(fileName = '11') {
-    return withLines(fileName, (lines, line) => [...lines, line], [])
+export function part1(fileName = '11') {
+    return expandAndSumDistances(2)(fileName)
+}
+
+export function part2(fileName = '11', expansion = 1_000_000) {
+    return expandAndSumDistances(expansion)(fileName)
 }
