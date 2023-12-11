@@ -8,7 +8,7 @@ function expandAndSumDistances(expansion) {
         }))], []).then(galaxies => {
         function expand(dimension) {
             let i = galaxies.length - 1
-            g: for (let coordinate = galaxies[galaxies.length - 1][dimension] - 1; coordinate >= 0; coordinate--) {
+            g: for (let coordinate = galaxies[i][dimension] - 1; coordinate >= 0; coordinate--) {
                 while (i >= 0) {
                     const galaxyCoordinate = galaxies[i][dimension]
                     if (galaxyCoordinate < coordinate) {
