@@ -66,7 +66,7 @@ function summarize(fileName) {
             ]
         }
         const previousPatterns = patterns.slice(0, -1)
-        const currentPattern = patterns[patterns.length - 1]
+        const currentPattern = patterns.at(-1)
         return [
             ...previousPatterns,
             [...currentPattern, line],

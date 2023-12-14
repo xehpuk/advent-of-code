@@ -5,7 +5,7 @@ function solve(fileName, parseLine) {
 }
 
 function calculateCalibrationValue(digits) {
-    return 10 * digits[0] + digits[digits.length - 1]
+    return 10 * digits[0] + digits.at(-1)
 }
 
 export function part1(fileName = '01') {
