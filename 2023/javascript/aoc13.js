@@ -3,7 +3,8 @@ import {withLines} from './utils.js'
 function calcNote(expectedSmudges) {
     return pattern => {
         const maxRow = pattern.length - 1
-        r: for (let row = 0; row < maxRow; row++) {
+
+        function checkRow(row) {
             const length = Math.min(maxRow - row, row + 1)
             let fixedSmudges = 0
             for (let y = 0; y < length; y++) {
@@ -13,19 +14,24 @@ function calcNote(expectedSmudges) {
                     const mirroredRow = pattern[row + y + 1][x]
                     if (originalRow !== mirroredRow) {
                         if (fixedSmudges >= expectedSmudges) {
-                            continue r
+                            return false
                         }
                         fixedSmudges++
                     }
                 }
             }
-            if (fixedSmudges === expectedSmudges) {
+            return fixedSmudges === expectedSmudges
+        }
+
+        for (let row = 0; row < maxRow; row++) {
+            if (checkRow(row)) {
                 return 100 * (row + 1)
             }
         }
 
         const maxColumn = pattern[0].length - 1
-        c: for (let column = 0; column < maxColumn; column++) {
+
+        function checkColumn(column) {
             const length = Math.min(maxColumn - column, column + 1)
             let fixedSmudges = 0
             for (let x = 0; x < length; x++) {
@@ -34,13 +40,17 @@ function calcNote(expectedSmudges) {
                     const mirroredColumn = row[column + x + 1]
                     if (originalColumn !== mirroredColumn) {
                         if (fixedSmudges >= expectedSmudges) {
-                            continue c
+                            return false
                         }
                         fixedSmudges++
                     }
                 }
             }
-            if (fixedSmudges === expectedSmudges) {
+            return fixedSmudges === expectedSmudges
+        }
+
+        for (let column = 0; column < maxColumn; column++) {
+            if (checkColumn(column)) {
                 return column + 1
             }
         }
