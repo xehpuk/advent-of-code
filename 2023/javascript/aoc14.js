@@ -133,8 +133,12 @@ function clone(platform) {
     return platform.map(row => [...row])
 }
 
-export function part1(fileName = '14') {
+function parseFile(fileName) {
     return withLines(fileName, (platform, row) => [...platform, parseRow(row)], [])
+}
+
+export function part1(fileName = '14') {
+    return parseFile(fileName)
         .then(platform => {
             tiltNorth(platform)
 
@@ -143,7 +147,7 @@ export function part1(fileName = '14') {
 }
 
 export function part2(fileName = '14') {
-    return withLines(fileName, (platform, row) => [...platform, parseRow(row)], [])
+    return parseFile(fileName)
         .then(platform => {
             const numberOfCycles = 1_000_000_000
             const platforms = []
