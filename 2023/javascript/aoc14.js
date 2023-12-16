@@ -5,8 +5,8 @@ const CUBE = -1
 const EMPTY = 0
 
 function parseRow(row) {
-    return Array.from(row).map(stone => {
-        switch (stone) {
+    return Array.from(row).map(rock => {
+        switch (rock) {
             case 'O':
                 return ROUND
             case '#':
@@ -101,19 +101,6 @@ function equals(platform1, platform2) {
         }
     }
     return true
-}
-
-function stringify(platform) {
-    return platform.map(row => row.map(rock => {
-        switch (rock) {
-            case ROUND:
-                return 'O'
-            case CUBE:
-                return '#'
-            case EMPTY:
-                return '.'
-        }
-    }).join('')).join('\n')
 }
 
 function calcTotalLoad(platform) {
