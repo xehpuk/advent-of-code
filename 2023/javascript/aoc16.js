@@ -83,4 +83,36 @@ export function part1(fileName = '16') {
 
 export function part2(fileName = '16') {
     return withLines(fileName, (lines, line, index) => [...lines, line], [])
+        .then(contraption => {
+            let maxEnergy = 0
+            for (let y = 0; y < contraption.length; y++) {
+                maxEnergy = Math.max(maxEnergy, energize(contraption, {
+                    x: -1,
+                    y,
+                    dx: 1,
+                    dy: 0,
+                }))
+                maxEnergy = Math.max(maxEnergy, energize(contraption, {
+                    x: contraption[y].length,
+                    y,
+                    dx: -1,
+                    dy: 0,
+                }))
+            }
+            for (let x = 0; x < contraption[0].length; x++) {
+                maxEnergy = Math.max(maxEnergy, energize(contraption, {
+                    x,
+                    y: -1,
+                    dx: 0,
+                    dy: 1,
+                }))
+                maxEnergy = Math.max(maxEnergy, energize(contraption, {
+                    x,
+                    y: contraption.length,
+                    dx: 0,
+                    dy: -1,
+                }))
+            }
+            return maxEnergy
+        })
 }
