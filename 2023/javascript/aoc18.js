@@ -1,32 +1,12 @@
 import {withLines} from './utils.js'
 
-const conversion = {
-    R: {
-        dx: 1,
-        dy: 0,
-    },
-    D: {
-        dx: 0,
-        dy: 1,
-    },
-    L: {
-        dx: -1,
-        dy: 0,
-    },
-    U: {
-        dx: 0,
-        dy: -1,
-    },
-}
-
-function stringifyHole(x, y) {
+function stringifyCube(x, y) {
     return `${x},${y}`
 }
 
 function solve(fileName, parseLine) {
     return withLines(fileName, (digPlan, line) => {
-        const {direction, length} = parseLine(line)
-        const offset = conversion[direction]
+        const {offset, length} = parseLine(line)
         const x = digPlan.x + offset.dx * length
         const y = digPlan.y + offset.dy * length
         return {
@@ -62,66 +42,99 @@ function solve(fileName, parseLine) {
             holes[hole.y] ??= []
             holes[hole.y][hole.x] = 1
         }
-        const exteriorCubes = new Set()
+        const cubesToCheck = []
         const checkedCubes = new Set()
         const xLength = digPlan.xMax - digPlan.xMin + 1
         const yLength = digPlan.yMax - digPlan.yMin + 1
 
-        function isExterior(x, y) {
-            if (x < 0 || x >= xLength || y < 0 || y >= yLength) {
-                return true
+        function push(x, y) {
+            if (checkedCubes.has(stringifyCube(x, y))) {
+                return
             }
-            if (holes[y][x]) {
-                return false
+            cubesToCheck.push({x, y})
+        }
+
+        function checkCube(x, y) {
+            if (x < 0 || x >= xLength || y < 0 || y >= yLength || holes[y][x]) {
+                return
             }
-            const stringified = stringifyHole(x, y)
-            if (exteriorCubes.has(stringified)) {
-                return true
-            }
-            if (checkedCubes.has(stringified)) {
-                return false
-            }
-            checkedCubes.add(stringified)
-            if (isExterior(x + 1, y) |
-                isExterior(x, y + 1) |
-                isExterior(x - 1, y) |
-                isExterior(x, y - 1)) {
-                exteriorCubes.add(stringified)
-                return true
-            }
-            return false
+            checkedCubes.add(stringifyCube(x, y))
+            push(x + 1, y)
+            push(x, y + 1)
+            push(x - 1, y)
+            push(x, y - 1)
         }
 
         for (let y = 0; y < yLength; y++) {
-            if (isExterior(0, y)) {
-                holes[y][0] = 0
-            }
-            if (isExterior(xLength - 1, y)) {
-                holes[y][xLength - 1] = 0
-            }
+            cubesToCheck.push({x: 0, y})
+            cubesToCheck.push({x: xLength - 1, y})
         }
-        for (let x = 0; x < xLength; x++) {
-            if (isExterior(x, 0)) {
-                holes[0][x] = 0
-            }
-            if (isExterior(x, yLength - 1)) {
-                holes[yLength - 1][x] = 0
-            }
+        for (let x = 1; x < xLength - 1; x++) {
+            cubesToCheck.push({x, y: 0})
+            cubesToCheck.push({x, y: yLength - 1})
+        }
+        while (cubesToCheck.length > 0) {
+            const cube = cubesToCheck.pop()
+            checkCube(cube.x, cube.y)
         }
         return xLength * yLength - checkedCubes.size
     })
 }
 
 export function part1(fileName = '18') {
+    const conversion = {
+        R: {
+            dx: 1,
+            dy: 0,
+        },
+        D: {
+            dx: 0,
+            dy: 1,
+        },
+        L: {
+            dx: -1,
+            dy: 0,
+        },
+        U: {
+            dx: 0,
+            dy: -1,
+        },
+    }
+
     return solve(fileName, line => {
         const [, direction, length] = line.match(/([RDLU]) (\d+)/)
         return {
-            direction,
+            offset: conversion[direction],
             length,
         }
     })
 }
 
 export function part2(fileName = '18') {
-    return withLines(fileName, (lines, line, index) => [...lines, line], [])
+    return solve(fileName, line => {
+        const conversion = [
+            {
+                dx: 1,
+                dy: 0,
+            },
+            {
+                dx: 0,
+                dy: 1,
+            },
+            {
+                dx: -1,
+                dy: 0,
+            },
+            {
+                dx: 0,
+                dy: -1,
+            },
+        ]
+
+        const [, length, direction] = line.match(/#(.{5})(.)/)
+        return {
+            offset: conversion[direction],
+            length: Number.parseInt(length, 16),
+        }
+    })
 }
