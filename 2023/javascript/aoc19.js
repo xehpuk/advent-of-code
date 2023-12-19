@@ -74,21 +74,15 @@ export function part1(fileName = '19') {
     }, {
         workflows: {},
         parts: [],
-    }).then(system =>
-        system.parts.map(part => {
-            let workflowName = 'in'
-            while (system.workflows[workflowName]) {
-                for (const rule of system.workflows[workflowName]) {
-                    if (rule.predicate(part)) {
-                        workflowName = rule.destination
-                        break
-                    }
-                }
-            }
-            return workflowName === 'A'
-                ? Object.values(part).reduce((rating, value) => rating + value, 0)
-                : 0
-        }).reduce((sum, rating) => sum + rating, 0))
+    }).then(system => system.parts.reduce((sum, part) => {
+        let workflowName = 'in'
+        while (system.workflows[workflowName]) {
+            workflowName = system.workflows[workflowName].find(rule => rule.predicate(part))?.destination
+        }
+        return workflowName === 'A'
+            ? Object.values(part).reduce((sum, rating) => sum + rating, sum)
+            : sum
+    }, 0))
 }
 
 export function part2(fileName = '19') {
