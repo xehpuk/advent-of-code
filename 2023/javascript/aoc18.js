@@ -23,10 +23,9 @@ function stringifyHole(x, y) {
     return `${x},${y}`
 }
 
-export function part1(fileName = '18') {
-    const regex = /([RDLU]) (\d+)/
+function solve(fileName, parseLine) {
     return withLines(fileName, (digPlan, line) => {
-        const [, direction, length] = line.match(regex)
+        const {direction, length} = parseLine(line)
         const offset = conversion[direction]
         const x = digPlan.x + offset.dx * length
         const y = digPlan.y + offset.dy * length
@@ -67,6 +66,7 @@ export function part1(fileName = '18') {
         const checkedCubes = new Set()
         const xLength = digPlan.xMax - digPlan.xMin + 1
         const yLength = digPlan.yMax - digPlan.yMin + 1
+
         function isExterior(x, y) {
             if (x < 0 || x >= xLength || y < 0 || y >= yLength) {
                 return true
@@ -91,6 +91,7 @@ export function part1(fileName = '18') {
             }
             return false
         }
+
         for (let y = 0; y < yLength; y++) {
             if (isExterior(0, y)) {
                 holes[y][0] = 0
@@ -108,6 +109,16 @@ export function part1(fileName = '18') {
             }
         }
         return xLength * yLength - checkedCubes.size
+    })
+}
+
+export function part1(fileName = '18') {
+    return solve(fileName, line => {
+        const [, direction, length] = line.match(/([RDLU]) (\d+)/)
+        return {
+            direction,
+            length,
+        }
     })
 }
 
