@@ -1,7 +1,7 @@
 import {withLines} from './utils.js'
 
 export function part1(fileName = '20') {
-    return withLines(fileName, (configuration, line) => {
+    return withLines(fileName, (modules, line) => {
         function parseModule(module) {
             const [type] = module
             switch (type) {
@@ -28,33 +28,78 @@ export function part1(fileName = '20') {
         const destinations = destinationsCsv.split(', ')
 
         return {
-            ...configuration,
-            modules: {
-                ...configuration.modules,
-                [name]: {
-                    type,
-                    destinations,
-                },
+            ...modules,
+            [name]: {
+                type,
+                destinations,
             },
-            conjunctionModules: type === 'conjunction'
-                ? [...configuration.conjunctionModules, name]
-                : configuration.conjunctionModules,
         }
-    }, {
-        modules: {},
-        conjunctionModules: [],
-    }).then(({modules, conjunctionModules}) => {
-        for (const conjunctionModuleName of conjunctionModules) {
-            const conjunctionModule = modules[conjunctionModuleName]
-            const inputs = conjunctionModule.inputs ??= {}
-            for (const [name, {destinations}] of Object.entries(modules)) {
-                if (destinations.includes(conjunctionModuleName)) {
-                    inputs[name] = 0
+    }, {}).then(modules => {
+        for (const [name, {destinations}] of Object.entries(modules)) {
+            for (const destination of destinations) {
+                const destinationModule = modules[destination] ?? {}
+                switch (destinationModule.type) {
+                    case 'flip-flop':
+                        destinationModule.value = 0
+                        break
+                    case 'conjunction':
+                        (destinationModule.inputs ??= {})[name] = 0
+                        break
                 }
             }
         }
 
         return modules
+    }).then(modules => {
+        const pulseCount = [0, 0]
+        for (let i = 0; i < 1000; i++) {
+            const pulses = [{
+                source: 'button',
+                value: 0,
+                destination: 'broadcaster',
+            }]
+            while (pulses.length > 0) {
+                const {source, value, destination: name} = pulses.shift()
+                pulseCount[value]++
+                const module = modules[name] ?? {}
+                switch (module.type) {
+                    case 'flip-flop':
+                        if (value === 0) {
+                            module.value ^= 1
+                            for (const destination of module.destinations) {
+                                pulses.push({
+                                    source: name,
+                                    value: module.value,
+                                    destination,
+                                })
+                            }
+                        }
+                        break
+                    case 'conjunction':
+                        module.inputs[source] = value
+                        const pulseValue = +Object.values(module.inputs).some(input => input === 0)
+                        for (const destination of module.destinations) {
+                            pulses.push({
+                                source: name,
+                                value: pulseValue,
+                                destination,
+                            })
+                        }
+                        break
+                    case 'broadcast':
+                        for (const destination of module.destinations) {
+                            pulses.push({
+                                source: name,
+                                value,
+                                destination,
+                            })
+                        }
+                        break
+                }
+            }
+        }
+
+        return pulseCount[0] * pulseCount[1]
     })
 }
 
