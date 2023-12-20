@@ -11,9 +11,7 @@ export function part1(fileName = '19') {
                     destination: check,
                 }
             }
-
-            const property = check[0]
-            const operator = check[1]
+            const [property, operator] = check
             const value = +check.substring(2)
             const predicate = operator === '<'
                 ? part => part[property] < value
@@ -99,9 +97,7 @@ export function part2(fileName = '19') {
                     destination: check,
                 }
             }
-
-            const property = check[0]
-            const operator = check[1]
+            const [property, operator] = check
             const value = +check.substring(2)
             const template = transform => part => ({
                     ...part,

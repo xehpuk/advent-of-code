@@ -1,4 +1,4 @@
-import {part1, part2} from './aoc20.js'
+import {part1} from './aoc20.js'
 
 test('day 20, part 1.1', async () => {
     const received = await part1('20_test1')
