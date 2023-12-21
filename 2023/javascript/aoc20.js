@@ -1,3 +1,5 @@
+import lcm from 'lcm'
+
 import {withLines} from './utils.js'
 
 function parseModules(modules, line) {
@@ -103,5 +105,41 @@ export function part1(fileName = '20') {
 }
 
 export function part2(fileName = '20') {
-    return withLines(fileName, (lines, line, index) => [...lines, line], [])
+    return withLines(fileName, parseModules, {})
+        .then(initModules)
+        .then(modules => {
+            // assumption: module rx only has one input, which is a conjunction
+            const inputs = {
+                ...Object.values(modules)
+                    .find(({destinations}) => destinations.includes('rx')).inputs,
+            }
+            for (let buttonPresses = 1; ; buttonPresses++) {
+                const pulses = [{
+                    source: 'button',
+                    value: 0,
+                    destination: 'broadcaster',
+                }]
+                while (pulses.length > 0) {
+                    const pulse = pulses.shift()
+                    const module = modules[pulse.destination] ?? {}
+                    const value = process(pulse, module)
+                    if (value !== undefined) {
+                        for (const destination of module.destinations) {
+                            if (inputs[pulse.destination] === 0 && value === 1) {
+                                inputs[pulse.destination] = buttonPresses
+                                const values = Object.values(inputs)
+                                if (values.every(value => value > 0)) {
+                                    return values.reduce(lcm)
+                                }
+                            }
+                            pulses.push({
+                                source: pulse.destination,
+                                value,
+                                destination,
+                            })
+                        }
+                    }
+                }
+            }
+        })
 }
