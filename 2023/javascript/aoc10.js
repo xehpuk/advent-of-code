@@ -9,12 +9,6 @@ const tileDirections = {
     'F': ['E', 'S'],
 }
 
-const tilesPointingNorth = new Set(
-    Object.entries(tileDirections)
-        .filter(([, directions]) => directions.includes('N'))
-        .map(([tile]) => tile),
-)
-
 const directions = {
     E: ([y, x]) => [y, x + 1],
     S: ([y, x]) => [y + 1, x],
@@ -42,6 +36,9 @@ function parseGrid(fileName) {
     }, {tiles: []})
 }
 
+/**
+ * @returns {boolean} whether the starting position connects north
+ */
 function walkLoop(start, tiles, handlePipe) {
     function findFirstPipe() {
         for (const [direction, move] of Object.entries(directions)) {
@@ -61,6 +58,7 @@ function walkLoop(start, tiles, handlePipe) {
     }
 
     let pipe = findFirstPipe()
+    const startConnectsNorth = pipe.direction === 'N'
     while (pipe.y !== start[0] || pipe.x !== start[1]) {
         const direction = tileDirections[pipe.label].find(direction => direction !== opposites[pipe.direction])
         const [y, x] = directions[direction]([pipe.y, pipe.x])
@@ -74,6 +72,7 @@ function walkLoop(start, tiles, handlePipe) {
         }
         handlePipe(pipe)
     }
+    return startConnectsNorth || pipe.direction === opposites['N']
 }
 
 export function part1(fileName = '10') {
@@ -92,12 +91,20 @@ export function part1(fileName = '10') {
 export function part2(fileName = '10') {
     return parseGrid(fileName)
         .then(({start, tiles}) => {
+            const tilesConnectingNorth = new Set(
+                Object.entries(tileDirections)
+                    .filter(([, directions]) => directions.includes('N'))
+                    .map(([tile]) => tile),
+            )
+
             const loop = []
 
-            walkLoop(start, tiles, pipe => {
+            if (walkLoop(start, tiles, pipe => {
                 loop[pipe.y] ??= []
-                loop[pipe.y][pipe.x] = tilesPointingNorth.has(pipe.label)
-            })
+                loop[pipe.y][pipe.x] = pipe.label
+            })) {
+                tilesConnectingNorth.add('S')
+            }
 
             let enclosed = 0
             for (let y = 0; y < tiles.length; y++) {
@@ -107,9 +114,9 @@ export function part2(fileName = '10') {
                 }
                 let interior = 0
                 for (let x = 0; x < tiles[y].length - 1; x++) {
-                    const north = row[x]
-                    if (north !== undefined) {
-                        interior ^= north
+                    const label = row[x]
+                    if (label !== undefined) {
+                        interior ^= tilesConnectingNorth.has(label)
                     } else {
                         enclosed += interior
                     }
