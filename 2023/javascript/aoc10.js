@@ -68,5 +68,64 @@ export function part1(fileName = '10') {
 }
 
 export function part2(fileName = '10') {
-    return withLines(fileName, (lines, line) => [...lines, line], [])
+    return withLines(fileName, (grid, line, index) => {
+        const startIndex = line.indexOf(startLabel)
+        return {
+            start: grid.start || startIndex !== -1 && [index, startIndex],
+            tiles: [
+                ...grid.tiles,
+                line,
+            ],
+        }
+    }, {tiles: []}).then(({start, tiles}) => {
+        let tile = (() => {
+            for (const [direction, move] of Object.entries(directions)) {
+                const [nextY, nextX] = move(start)
+                const label = tiles[nextY][nextX]
+                if (tileDirections[label].includes(opposites[direction])) {
+                    return {
+                        direction,
+                        nextY,
+                        nextX,
+                        label,
+                    }
+                }
+            }
+        })()
+        const loop = [tile]
+        while (tile.label !== startLabel) {
+            const direction = tileDirections[tile.label].find(direction => direction !== opposites[tile.direction])
+            const [nextY, nextX] = directions[direction]([tile.nextY, tile.nextX])
+            const label = tiles[nextY][nextX]
+            tile = {
+                direction,
+                nextY,
+                nextX,
+                label,
+            }
+            loop.push(tile)
+        }
+
+        const tilesPointingNorth = new Set(
+            Object.entries(tileDirections)
+                .filter(([, directions]) => directions.includes('N'))
+                .map(([tile]) => tile),
+        )
+
+        let interior = 0
+        for (let y = 0; y < tiles.length; y++) {
+            let numberOfPipes = 0
+            for (let x = 0; x < tiles[y].length; x++) {
+                const pipe = loop.find(({nextY, nextX}) => nextY === y && nextX === x)
+                if (pipe) {
+                    if (tilesPointingNorth.has(pipe.label)) {
+                        numberOfPipes ^= 1
+                    }
+                } else {
+                    interior += numberOfPipes
+                }
+            }
+        }
+        return interior
+    })
 }

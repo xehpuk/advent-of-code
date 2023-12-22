@@ -32,10 +32,20 @@ test('day 10, part 2.2', async () => {
 
 test('day 10, part 2.3', async () => {
     const received = await part2('10_test7')
-    expect(received).toBe(8)
+    expect(received).toBe(4)
 })
 
 test('day 10, part 2.4', async () => {
     const received = await part2('10_test8')
+    expect(received).toBe(4)
+})
+
+test('day 10, part 2.5', async () => {
+    const received = await part2('10_test9')
+    expect(received).toBe(8)
+})
+
+test('day 10, part 2.6', async () => {
+    const received = await part2('10_test10')
     expect(received).toBe(10)
 })
