@@ -31,7 +31,7 @@ const opposites = {
     N: 'S',
 }
 
-export function part1(fileName = '10') {
+function parseGrid(fileName) {
     return withLines(fileName, (grid, line, index) => {
         const startIndex = line.indexOf(startLabel)
         return {
@@ -41,99 +41,80 @@ export function part1(fileName = '10') {
                 line,
             ],
         }
-    }, {tiles: []}).then(({start, tiles}) => {
-        let tile = (() => {
-            for (const [direction, move] of Object.entries(directions)) {
-                const [nextY, nextX] = move(start)
-                const label = tiles[nextY][nextX]
-                if (tileDirections[label].includes(opposites[direction])) {
-                    return {
-                        direction,
-                        nextY,
-                        nextX,
-                        label,
-                    }
-                }
-            }
-        })()
-        let i = 1
-        while (tile.label !== startLabel) {
-            const direction = tileDirections[tile.label].find(direction => direction !== opposites[tile.direction])
-            const [nextY, nextX] = directions[direction]([tile.nextY, tile.nextX])
+    }, {tiles: []})
+}
+
+function walkLoop(start, tiles, handlePipe) {
+    let pipe = (() => {
+        for (const [direction, move] of Object.entries(directions)) {
+            const [nextY, nextX] = move(start)
             const label = tiles[nextY][nextX]
-            tile = {
-                direction,
-                nextY,
-                nextX,
-                label,
+            if (tileDirections[label].includes(opposites[direction])) {
+                const pipe = {
+                    direction,
+                    nextY,
+                    nextX,
+                    label,
+                }
+                handlePipe(pipe)
+                return pipe
             }
-            i++
         }
-        return i / 2
-    })
+    })()
+    while (pipe.label !== startLabel) {
+        const direction = tileDirections[pipe.label].find(direction => direction !== opposites[pipe.direction])
+        const [nextY, nextX] = directions[direction]([pipe.nextY, pipe.nextX])
+        const label = tiles[nextY][nextX]
+
+        pipe = {
+            direction,
+            nextY,
+            nextX,
+            label,
+        }
+        handlePipe(pipe)
+    }
+}
+
+export function part1(fileName = '10') {
+    return parseGrid(fileName)
+        .then(({start, tiles}) => {
+            let i = 0
+
+            walkLoop(start, tiles, _ => {
+                i++
+            })
+
+            return i / 2
+        })
 }
 
 export function part2(fileName = '10') {
-    return withLines(fileName, (grid, line, index) => {
-        const startIndex = line.indexOf(startLabel)
-        return {
-            start: grid.start || startIndex !== -1 && [index, startIndex],
-            tiles: [
-                ...grid.tiles,
-                line,
-            ],
-        }
-    }, {tiles: []}).then(({start, tiles}) => {
-        const loop = []
-        let tile = (() => {
-            for (const [direction, move] of Object.entries(directions)) {
-                const [nextY, nextX] = move(start)
-                const label = tiles[nextY][nextX]
-                if (tileDirections[label].includes(opposites[direction])) {
-                    loop[nextY] = []
-                    loop[nextY][nextX] = tilesPointingNorth.has(label)
+    return parseGrid(fileName)
+        .then(({start, tiles}) => {
+            const loop = []
 
-                    return {
-                        direction,
-                        nextY,
-                        nextX,
-                        label,
+            walkLoop(start, tiles, pipe => {
+                loop[pipe.nextY] ??= []
+                loop[pipe.nextY][pipe.nextX] = tilesPointingNorth.has(pipe.label)
+            })
+
+            let enclosed = 0
+            for (let y = 0; y < tiles.length; y++) {
+                const row = loop[y]
+                if (row === undefined) {
+                    continue
+                }
+                let interior = 0
+                for (let x = 0; x < tiles[y].length - 1; x++) {
+                    const pipe = row[x]
+                    if (pipe !== undefined) {
+                        interior ^= pipe
+                    } else {
+                        enclosed += interior
                     }
                 }
             }
-        })()
-        while (tile.label !== startLabel) {
-            const direction = tileDirections[tile.label].find(direction => direction !== opposites[tile.direction])
-            const [nextY, nextX] = directions[direction]([tile.nextY, tile.nextX])
-            const label = tiles[nextY][nextX]
-
-            loop[nextY] ??= []
-            loop[nextY][nextX] = tilesPointingNorth.has(label)
-
-            tile = {
-                direction,
-                nextY,
-                nextX,
-                label,
-            }
-        }
-
-        let interior = 0
-        for (let y = 0; y < tiles.length; y++) {
-            const row = loop[y]
-            if (row === undefined) {
-                continue
-            }
-            let numberOfPipes = 0
-            for (let x = 0; x < tiles[y].length - 1; x++) {
-                const pipe = row[x]
-                if (pipe !== undefined) {
-                    numberOfPipes ^= pipe
-                } else {
-                    interior += numberOfPipes
-                }
-            }
-        }
-        return interior
-    })
+            return enclosed
+        })
 }
