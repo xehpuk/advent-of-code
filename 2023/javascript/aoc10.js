@@ -18,10 +18,10 @@ const tilesPointingNorth = new Set(
 )
 
 const directions = {
-    E: ([lat, long]) => [lat, long + 1],
-    S: ([lat, long]) => [lat + 1, long],
-    W: ([lat, long]) => [lat, long - 1],
-    N: ([lat, long]) => [lat - 1, long],
+    E: ([y, x]) => [y, x + 1],
+    S: ([y, x]) => [y + 1, x],
+    W: ([y, x]) => [y, x - 1],
+    N: ([y, x]) => [y - 1, x],
 }
 
 const opposites = {
@@ -47,13 +47,13 @@ function parseGrid(fileName) {
 function walkLoop(start, tiles, handlePipe) {
     let pipe = (() => {
         for (const [direction, move] of Object.entries(directions)) {
-            const [nextY, nextX] = move(start)
-            const label = tiles[nextY][nextX]
+            const [y, x] = move(start)
+            const label = tiles[y][x]
             if (tileDirections[label].includes(opposites[direction])) {
                 const pipe = {
                     direction,
-                    nextY,
-                    nextX,
+                    y,
+                    x,
                     label,
                 }
                 handlePipe(pipe)
@@ -63,13 +63,13 @@ function walkLoop(start, tiles, handlePipe) {
     })()
     while (pipe.label !== startLabel) {
         const direction = tileDirections[pipe.label].find(direction => direction !== opposites[pipe.direction])
-        const [nextY, nextX] = directions[direction]([pipe.nextY, pipe.nextX])
-        const label = tiles[nextY][nextX]
+        const [y, x] = directions[direction]([pipe.y, pipe.x])
+        const label = tiles[y][x]
 
         pipe = {
             direction,
-            nextY,
-            nextX,
+            y,
+            x,
             label,
         }
         handlePipe(pipe)
@@ -95,8 +95,8 @@ export function part2(fileName = '10') {
             const loop = []
 
             walkLoop(start, tiles, pipe => {
-                loop[pipe.nextY] ??= []
-                loop[pipe.nextY][pipe.nextX] = tilesPointingNorth.has(pipe.label)
+                loop[pipe.y] ??= []
+                loop[pipe.y][pipe.x] = tilesPointingNorth.has(pipe.label)
             })
 
             let enclosed = 0
@@ -107,9 +107,9 @@ export function part2(fileName = '10') {
                 }
                 let interior = 0
                 for (let x = 0; x < tiles[y].length - 1; x++) {
-                    const pipe = row[x]
-                    if (pipe !== undefined) {
-                        interior ^= pipe
+                    const north = row[x]
+                    if (north !== undefined) {
+                        interior ^= north
                     } else {
                         enclosed += interior
                     }
