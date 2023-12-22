@@ -1,7 +1,5 @@
 import {withLines} from './utils.js'
 
-const startLabel = 'S'
-
 const tileDirections = {
     '-': ['E', 'W'],
     'J': ['W', 'N'],
@@ -33,7 +31,7 @@ const opposites = {
 
 function parseGrid(fileName) {
     return withLines(fileName, (grid, line, index) => {
-        const startIndex = line.indexOf(startLabel)
+        const startIndex = line.indexOf('S')
         return {
             start: grid.start || startIndex !== -1 && [index, startIndex],
             tiles: [
@@ -45,7 +43,7 @@ function parseGrid(fileName) {
 }
 
 function walkLoop(start, tiles, handlePipe) {
-    let pipe = (() => {
+    function findFirstPipe() {
         for (const [direction, move] of Object.entries(directions)) {
             const [y, x] = move(start)
             const label = tiles[y][x]
@@ -60,8 +58,10 @@ function walkLoop(start, tiles, handlePipe) {
                 return pipe
             }
         }
-    })()
-    while (pipe.label !== startLabel) {
+    }
+
+    let pipe = findFirstPipe()
+    while (pipe.y !== start[0] || pipe.x !== start[1]) {
         const direction = tileDirections[pipe.label].find(direction => direction !== opposites[pipe.direction])
         const [y, x] = directions[direction]([pipe.y, pipe.x])
         const label = tiles[y][x]
