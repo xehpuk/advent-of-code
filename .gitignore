@@ -8,4 +8,9 @@
 *.pdb
 */rust/target
 
+*/java/target
+
+/out
+*/_input
+
 node_modules
