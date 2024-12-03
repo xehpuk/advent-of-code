@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 /// An alternative to [Day01] using `(List<Integer>, List<Integer>)` instead of `List<(int, int)>`.
 /// Too verbose and probably (can't bother to benchmark) not as efficient.
 @SuppressWarnings("unused")
-public class Day01Alt {
+public class Day01ListPair {
     public static long part1(final Stream<String> lines) {
         final var idListPair = parseLines(lines);
         final var sortedLeft = idListPair.left().stream()
@@ -38,7 +38,7 @@ public class Day01Alt {
 
     private static IdListPair parseLines(final Stream<String> lines) {
         return lines
-                .map(Day01Alt::parseLine)
+                .map(Day01ListPair::parseLine)
                 .collect(
                         () -> new IdListPair(new ArrayList<>(), new ArrayList<>()),
                         (idListPair, idPair) -> {
