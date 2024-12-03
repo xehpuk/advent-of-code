@@ -16,6 +16,9 @@ public class Day03Reduce {
     }
 
     public static long part2(final Stream<String> lines) {
+        record Acc(boolean enabled, long sum) {
+        }
+
         return lines
                 .flatMap(Day03Reduce::parseLine2)
                 .reduce(new Acc(true, 0),
@@ -57,8 +60,5 @@ public class Day03Reduce {
 
     enum Dont implements Instruction {
         INSTANCE
-    }
-
-    record Acc(boolean enabled, long sum) {
     }
 }

@@ -1,39 +1,46 @@
 package de.xehpuk;
 
 import java.util.regex.Pattern;
-import java.util.stream.Gatherers;
+import java.util.stream.Gatherer;
 import java.util.stream.Stream;
 
-/// An alternative to [Day03] using [java.util.stream.Gatherers]`.fold()` instead of a traditional `for`-loop.
-public class Day03Fold {
+/// An alternative to [Day03] using [Gatherer]`.ofSequential()` instead of a traditional `for`-loop.
+public class Day03Gatherer {
     private static final Pattern PATTERN = Pattern.compile("mul\\((\\d+),(\\d+)\\)");
     private static final Pattern PATTERN2 = Pattern.compile("mul\\((\\d+),(\\d+)\\)|do\\(\\)|don't\\(\\)");
 
     public static long part1(final Stream<String> lines) {
         return lines
-                .flatMap(Day03Fold::parseLine)
+                .flatMap(Day03Gatherer::parseLine)
                 .mapToInt(mul -> mul.left() * mul.right())
                 .sum();
     }
 
     public static long part2(final Stream<String> lines) {
-        record Acc(boolean enabled, long sum) {
+        class Acc {
+            boolean enabled = true;
+            long sum;
         }
 
         return lines
-                .flatMap(Day03Fold::parseLine2)
-                .gather(Gatherers.fold(
-                        () -> new Acc(true, 0),
-                        (acc, instruction) ->
-                                switch (instruction) {
-                                    case Mul(int left, int right) -> acc.enabled()
-                                            ? new Acc(true, acc.sum() + left * right)
-                                            : acc;
-                                    case Do.INSTANCE -> new Acc(true, acc.sum());
-                                    case Dont.INSTANCE -> new Acc(false, acc.sum());
-                                }
-                ))
-                .findAny().get().sum();
+                .flatMap(Day03Gatherer::parseLine2)
+                .gather(Gatherer.<Instruction, Acc, Long>ofSequential(Acc::new, (acc, element, _) -> {
+                    switch (element) {
+                        case Mul(int left, int right):
+                            if (acc.enabled) {
+                                acc.sum += left * right;
+                            }
+                            break;
+                        case Do.INSTANCE:
+                            acc.enabled = true;
+                            break;
+                        case Dont.INSTANCE:
+                            acc.enabled = false;
+                            break;
+                    }
+                    return true;
+                }, (acc, downstream) -> downstream.push(acc.sum)))
+                .findAny().get();
     }
 
     private static Stream<Mul> parseLine(final String line) {
