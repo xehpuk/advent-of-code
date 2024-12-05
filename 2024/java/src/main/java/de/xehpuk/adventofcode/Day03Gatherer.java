@@ -1,4 +1,4 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import java.util.regex.Pattern;
 import java.util.stream.Gatherer;

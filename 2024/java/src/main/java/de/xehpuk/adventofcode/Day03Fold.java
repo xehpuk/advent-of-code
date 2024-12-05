@@ -1,16 +1,17 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import java.util.regex.Pattern;
+import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
-/// An alternative to [Day03] using `reduce()` instead of a traditional `for`-loop.
-public class Day03Reduce {
+/// An alternative to [Day03] using [java.util.stream.Gatherers]`.fold()` instead of a traditional `for`-loop.
+public class Day03Fold {
     private static final Pattern PATTERN = Pattern.compile("mul\\((\\d+),(\\d+)\\)");
     private static final Pattern PATTERN2 = Pattern.compile("mul\\((\\d+),(\\d+)\\)|do\\(\\)|don't\\(\\)");
 
     public static long part1(final Stream<String> lines) {
         return lines
-                .flatMap(Day03Reduce::parseLine)
+                .flatMap(Day03Fold::parseLine)
                 .mapToInt(mul -> mul.left() * mul.right())
                 .sum();
     }
@@ -20,8 +21,9 @@ public class Day03Reduce {
         }
 
         return lines
-                .flatMap(Day03Reduce::parseLine2)
-                .reduce(new Acc(true, 0),
+                .flatMap(Day03Fold::parseLine2)
+                .gather(Gatherers.fold(
+                        () -> new Acc(true, 0),
                         (acc, instruction) ->
                                 switch (instruction) {
                                     case Mul(int left, int right) -> acc.enabled()
@@ -29,9 +31,9 @@ public class Day03Reduce {
                                             : acc;
                                     case Do.INSTANCE -> new Acc(true, acc.sum());
                                     case Dont.INSTANCE -> new Acc(false, acc.sum());
-                                },
-                        (acc, acc2) -> new Acc(acc2.enabled(), acc.sum() + acc2.sum())
-                ).sum();
+                                }
+                ))
+                .findAny().get().sum();
     }
 
     private static Stream<Mul> parseLine(final String line) {

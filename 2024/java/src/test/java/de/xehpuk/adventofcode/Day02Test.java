@@ -1,4 +1,4 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import org.junit.jupiter.api.Test;
 

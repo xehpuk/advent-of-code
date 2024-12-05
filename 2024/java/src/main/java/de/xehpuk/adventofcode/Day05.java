@@ -1,4 +1,4 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import java.util.*;
 import java.util.function.Function;

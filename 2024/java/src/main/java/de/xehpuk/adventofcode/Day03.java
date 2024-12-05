@@ -1,39 +1,42 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import java.util.regex.Pattern;
-import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
-/// An alternative to [Day03] using [java.util.stream.Gatherers]`.fold()` instead of a traditional `for`-loop.
-public class Day03Fold {
+public class Day03 {
     private static final Pattern PATTERN = Pattern.compile("mul\\((\\d+),(\\d+)\\)");
     private static final Pattern PATTERN2 = Pattern.compile("mul\\((\\d+),(\\d+)\\)|do\\(\\)|don't\\(\\)");
 
     public static long part1(final Stream<String> lines) {
         return lines
-                .flatMap(Day03Fold::parseLine)
+                .flatMap(Day03::parseLine)
                 .mapToInt(mul -> mul.left() * mul.right())
                 .sum();
     }
 
     public static long part2(final Stream<String> lines) {
-        record Acc(boolean enabled, long sum) {
-        }
+        final Iterable<Instruction> instructions = () -> lines
+                .flatMap(Day03::parseLine2)
+                .iterator();
 
-        return lines
-                .flatMap(Day03Fold::parseLine2)
-                .gather(Gatherers.fold(
-                        () -> new Acc(true, 0),
-                        (acc, instruction) ->
-                                switch (instruction) {
-                                    case Mul(int left, int right) -> acc.enabled()
-                                            ? new Acc(true, acc.sum() + left * right)
-                                            : acc;
-                                    case Do.INSTANCE -> new Acc(true, acc.sum());
-                                    case Dont.INSTANCE -> new Acc(false, acc.sum());
-                                }
-                ))
-                .findAny().get().sum();
+        var enabled = true;
+        var sum = 0;
+        for (var instruction : instructions) {
+            switch (instruction) {
+                case Mul(int left, int right):
+                    if (enabled) {
+                        sum += left * right;
+                    }
+                    break;
+                case Do.INSTANCE:
+                    enabled = true;
+                    break;
+                case Dont.INSTANCE:
+                    enabled = false;
+                    break;
+            }
+        }
+        return sum;
     }
 
     private static Stream<Mul> parseLine(final String line) {

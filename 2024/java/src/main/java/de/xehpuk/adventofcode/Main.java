@@ -1,4 +1,4 @@
-import de.xehpuk.*;
+import de.xehpuk.adventofcode.*;
 
 void main() {
     solve(1, 1, Day01::part1);

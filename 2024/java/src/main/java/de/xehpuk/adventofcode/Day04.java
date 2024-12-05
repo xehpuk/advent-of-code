@@ -1,4 +1,4 @@
-package de.xehpuk;
+package de.xehpuk.adventofcode;
 
 import java.util.List;
 import java.util.stream.Stream;
