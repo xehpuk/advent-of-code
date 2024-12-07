@@ -41,17 +41,14 @@ public class Day07 {
             return false;
         }
         for (final var operator : test.operators()) {
-            try {
-                if (test(test, operator.eval(result, test.operands()[i]), i + 1)) {
-                    return true;
-                }
-            } catch (ArithmeticException _) {
+            if (test(test, operator.eval(result, test.operands()[i]), i + 1)) {
+                return true;
             }
         }
         return false;
     }
 
-    record Test(long test, long[] operands, Op[] operators) {
+    record Test(long test, int[] operands, Op[] operators) {
         Test(final Equation equation, final Op[] operators) {
             this(equation.test(), equation.operands(), operators);
         }
@@ -61,35 +58,35 @@ public class Day07 {
         final String[] split = line.split(": ", 2);
         final var test = Long.parseLong(split[0]);
         final var operands = Arrays.stream(split[1].split(" "))
-                .mapToLong(Long::parseLong)
+                .mapToInt(Integer::parseInt)
                 .toArray();
         return new Equation(test, operands);
     }
 
-    record Equation(long test, long[] operands) {
+    record Equation(long test, int[] operands) {
     }
 
     enum Op {
         ADD {
             @Override
-            long eval(final long first, final long second) {
-                return Math.addExact(first, second);
+            long eval(final long first, final int second) {
+                return first + second;
             }
         },
         MUL {
             @Override
-            long eval(final long first, final long second) {
-                return Math.multiplyExact(first, second);
+            long eval(final long first, final int second) {
+                return first * second;
             }
         },
         CONCAT {
             @Override
-            long eval(final long first, final long second) {
+            long eval(final long first, final int second) {
                 final int digits = (int) (Math.log10(second) + 1);
-                return ADD.eval(MUL.eval(first, (long) Math.pow(10, digits)), second);
+                return first * (long) Math.pow(10, digits) + second;
             }
         };
 
-        abstract long eval(long first, long second);
+        abstract long eval(long first, int second);
     }
 }
