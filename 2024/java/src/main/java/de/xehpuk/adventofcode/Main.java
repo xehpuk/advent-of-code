@@ -13,6 +13,8 @@ void main() {
     solve(5, 2, Day05::part2);
     solve(6, 1, Day06::part1);
     solve(6, 2, Day06::part2);
+    solve(7, 1, Day07::part1);
+    solve(7, 2, Day07::part2);
 }
 
 void solve(final int day, final int part, final Function<Stream<String>, ?> handleLines) {
