@@ -18,6 +18,14 @@ public class Utils {
         }
     }
 
+    public record LE<E>(E e, long l) {
+    }
+
+    public static <T> LE<T> withTiming(final Supplier<T> supplier) {
+        final long start = System.currentTimeMillis();
+        return new LE<>(supplier.get(), System.currentTimeMillis() - start);
+    }
+
     // https://mail.openjdk.org/pipermail/core-libs-dev/2024-December/136867.html
     public static <TR> Gatherer<TR, ?, IndexedElement<TR>> indexed() {
         return Gatherer.ofSequential(

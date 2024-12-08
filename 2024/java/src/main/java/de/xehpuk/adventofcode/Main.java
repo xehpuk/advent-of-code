@@ -19,9 +19,9 @@ void main() {
 
 void solve(final int day, final int part, final Function<Stream<String>, ?> handleLines) {
     final var fmtDay = "%02d".formatted(day);
-    final var solution = Utils.withLines(fmtDay, handleLines);
+    final var solution = Utils.withTiming(() -> Utils.withLines(fmtDay, handleLines));
 
-    printf("day %s, part %d: %s%n", fmtDay, part, solution);
+    printf("day %s, part %d (%dms): %s%n", fmtDay, part, solution.l(), solution.e());
 }
 
 // https://mail.openjdk.org/pipermail/amber-dev/2024-December/009101.html
