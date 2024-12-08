@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Gatherer;
 import java.util.stream.Stream;
 
@@ -24,6 +25,10 @@ public class Utils {
     public static <T> LE<T> withTiming(final Supplier<T> supplier) {
         final long start = System.currentTimeMillis();
         return new LE<>(supplier.get(), System.currentTimeMillis() - start);
+    }
+
+    public static <T> T middleElement(final List<T> list) {
+        return list.get(list.size() / 2);
     }
 
     public static int countDigits(final int digits) {
@@ -75,9 +80,5 @@ public class Utils {
                 Gatherer.Integrator.ofGreedy((state, element, downstream) ->
                         downstream.push(new EI<>(element, state[0]++)))
         );
-    }
-
-    public static <T> T middleElement(final List<T> list) {
-        return list.get(list.size() / 2);
     }
 }
