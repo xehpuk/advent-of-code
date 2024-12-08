@@ -109,17 +109,15 @@ public class Utils {
     public record Pair<L, R>(L l, R r) {
     }
 
-    public static <L, R> List<List<Pair<L, R>>> cartesianProduct(final List<L> left, final List<R> right) {
+    public static <L, R> Stream<Stream<Pair<L, R>>> cartesianProduct(final List<L> left, final List<R> right) {
         return switch (left.size()) {
-            case 0 -> List.of();
-            case 1 -> List.of(right.stream().map(r -> new Pair<>(left.getFirst(), r)).toList());
+            case 0 -> Stream.empty();
+            case 1 -> Stream.of(right.stream().map(r -> new Pair<>(left.getFirst(), r)));
             case int s -> IntStream.range(0, (int) pow(s, right.size()))
                     .mapToLong(i -> toBase(i, s))
                     .mapToObj(i -> right.stream()
                             .gather(indexed())
-                            .map(r -> new Pair<>(left.get(nthDigit(i, r.i())), r.e()))
-                            .toList())
-                    .toList();
+                            .map(r -> new Pair<>(left.get(nthDigit(i, r.i())), r.e())));
         };
     }
 }

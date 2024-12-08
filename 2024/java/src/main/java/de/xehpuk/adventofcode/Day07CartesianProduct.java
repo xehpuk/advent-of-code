@@ -3,6 +3,8 @@ package de.xehpuk.adventofcode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Gatherer;
+import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
 public class Day07CartesianProduct {
@@ -31,16 +33,25 @@ public class Day07CartesianProduct {
     }
 
     private static boolean test(final Test test) {
-        for (var pairs : Utils.cartesianProduct(test.operators(), test.operands().subList(1, test.operands().size()))) {
-            long result = test.operands().getFirst();
-            for (var pair : pairs) {
-                result = pair.l().eval(result, pair.r());
-            }
-            if (result == test.test()) {
-                return true;
-            }
-        }
-        return false;
+        return Utils.cartesianProduct(test.operators(), test.operands().subList(1, test.operands().size()))
+                .parallel()
+                .gather(Gatherer.<Stream<Utils.Pair<Op, Integer>>, Boolean>of(
+                        Gatherer.Integrator.ofGreedy((_, pairs, downstream) -> {
+                            final long result = pairs
+                                    .gather(Gatherers.fold(
+                                            () -> (long) test.operands().getFirst(),
+                                            (acc, pair) -> pair.l().eval(acc, pair.r())
+                                    ))
+                                    .findAny().get();
+                            if (result == test.test()) {
+                                downstream.push(true);
+                                return false;
+                            }
+                            return true;
+                        }),
+                        (_, downstream) -> downstream.push(false)
+                ))
+                .findFirst().get();
     }
 
     record Test(long test, List<Integer> operands, List<Op> operators) {
