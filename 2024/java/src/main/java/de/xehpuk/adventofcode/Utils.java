@@ -64,16 +64,17 @@ public class Utils {
         }
         return result;
     }
+
+    public record EI<E>(E e, int i) {
+    }
+
     // https://mail.openjdk.org/pipermail/core-libs-dev/2024-December/136867.html
-    public static <TR> Gatherer<TR, ?, IndexedElement<TR>> indexed() {
+    public static <TR> Gatherer<TR, ?, EI<TR>> indexed() {
         return Gatherer.ofSequential(
                 () -> new int[1],
                 Gatherer.Integrator.ofGreedy((state, element, downstream) ->
-                        downstream.push(new IndexedElement<>(state[0]++, element)))
+                        downstream.push(new EI<>(element, state[0]++)))
         );
-    }
-
-    public record IndexedElement<T>(int index, T element) {
     }
 
     public static <T> T middleElement(final List<T> list) {
