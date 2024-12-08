@@ -82,8 +82,7 @@ public class Day07 {
         CONCAT {
             @Override
             long eval(final long first, final int second) {
-                final int digits = (int) (Math.log10(second) + 1);
-                return first * (long) Math.pow(10, digits) + second;
+                return first * Utils.pow(10, Utils.countDigits(second)) + second;
             }
         };
 

@@ -26,6 +26,44 @@ public class Utils {
         return new LE<>(supplier.get(), System.currentTimeMillis() - start);
     }
 
+    public static int countDigits(final int digits) {
+        return switch (digits) {
+            case int _ when digits < 10 -> 1;
+            case int _ when digits < 100 -> 2;
+            case int _ when digits < 1_000 -> 3;
+            case int _ when digits < 10_000 -> 4;
+            case int _ when digits < 100_000 -> 5;
+            case int _ when digits < 1_000_000 -> 6;
+            case int _ when digits < 10_000_000 -> 7;
+            case int _ when digits < 100_000_000 -> 8;
+            case int _ when digits < 1_000_000_000 -> 9;
+            default -> 10;
+        };
+    }
+
+    public static int countDigits(final long digits) {
+        return switch (digits) {
+            case int i -> countDigits(i);
+            case long _ when digits < 10_000_000_000L -> 10;
+            case long _ when digits < 100_000_000_000L -> 11;
+            case long _ when digits < 1_000_000_000_000L -> 12;
+            case long _ when digits < 10_000_000_000_000L -> 13;
+            case long _ when digits < 100_000_000_000_000L -> 14;
+            case long _ when digits < 1_000_000_000_000_000L -> 15;
+            case long _ when digits < 10_000_000_000_000_000L -> 16;
+            case long _ when digits < 100_000_000_000_000_000L -> 17;
+            case long _ when digits < 1_000_000_000_000_000_000L -> 18;
+            default -> 19;
+        };
+    }
+
+    public static long pow(final int base, final int exponent) {
+        long result = 1;
+        for (int e = 0; e < exponent; e++) {
+            result *= base;
+        }
+        return result;
+    }
     // https://mail.openjdk.org/pipermail/core-libs-dev/2024-December/136867.html
     public static <TR> Gatherer<TR, ?, IndexedElement<TR>> indexed() {
         return Gatherer.ofSequential(
