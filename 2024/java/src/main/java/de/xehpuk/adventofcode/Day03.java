@@ -10,7 +10,7 @@ public class Day03 {
     public static long part1(final Stream<String> lines) {
         return lines
                 .flatMap(Day03::parseLine)
-                .mapToInt(mul -> mul.left() * mul.right())
+                .mapToInt(mul -> mul.m() * mul.n())
                 .sum();
     }
 
@@ -23,9 +23,9 @@ public class Day03 {
         var sum = 0;
         for (var instruction : instructions) {
             switch (instruction) {
-                case Mul(int left, int right):
+                case Mul(int m, int n):
                     if (enabled) {
-                        sum += left * right;
+                        sum += m * n;
                     }
                     break;
                 case Do.INSTANCE:
@@ -56,7 +56,7 @@ public class Day03 {
     sealed interface Instruction permits Mul, Do, Dont {
     }
 
-    record Mul(int left, int right) implements Instruction {
+    record Mul(int m, int n) implements Instruction {
     }
 
     enum Do implements Instruction {

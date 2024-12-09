@@ -1,5 +1,7 @@
 package de.xehpuk.adventofcode;
 
+import de.xehpuk.adventofcode.Utils.II;
+
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,16 +12,16 @@ public class Day01 {
                 .map(Day01::parseLine)
                 .toList();
         final var sortedByLeft = idPairs.stream()
-                .sorted(Comparator.comparing(IdPair::left))
+                .sorted(Comparator.comparing(II::l))
                 .toList();
         final var sortedByRight = idPairs.stream()
-                .sorted(Comparator.comparing(IdPair::right))
+                .sorted(Comparator.comparing(II::r))
                 .toList();
 
         var sum = 0;
         for (int i = 0; i < sortedByLeft.size(); i++) {
-            final var leftId = sortedByLeft.get(i).left();
-            final var rightId = sortedByRight.get(i).right();
+            final var leftId = sortedByLeft.get(i).l();
+            final var rightId = sortedByRight.get(i).r();
 
             sum += Math.abs(leftId - rightId);
         }
@@ -31,19 +33,16 @@ public class Day01 {
                 .map(Day01::parseLine)
                 .toList();
         final var rightIdCount = idPairs.stream()
-                .collect(Collectors.groupingBy(IdPair::right, Collectors.counting()));
+                .collect(Collectors.groupingBy(II::r, Collectors.counting()));
 
         return idPairs.stream()
-                .mapToInt(IdPair::left)
+                .mapToInt(II::l)
                 .mapToLong(leftId -> leftId * rightIdCount.getOrDefault(leftId, 0L))
                 .sum();
     }
 
-    private static IdPair parseLine(final String line) {
+    private static II parseLine(final String line) {
         final String[] split = line.split(" {3}", 2);
-        return new IdPair(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
-    }
-
-    record IdPair(int left, int right) {
+        return new II(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
     }
 }

@@ -11,7 +11,7 @@ public class Day03Reduce {
     public static long part1(final Stream<String> lines) {
         return lines
                 .flatMap(Day03Reduce::parseLine)
-                .mapToInt(mul -> mul.left() * mul.right())
+                .mapToInt(mul -> mul.m() * mul.n())
                 .sum();
     }
 
@@ -24,8 +24,8 @@ public class Day03Reduce {
                 .reduce(new Acc(true, 0),
                         (acc, instruction) ->
                                 switch (instruction) {
-                                    case Mul(int left, int right) -> acc.enabled()
-                                            ? new Acc(true, acc.sum() + left * right)
+                                    case Mul(int m, int n) -> acc.enabled()
+                                            ? new Acc(true, acc.sum() + m * n)
                                             : acc;
                                     case Do.INSTANCE -> new Acc(true, acc.sum());
                                     case Dont.INSTANCE -> new Acc(false, acc.sum());
@@ -51,7 +51,7 @@ public class Day03Reduce {
     sealed interface Instruction permits Mul, Do, Dont {
     }
 
-    record Mul(int left, int right) implements Instruction {
+    record Mul(int m, int n) implements Instruction {
     }
 
     enum Do implements Instruction {

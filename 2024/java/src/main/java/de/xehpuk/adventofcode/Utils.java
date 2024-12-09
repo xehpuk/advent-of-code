@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Gatherer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,6 +29,9 @@ public class Utils {
     public static <T> LE<T> withTiming(final Supplier<T> supplier) {
         final long start = System.currentTimeMillis();
         return new LE<>(supplier.get(), System.currentTimeMillis() - start);
+    }
+
+    public record II(int l, int r) {
     }
 
     public static <T> T middleElement(final List<T> list) {
@@ -119,5 +125,38 @@ public class Utils {
                             .gather(indexed())
                             .map(r -> new Pair<>(left.get(nthDigit(i, r.i())), r.e())));
         };
+    }
+
+    private static final Pattern NO_DOT = Pattern.compile("[^.]");
+
+    public record Grid(int width, int height, List<Pair<II, Character>> elements) {
+    }
+
+    public static Grid parseGrid(final Stream<String> lines) {
+        final var width = new AtomicInteger();
+        final var height = new AtomicInteger();
+        final var list = lines.peek(line -> width.set(line.length()))
+                .gather(indexed())
+                .flatMap(line -> {
+                    height.set(line.i() + 1);
+                    return NO_DOT.matcher(line.e()).results()
+                            .map(r -> new Pair<>(new II(r.start(), line.i()), r.group().charAt(0)));
+                })
+                .toList();
+
+        return new Grid(width.get(), height.get(), list);
+    }
+
+    public static <L, R> Map<L, R> mapByL(final Collection<Pair<L, R>> elements) {
+        return elements.stream()
+                .collect(Collectors.toMap(Pair::l, Pair::r));
+    }
+
+    public static <L, R> Map<R, SequencedSet<L>> mapByR(final Collection<Pair<L, R>> elements) {
+        return elements.stream()
+                .collect(Collectors.toMap(Pair::r, t -> new LinkedHashSet<>(List.of(t.l())), (o, o2) -> {
+                    o.addAll(o2);
+                    return o;
+                }));
     }
 }

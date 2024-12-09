@@ -12,7 +12,7 @@ public class Day03Gatherer {
     public static long part1(final Stream<String> lines) {
         return lines
                 .flatMap(Day03Gatherer::parseLine)
-                .mapToInt(mul -> mul.left() * mul.right())
+                .mapToInt(mul -> mul.m() * mul.n())
                 .sum();
     }
 
@@ -26,9 +26,9 @@ public class Day03Gatherer {
                 .flatMap(Day03Gatherer::parseLine2)
                 .gather(Gatherer.<Instruction, Acc, Long>ofSequential(Acc::new, (acc, element, _) -> {
                     switch (element) {
-                        case Mul(int left, int right):
+                        case Mul(int m, int n):
                             if (acc.enabled) {
-                                acc.sum += left * right;
+                                acc.sum += m * n;
                             }
                             break;
                         case Do.INSTANCE:
@@ -60,7 +60,7 @@ public class Day03Gatherer {
     sealed interface Instruction permits Mul, Do, Dont {
     }
 
-    record Mul(int left, int right) implements Instruction {
+    record Mul(int m, int n) implements Instruction {
     }
 
     enum Do implements Instruction {
