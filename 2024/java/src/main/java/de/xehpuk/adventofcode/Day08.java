@@ -1,94 +1,99 @@
 package de.xehpuk.adventofcode;
 
-import java.util.*;
-import java.util.regex.MatchResult;
-import java.util.regex.Pattern;
+import de.xehpuk.adventofcode.Utils.Grid;
+import de.xehpuk.adventofcode.Utils.II;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 public class Day08 {
-    private static final Pattern P = Pattern.compile("[^.]");
-
     public static long part1(final Stream<String> lines) {
-        final var freqMap = parseLines(lines);
-        return countAntinodes(freqMap);
+        final var grid = Utils.parseGrid(lines);
+        return countAntinodes(grid);
     }
 
-    private static long countAntinodes(FreqMap freqMap) {
-        Set<Position> antinodes = new HashSet<>();
-        for (var entry : freqMap.antennas.entrySet()) {
-            var positions = entry.getValue();
+    private static long countAntinodes(final Grid grid) {
+        final var antennas = Utils.mapByR(grid.elements(), ArrayList::new);
+        final var antinodes = new HashSet<II>();
+        for (var positions : antennas.values()) {
             for (int i = 0; i < positions.size(); i++) {
-                var position = positions.get(i);
+                final var position = positions.get(i);
                 for (int j = i + 1; j < positions.size(); j++) {
-                    var position2 = positions.get(j);
-                    var diffX = Math.abs(position.x - position2.x);
-                    var diffY = Math.abs(position.y - position2.y);
-                    if (position.x < position2.x) {
-                        if (position.y < position2.y) {
-                            antinodes.add(new Position(position.x - diffX, position.y - diffY));
-                            antinodes.add(new Position(position2.x + diffX, position2.y + diffY));
+                    final var position2 = positions.get(j);
+                    final var diffX = Math.abs(position.l() - position2.l());
+                    final var diffY = Math.abs(position.r() - position2.r());
+                    if (position.l() < position2.l()) {
+                        if (position.r() < position2.r()) {
+                            antinodes.add(new II(position.l() - diffX, position.r() - diffY));
+                            antinodes.add(new II(position2.l() + diffX, position2.r() + diffY));
                         } else {
-                            antinodes.add(new Position(position.x - diffX, position.y + diffY));
-                            antinodes.add(new Position(position2.x + diffX, position2.y - diffY));
+                            antinodes.add(new II(position.l() - diffX, position.r() + diffY));
+                            antinodes.add(new II(position2.l() + diffX, position2.r() - diffY));
                         }
                     } else {
-                        if (position.y < position2.y) {
-                            antinodes.add(new Position(position.x + diffX, position.y - diffY));
-                            antinodes.add(new Position(position2.x - diffX, position2.y + diffY));
+                        if (position.r() < position2.r()) {
+                            antinodes.add(new II(position.l() + diffX, position.r() - diffY));
+                            antinodes.add(new II(position2.l() - diffX, position2.r() + diffY));
                         } else {
-                            antinodes.add(new Position(position.x + diffX, position.y + diffY));
-                            antinodes.add(new Position(position2.x - diffX, position2.y - diffY));
+                            antinodes.add(new II(position.l() + diffX, position.r() + diffY));
+                            antinodes.add(new II(position2.l() - diffX, position2.r() - diffY));
                         }
                     }
                 }
             }
         }
         return antinodes.stream()
-                .filter(antinode -> antinode.x >= 0 && antinode.y >= 0 &&
-                                    antinode.x < freqMap.width && antinode.y < freqMap.height)
+                .filter(antinode -> antinode.l() >= 0 && antinode.r() >= 0 &&
+                                    antinode.l() < grid.width() && antinode.r() < grid.height())
                 .count();
     }
 
-    private static long countAntinodes2(FreqMap freqMap) {
-        Set<Position> antinodes = new HashSet<>();
-        for (var entry : freqMap.antennas.entrySet()) {
-            var positions = entry.getValue();
+    public static long part2(final Stream<String> lines) {
+        final var grid = Utils.parseGrid(lines);
+        return countAntinodes2(grid);
+    }
+
+    private static long countAntinodes2(final Grid grid) {
+        final var antennas = Utils.mapByR(grid.elements(), ArrayList::new);
+        final var antinodes = new HashSet<II>();
+        for (var positions : antennas.values()) {
             for (int i = 0; i < positions.size(); i++) {
-                var position = positions.get(i);
+                final var position = positions.get(i);
                 for (int j = i + 1; j < positions.size(); j++) {
-                    var position2 = positions.get(j);
-                    var diffX = Math.abs(position.x - position2.x);
-                    var diffY = Math.abs(position.y - position2.y);
-                    if (position.x < position2.x) {
-                        if (position.y < position2.y) {
-                            for (int k = position2.y, l = position2.x; k < freqMap.height && l < freqMap.width; k += diffY, l += diffX) {
-                                antinodes.add(new Position(l, k));
+                    final var position2 = positions.get(j);
+                    final var diffX = Math.abs(position.l() - position2.l());
+                    final var diffY = Math.abs(position.r() - position2.r());
+                    if (position.l() < position2.l()) {
+                        if (position.r() < position2.r()) {
+                            for (int k = position2.r(), l = position2.l(); k < grid.height() && l < grid.width(); k += diffY, l += diffX) {
+                                antinodes.add(new II(l, k));
                             }
-                            for (int k = position.y, l = position.x; k >= 0 && l >= 0; k -= diffY, l -= diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position.r(), l = position.l(); k >= 0 && l >= 0; k -= diffY, l -= diffX) {
+                                antinodes.add(new II(l, k));
                             }
                         } else {
-                            for (int k = position.y, l = position.x; k < freqMap.height && l >= 0; k += diffY, l -= diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position.r(), l = position.l(); k < grid.height() && l >= 0; k += diffY, l -= diffX) {
+                                antinodes.add(new II(l, k));
                             }
-                            for (int k = position2.y, l = position2.x; k >= 0 && l < freqMap.width; k -= diffY, l += diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position2.r(), l = position2.l(); k >= 0 && l < grid.width(); k -= diffY, l += diffX) {
+                                antinodes.add(new II(l, k));
                             }
                         }
                     } else {
-                        if (position.y < position2.y) {
-                            for (int k = position2.y, l = position2.x; k < freqMap.height && l >= 0; k += diffY, l -= diffX) {
-                                antinodes.add(new Position(l, k));
+                        if (position.r() < position2.r()) {
+                            for (int k = position2.r(), l = position2.l(); k < grid.height() && l >= 0; k += diffY, l -= diffX) {
+                                antinodes.add(new II(l, k));
                             }
-                            for (int k = position.y, l = position.x; k >= 0 && l < freqMap.width; k -= diffY, l += diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position.r(), l = position.l(); k >= 0 && l < grid.width(); k -= diffY, l += diffX) {
+                                antinodes.add(new II(l, k));
                             }
                         } else {
-                            for (int k = position.y, l = position.x; k < freqMap.height && l < freqMap.width; k += diffY, l += diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position.r(), l = position.l(); k < grid.height() && l < grid.width(); k += diffY, l += diffX) {
+                                antinodes.add(new II(l, k));
                             }
-                            for (int k = position2.y, l = position2.x; k >= 0 && l >= 0; k -= diffY, l -= diffX) {
-                                antinodes.add(new Position(l, k));
+                            for (int k = position2.r(), l = position2.l(); k >= 0 && l >= 0; k -= diffY, l -= diffX) {
+                                antinodes.add(new II(l, k));
                             }
                         }
                     }
@@ -96,67 +101,5 @@ public class Day08 {
             }
         }
         return antinodes.size();
-    }
-
-    public static long part2(final Stream<String> lines) {
-        final var freqMap = parseLines(lines);
-        return countAntinodes2(freqMap);
-    }
-
-    private static FreqMap parseLines(final Stream<String> lines) {
-        final var antennas = new HashMap<Character, List<Position>>();
-
-        Iterable<Utils.EI<String>> i = () -> lines
-                .gather(Utils.indexed())
-                .iterator();
-        int width = 0;
-        int height = 0;
-        for (var ie : i) {
-            width = Math.max(width, ie.e().length());
-            height = ie.i() + 1;
-
-            Iterable<MatchResult> p = () -> P.matcher(ie.e()).results().iterator();
-
-            for (var m : p) {
-                antennas.merge(m.group().charAt(0), new ArrayList<>(List.of(new Position(m.start(), ie.i()))),
-                        (o, o2) -> {
-                            o.addAll(o2);
-                            return o;
-                        });
-            }
-        }
-
-        return new FreqMap(width, height, antennas);
-//        return lines
-//                .gather(Utils.indexed())
-//                .flatMap(s -> P.matcher(s.e()).results()
-//                        .map(result -> new Utils.EI<>(s.i(), result)))
-//                .collect(Collectors.toMap(
-//                        ie -> ie.e().group().charAt(0),
-//                        ie -> new ArrayList<>(List.of(new Position(ie.e().start(), ie.i()))),
-//                        (o, o2) -> {
-//                            o.addAll(o2);
-//                            return o;
-//                        }));
-    }
-
-//    private static Map<Character, List<Position>> parseLines(final Stream<String> lines) {
-//        return lines
-//                .gather(Utils.indexed())
-//                .flatMap(s -> P.matcher(s.e()).results()
-//                        .map(result -> new Utils.EI<>(s.i(), result)))
-//                .collect(Collectors.toMap(
-//                        ie -> ie.e().group().charAt(0),
-//                        ie -> new ArrayList<>(List.of(new Position(ie.e().start(), ie.i()))),
-//                        (o, o2) -> {
-//                            o.addAll(o2);
-//                            return o;
-//                        }));
-//    }
-
-    record FreqMap(int width, int height, Map<Character, List<Position>> antennas) {
-    }
-
-    record Position(int x, int y) {
     }
 }

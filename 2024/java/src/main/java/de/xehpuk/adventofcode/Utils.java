@@ -152,11 +152,15 @@ public class Utils {
                 .collect(Collectors.toMap(Pair::l, Pair::r));
     }
 
-    public static <L, R> Map<R, SequencedSet<L>> mapByR(final Collection<Pair<L, R>> elements) {
+    public static <L, R, C extends Collection<L>> Map<R, C> mapByR(final Collection<Pair<L, R>> elements, final Supplier<C> constructor) {
         return elements.stream()
-                .collect(Collectors.toMap(Pair::r, t -> new LinkedHashSet<>(List.of(t.l())), (o, o2) -> {
-                    o.addAll(o2);
-                    return o;
+                .collect(Collectors.toMap(Pair::r, e -> {
+                    final C c = constructor.get();
+                    c.add(e.l());
+                    return c;
+                }, (c, c2) -> {
+                    c.addAll(c2);
+                    return c;
                 }));
     }
 }

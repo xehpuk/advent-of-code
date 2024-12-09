@@ -22,7 +22,7 @@ public class Day06Grid {
     }
 
     private static Set<II> visitedPositionsBeforeLeave(final Grid grid) {
-        final var gridByChars = Utils.mapByR(grid.elements());
+        final var gridByChars = Utils.mapByR(grid.elements(), LinkedHashSet::new);
         var guard = findGuard(gridByChars);
         final var obstructions = gridByChars.get('#');
         final var visitedPositions = new HashSet<II>();
@@ -44,7 +44,7 @@ public class Day06Grid {
         }
     }
 
-    private static Guard findGuard(final Map<Character, SequencedSet<II>> gridByChars) {
+    private static <C extends SequencedCollection<II>> Guard findGuard(final Map<Character, C> gridByChars) {
         for (char c : List.of('^', '>', 'v', '<')) {
             final var pos = gridByChars.get(c);
             if (pos != null) {
@@ -55,7 +55,7 @@ public class Day06Grid {
     }
 
     private static boolean loops(final Grid grid, final II obstruction) {
-        final var gridByChars = Utils.mapByR(grid.elements());
+        final var gridByChars = Utils.mapByR(grid.elements(), LinkedHashSet::new);
         final var obstructions = gridByChars.get('#');
         var guard = findGuard(gridByChars);
         final var visitedPositions = new HashSet<>();
