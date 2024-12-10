@@ -24,6 +24,10 @@ public class Utils {
     }
 
     public record LE<E>(E e, long l) {
+        @Override
+        public String toString() {
+            return "(" + e + ", " + l + ")";
+        }
     }
 
     public static <T> LE<T> withTiming(final Supplier<T> supplier) {
@@ -32,6 +36,10 @@ public class Utils {
     }
 
     public record II(int l, int r) {
+        @Override
+        public String toString() {
+            return "(" + l + ", " + r + ")";
+        }
     }
 
     public static <T> T middleElement(final List<T> list) {
@@ -78,6 +86,10 @@ public class Utils {
     }
 
     public record EI<E>(E e, int i) {
+        @Override
+        public String toString() {
+            return "(" + e + ", " + i + ")";
+        }
     }
 
     // https://mail.openjdk.org/pipermail/core-libs-dev/2024-December/136867.html
@@ -113,6 +125,10 @@ public class Utils {
     }
 
     public record Pair<L, R>(L l, R r) {
+        @Override
+        public String toString() {
+            return "(" + l + ", " + r + ")";
+        }
     }
 
     public static <L, R> Stream<Stream<Pair<L, R>>> cartesianProduct(final List<L> left, final List<R> right) {
