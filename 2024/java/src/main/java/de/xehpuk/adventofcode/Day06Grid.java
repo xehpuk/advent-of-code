@@ -1,5 +1,6 @@
 package de.xehpuk.adventofcode;
 
+import de.xehpuk.adventofcode.Utils.Direction;
 import de.xehpuk.adventofcode.Utils.Grid;
 import de.xehpuk.adventofcode.Utils.II;
 
@@ -75,42 +76,6 @@ public class Day06Grid {
             if (obstructions.contains(guard.position()) || guard.position().equals(obstruction)) {
                 guard = old.turnRight();
             }
-        }
-    }
-
-    enum Direction {
-        UP('^', 0, -1),
-        RIGHT('>', 1, 0),
-        DOWN('v', 0, 1),
-        LEFT('<', -1, 0);
-
-        static Direction fromChar(final char c) {
-            return Arrays.stream(values())
-                    .filter(direction -> direction.c == c)
-                    .findAny().get();
-        }
-
-        private final char c;
-        private final int dx;
-        private final int dy;
-
-        Direction(final char c, final int dx, final int dy) {
-            this.c = c;
-            this.dx = dx;
-            this.dy = dy;
-        }
-
-        Direction rotateClockwise() {
-            return switch (this) {
-                case UP -> RIGHT;
-                case RIGHT -> DOWN;
-                case DOWN -> LEFT;
-                case LEFT -> UP;
-            };
-        }
-
-        II move(final II ii) {
-            return new II(ii.l() + dx, ii.r() + dy);
         }
     }
 

@@ -1,5 +1,6 @@
 package de.xehpuk.adventofcode;
 
+import de.xehpuk.adventofcode.Utils.Direction;
 import de.xehpuk.adventofcode.Utils.II;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class Day10 {
                 reachablePositions = reachablePositions.stream()
                         .flatMap(reachablePosition -> Arrays.stream(Direction.values())
                                 .<II>mapMulti((direction, consumer) -> {
-                                    final var nextPosition = new II(reachablePosition.l() + direction.dx, reachablePosition.r() + direction.dy);
+                                    final var nextPosition = direction.move(reachablePosition);
                                     if (nextPositions.contains(nextPosition)) {
                                         consumer.accept(nextPosition);
                                     }
@@ -39,20 +40,5 @@ public class Day10 {
             sum += reachablePositions.size();
         }
         return sum;
-    }
-
-    enum Direction {
-        UP(0, -1),
-        RIGHT(1, 0),
-        DOWN(0, 1),
-        LEFT(-1, 0);
-
-        private final int dx;
-        private final int dy;
-
-        Direction(final int dx, final int dy) {
-            this.dx = dx;
-            this.dy = dy;
-        }
     }
 }

@@ -1,5 +1,8 @@
 package de.xehpuk.adventofcode;
 
+import de.xehpuk.adventofcode.Utils.Direction;
+import de.xehpuk.adventofcode.Utils.II;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,21 +26,21 @@ public class Day06 {
                 .count();
     }
 
-    private static Set<Position> visitedPositionsBeforeLeave(final List<String> map, final Guard initialGuard) {
+    private static Set<II> visitedPositionsBeforeLeave(final List<String> map, final Guard initialGuard) {
         var guard = initialGuard;
-        final var visitedPositions = new HashSet<Position>();
+        final var visitedPositions = new HashSet<II>();
         visitedPositions.add(guard.position);
         while (true) {
             var old = guard;
             guard = guard.move();
-            if (guard.position.y < 0 || guard.position.y >= map.size()) {
+            if (guard.position.r() < 0 || guard.position.r() >= map.size()) {
                 return visitedPositions;
             }
-            final var row = map.get(guard.position.y);
-            if (guard.position.x < 0 || guard.position.x >= row.length()) {
+            final var row = map.get(guard.position.r());
+            if (guard.position.l() < 0 || guard.position.l() >= row.length()) {
                 return visitedPositions;
             }
-            if (row.charAt(guard.position.x) == '#') {
+            if (row.charAt(guard.position.l()) == '#') {
                 guard = old.turnRight();
                 continue;
             }
@@ -51,20 +54,20 @@ public class Day06 {
             for (int x = 0; x < row.length(); x++) {
                 switch (row.charAt(x)) {
                     case '^':
-                        return new Guard(new Position(x, y), Direction.UP);
+                        return new Guard(new II(x, y), Direction.UP);
                     case '>':
-                        return new Guard(new Position(x, y), Direction.RIGHT);
+                        return new Guard(new II(x, y), Direction.RIGHT);
                     case 'v':
-                        return new Guard(new Position(x, y), Direction.DOWN);
+                        return new Guard(new II(x, y), Direction.DOWN);
                     case '<':
-                        return new Guard(new Position(x, y), Direction.LEFT);
+                        return new Guard(new II(x, y), Direction.LEFT);
                 }
             }
         }
         throw new NoSuchElementException();
     }
 
-    private static boolean loops(final List<String> map, final Guard initialGuard, final Position obstruction) {
+    private static boolean loops(final List<String> map, final Guard initialGuard, final II obstruction) {
         var guard = initialGuard;
         final var visitedPositions = new HashSet<>();
         visitedPositions.add(guard);
@@ -74,52 +77,22 @@ public class Day06 {
             if (!visitedPositions.add(guard)) {
                 return true;
             }
-            if (guard.position.y < 0 || guard.position.y >= map.size()) {
+            if (guard.position.r() < 0 || guard.position.r() >= map.size()) {
                 return false;
             }
-            final var row = map.get(guard.position.y);
-            if (guard.position.x < 0 || guard.position.x >= row.length()) {
+            final var row = map.get(guard.position.r());
+            if (guard.position.l() < 0 || guard.position.l() >= row.length()) {
                 return false;
             }
-            if (row.charAt(guard.position.x) == '#' || guard.position.equals(obstruction)) {
+            if (row.charAt(guard.position.l()) == '#' || guard.position.equals(obstruction)) {
                 guard = old.turnRight();
             }
         }
     }
 
-    enum Direction {
-        UP(0, -1),
-        RIGHT(1, 0),
-        DOWN(0, 1),
-        LEFT(-1, 0);
-
-        private final int dx;
-        private final int dy;
-
-        Direction(int dx, int dy) {
-            this.dx = dx;
-            this.dy = dy;
-        }
-
-        Direction rotateClockwise() {
-            return switch (this) {
-                case UP -> RIGHT;
-                case RIGHT -> DOWN;
-                case DOWN -> LEFT;
-                case LEFT -> UP;
-            };
-        }
-    }
-
-    record Position(int x, int y) {
-        Position move(final Direction direction) {
-            return new Position(x + direction.dx, y + direction.dy);
-        }
-    }
-
-    record Guard(Position position, Direction direction) {
+    record Guard(II position, Direction direction) {
         Guard move() {
-            return new Guard(position.move(direction), direction);
+            return new Guard(direction.move(position), direction);
         }
 
         Guard turnRight() {
