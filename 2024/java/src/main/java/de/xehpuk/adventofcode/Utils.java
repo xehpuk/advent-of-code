@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToLongFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherer;
@@ -15,9 +16,21 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Utils {
+    private static Stream<String> lines(final String fileName) throws IOException, URISyntaxException {
+        return Files.lines(Path.of(Utils.class.getResource("/input/%s.txt".formatted(fileName)).toURI()));
+    }
+
     public static <R> R withLines(final String fileName, final Function<Stream<String>, R> handleLines) {
-        try (final var lines = Files.lines(Path.of(Utils.class.getResource("/input/%s.txt".formatted(fileName)).toURI()))) {
+        try (final var lines = lines(fileName)) {
             return handleLines.apply(lines);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static long withLines(final String fileName, final ToLongFunction<Stream<String>> handleLines) {
+        try (final var lines = lines(fileName)) {
+            return handleLines.applyAsLong(lines);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
