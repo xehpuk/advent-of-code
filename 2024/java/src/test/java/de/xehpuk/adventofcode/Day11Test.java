@@ -10,21 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class Day11Test {
     @Test
     void part1() {
-        assertEquals(55312L, Utils.withLines("11_1_test", (ToLongFunction<Stream<String>>) Day11::part1));
+        assertEquals(55312L, Utils.withLines("11_1_test", Day11::part1));
     }
 
     @Test
     void part1_2() {
-        assertEquals(7L, Utils.withLines("11_2_test", (ToLongFunction<Stream<String>>) lines -> Day11.part1(lines, 1)));
+        assertEquals(7L, Utils.withLines("11_2_test", (ToLongFunction<Stream<String>>) lines -> Day11.solve(lines, 1)));
     }
 
     @Test
     void part1_3() {
-        assertEquals(22L, Utils.withLines("11_1_test", (ToLongFunction<Stream<String>>) lines -> Day11.part1(lines, 6)));
-    }
-
-    @Test
-    void part2() {
-        assertEquals(55312L, Utils.withLines("11_1_test", (ToLongFunction<Stream<String>>) lines -> Day11.part2(lines, 25)));
+        assertEquals(22L, Utils.withLines("11_1_test", (ToLongFunction<Stream<String>>) lines -> Day11.solve(lines, 6)));
     }
 }

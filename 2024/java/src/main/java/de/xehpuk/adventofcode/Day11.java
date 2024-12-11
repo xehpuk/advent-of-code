@@ -1,42 +1,22 @@
 package de.xehpuk.adventofcode;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Day11 {
     public static long part1(final Stream<String> lines) {
-        return part1(lines, 25);
-    }
-
-    static long part1(final Stream<String> lines, final int blinks) {
-        final var stones = parseLines(lines);
-        for (int i = 0; i < blinks; i++) {
-            for (int j = stones.size() - 1; j >= 0; j--) {
-                final long stone = stones.get(j);
-                if (stone == 0) {
-                    stones.set(j, 1L);
-                } else {
-                    final int digits = Utils.countDigits(stone);
-                    if ((digits & 1) == 0) {
-                        final long splitter = Utils.pow(10, digits / 2);
-                        stones.set(j, stone % splitter);
-                        stones.add(j, stone / splitter);
-                    } else {
-                        stones.set(j, stone * 2024);
-                    }
-                }
-            }
-        }
-        return stones.size();
+        return solve(lines, 25);
     }
 
     public static long part2(final Stream<String> lines) {
-        return part2(lines, 75);
+        return solve(lines, 75);
     }
 
-    static long part2(final Stream<String> lines, final int blinks) {
+    static long solve(final Stream<String> lines, final int blinks) {
         var stones = parseLines(lines).stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         for (int i = 0; i < blinks; i++) {
@@ -65,8 +45,8 @@ public class Day11 {
     }
 
     private static List<Long> parseLines(final Stream<String> lines) {
-        return new ArrayList<>(Arrays.stream(lines.findAny().get().split(" "))
+        return Arrays.stream(lines.findAny().get().split(" "))
                 .map(Long::parseLong)
-                .toList());
+                .toList();
     }
 }
