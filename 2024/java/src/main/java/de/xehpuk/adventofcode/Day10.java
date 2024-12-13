@@ -19,7 +19,7 @@ public class Day10 {
 
     private static <C extends Collection<II>> long solve(final Stream<String> lines, final Collector<II, ?, C> collector) {
         final var grid = Utils.parseGrid(lines);
-        final Map<Character, Set<II>> map = Utils.mapByR(grid.elements(), HashSet::new);
+        final Map<Character, Set<II>> map = Utils.groupByR(grid.elements(), HashSet::new);
 
         long sum = 0;
         for (final var trailhead : map.get('0')) {

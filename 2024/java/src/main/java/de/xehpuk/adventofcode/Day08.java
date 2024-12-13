@@ -14,7 +14,7 @@ public class Day08 {
     }
 
     private static long countAntinodes(final Grid grid) {
-        final var antennas = Utils.mapByR(grid.elements(), ArrayList::new);
+        final var antennas = Utils.groupByR(grid.elements(), ArrayList::new);
         final var antinodes = new HashSet<II>();
         for (var positions : antennas.values()) {
             for (int i = 0; i < positions.size(); i++) {
@@ -55,7 +55,7 @@ public class Day08 {
     }
 
     private static long countAntinodes2(final Grid grid) {
-        final var antennas = Utils.mapByR(grid.elements(), ArrayList::new);
+        final var antennas = Utils.groupByR(grid.elements(), ArrayList::new);
         final var antinodes = new HashSet<II>();
         for (var positions : antennas.values()) {
             for (int i = 0; i < positions.size(); i++) {

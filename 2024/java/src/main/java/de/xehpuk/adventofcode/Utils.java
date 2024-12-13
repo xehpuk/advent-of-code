@@ -49,6 +49,30 @@ public class Utils {
     }
 
     public record II(int l, int r) {
+        public II add(final II other) {
+            return add(other.l, other.r);
+        }
+
+        public II add(final int l, final int r) {
+            return new II(this.l + l, this.r + r);
+        }
+
+        public II addL(final int l) {
+            return new II(this.l + l, r);
+        }
+
+        public II addR(final int r) {
+            return new II(l, this.r + r);
+        }
+
+        public int sum() {
+            return l + r;
+        }
+
+        public int product() {
+            return l * r;
+        }
+
         @Override
         public String toString() {
             return "(" + l + ", " + r + ")";
@@ -159,6 +183,18 @@ public class Utils {
     private static final Pattern NO_DOT = Pattern.compile("[^.]");
 
     public record Grid(int width, int height, List<Pair<II, Character>> elements) {
+        @Override
+        public String toString() {
+            final var map = groupByL(elements);
+            final var builder = new StringBuilder((width + 1) * height);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    builder.append(map.getOrDefault(new II(x, y), '.'));
+                }
+                builder.append('\n');
+            }
+            return builder.toString();
+        }
     }
 
     public static Grid parseGrid(final Stream<String> lines) {
@@ -176,12 +212,12 @@ public class Utils {
         return new Grid(width.get(), height.get(), list);
     }
 
-    public static <L, R> Map<L, R> mapByL(final Collection<Pair<L, R>> elements) {
+    public static <L, R> Map<L, R> groupByL(final Collection<Pair<L, R>> elements) {
         return elements.stream()
                 .collect(Collectors.toMap(Pair::l, Pair::r));
     }
 
-    public static <L, R, C extends Collection<L>> Map<R, C> mapByR(final Collection<Pair<L, R>> elements, final Supplier<C> constructor) {
+    public static <L, R, C extends Collection<L>> Map<R, C> groupByR(final Collection<Pair<L, R>> elements, final Supplier<C> constructor) {
         return elements.stream()
                 .collect(Collectors.toMap(Pair::r, e -> {
                     final C c = constructor.get();
@@ -225,7 +261,7 @@ public class Utils {
         }
 
         II move(final II ii) {
-            return new II(ii.l() + dx, ii.r() + dy);
+            return ii.add(dx, dy);
         }
     }
 }
