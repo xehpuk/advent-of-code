@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,6 +49,9 @@ public class Utils {
     public static <T> LE<T> withTiming(final Supplier<T> supplier) {
         final long start = System.currentTimeMillis();
         return new LE<>(supplier.get(), System.currentTimeMillis() - start);
+    }
+
+    public record LL(long l, long r) {
     }
 
     public record II(int l, int r) {
@@ -159,6 +165,14 @@ public class Utils {
 
     public static int nthDigit(final long number, final int n) {
         return (int) (number / pow(10, n) % 10);
+    }
+
+    public static int gcd(final int a, final int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
+    public static int lcm(final int a, final int b) {
+        return b == 0 ? 0 : a * b / gcd(a, b);
     }
 
     public record Pair<L, R>(L l, R r) {
