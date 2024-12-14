@@ -79,6 +79,14 @@ public class Utils {
             return l * r;
         }
 
+        public II mul(final int n) {
+            return new II(l * n, r * n);
+        }
+
+        public II mod(final int l, final int r) {
+            return new II(Math.floorMod(this.l, l), Math.floorMod(this.r, r));
+        }
+
         @Override
         public String toString() {
             return "(" + l + ", " + r + ")";
