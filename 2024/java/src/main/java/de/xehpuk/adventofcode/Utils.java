@@ -202,7 +202,7 @@ public class Utils {
         };
     }
 
-    private static final Pattern NO_DOT = Pattern.compile("[^.]");
+    public static final Pattern NO_DOT = Pattern.compile("[^.]");
 
     public record Grid(int width, int height, List<Pair<II, Character>> elements) {
         @Override
