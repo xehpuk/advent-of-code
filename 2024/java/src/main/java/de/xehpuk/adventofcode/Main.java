@@ -29,6 +29,8 @@ void main() {
     solve(13, 2, Day13::part2); // too high 106084147308293
     solve(14, 1, Day14::part1);
     solve(14, 2, Day14::part2);
+    solve(15, 1, Day15::part1);
+    solve(15, 2, Day15::part2);
 }
 
 void solve(final int day, final int part, final Function<Stream<String>, ?> handleLines) {
