@@ -31,6 +31,8 @@ void main() {
     solve(14, 2, Day14::part2);
     solve(15, 1, Day15::part1);
     solve(15, 2, Day15::part2);
+    solve(17, 1, Day17::part1);
+    solve(17, 2, Day17::part2);
 }
 
 void solve(final int day, final int part, final Function<Stream<String>, ?> handleLines) {
