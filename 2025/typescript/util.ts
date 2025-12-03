@@ -9,3 +9,7 @@ export function lines(input: string): string[] {
   const lines = input.split(/\r?\n/);
   return lines.at(-1) ? lines : lines.slice(0, -1);
 }
+
+export function mod(n: number, m: number): number {
+  return ((n % m) + m) % m;
+}

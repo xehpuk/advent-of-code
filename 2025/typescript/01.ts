@@ -1,4 +1,4 @@
-import { lines } from "./util.ts";
+import { lines, mod } from "./util.ts";
 
 export function part1(input: string): string {
   let zeroes = 0;
@@ -15,7 +15,23 @@ export function part1(input: string): string {
 }
 
 export function part2(input: string): string {
-  return "// TODO";
+  let zeroes = 0;
+  let pointer = 50;
+  for (const line of lines(input)) {
+    const oldPointer = pointer;
+    const rotation = parseRotation(line);
+    zeroes += Math.trunc(rotation.distance / 100);
+    const sign = rotation.direction === "L" ? -1 : 1;
+    pointer = mod(pointer + sign * rotation.distance, 100);
+    if (
+      oldPointer !== 0 &&
+      (pointer === 0 || sign < 0 && pointer > oldPointer ||
+        sign > 0 && pointer < oldPointer)
+    ) {
+      zeroes++;
+    }
+  }
+  return zeroes.toString();
 }
 
 function parseRotation(line: string): Rotation {
