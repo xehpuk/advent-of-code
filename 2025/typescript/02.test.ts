@@ -14,5 +14,5 @@ Deno.test("02.1", () => {
 });
 
 Deno.test("02.2", () => {
-  assertEquals(part2(input), "");
+  assertEquals(part2(input), "4174379265");
 });
