@@ -1,38 +1,33 @@
 import { lines } from "./util.ts";
 
 export function part1(input: string): string {
-  return lines(input).map(calcJoltage).reduce(
+  return solve(input, makeCalcJoltage(2));
+}
+
+export function part2(input: string): string {
+  return solve(input, makeCalcJoltage(12));
+}
+
+function solve(input: string, calcJoltageFn: (bank: string) => number): string {
+  return lines(input).map(calcJoltageFn).reduce(
     (totalJoltage, joltage) => totalJoltage + joltage,
     0,
   ).toString();
 }
 
-function calcJoltage(bank: string): number {
-  let mostSignificantMax = "";
-  let index = -1;
-  for (let i = 0; i < bank.length - 1; i++) {
-    const battery = bank[i];
-    if (battery > mostSignificantMax) {
-      mostSignificantMax = battery;
-      index = i;
-      if (battery === "9") {
-        break;
+function makeCalcJoltage(count: number): (bank: string) => number {
+  return (bank: string): number => {
+    const maxes: number[] = Array(count).fill(0);
+    let index = -1;
+    for (let i = 0; i < maxes.length; i++) {
+      for (let j = index + 1; j < bank.length - maxes.length + i + 1; j++) {
+        const battery = Number.parseInt(bank[j]);
+        if (battery > maxes[i]) {
+          maxes[i] = battery;
+          index = j;
+        }
       }
     }
-  }
-  let leastSignificantMax = "";
-  for (let i = index + 1; i < bank.length; i++) {
-    const battery = bank[i];
-    if (battery > leastSignificantMax) {
-      leastSignificantMax = battery;
-      if (battery === "9") {
-        break;
-      }
-    }
-  }
-  return Number.parseInt(mostSignificantMax + leastSignificantMax);
-}
-
-export function part2(input: string): string {
-  return "// TODO";
+    return Number.parseInt(maxes.join(""));
+  };
 }
