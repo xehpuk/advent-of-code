@@ -1,4 +1,4 @@
-export function readInput(day: string) {
+export function readInput(day: string): Promise<string> {
   return Deno.readTextFile(`./input/${day}.txt`);
 }
 
@@ -12,4 +12,8 @@ export function lines(input: string): string[] {
 
 export function mod(n: number, m: number): number {
   return ((n % m) + m) % m;
+}
+
+export function countDigits(n: number): number {
+  return n === 0 ? 1 : Math.trunc(Math.log10(n) + 1);
 }
