@@ -70,6 +70,5 @@ function isAccessibleRollOfPaper(
 }
 
 function isRollOfPaper(grid: string[][], x: number, y: number): boolean {
-  const row = grid[y];
-  return !!row && row[x] === "@";
+  return grid[y]?.[x] === "@";
 }
