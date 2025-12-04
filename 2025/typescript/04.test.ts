@@ -14,5 +14,5 @@ Deno.test("04.1", () => {
 });
 
 Deno.test("04.2", () => {
-  assertEquals(part2(input), "");
+  assertEquals(part2(input), "43");
 });

@@ -1,9 +1,9 @@
-import { lines, mod } from "./util.ts";
+import { mod, toLines } from "./util.ts";
 
 export function part1(input: string): string {
   let zeroes = 0;
   let pointer = 50;
-  for (const line of lines(input)) {
+  for (const line of toLines(input)) {
     const rotation = parseRotation(line);
     const sign = rotation.direction === "L" ? -1 : 1;
     pointer += sign * rotation.distance;
@@ -17,7 +17,7 @@ export function part1(input: string): string {
 export function part2(input: string): string {
   let zeroes = 0;
   let pointer = 50;
-  for (const line of lines(input)) {
+  for (const line of toLines(input)) {
     const oldPointer = pointer;
     const rotation = parseRotation(line);
     zeroes += Math.trunc(rotation.distance / 100);

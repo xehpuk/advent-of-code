@@ -1,4 +1,4 @@
-import { lines } from "./util.ts";
+import { toLines } from "./util.ts";
 
 export function part1(input: string): string {
   return solve(input, makeCalcJoltage(2));
@@ -9,7 +9,7 @@ export function part2(input: string): string {
 }
 
 function solve(input: string, calcJoltageFn: (bank: string) => number): string {
-  return lines(input).map(calcJoltageFn).reduce(
+  return toLines(input).map(calcJoltageFn).reduce(
     (totalJoltage, joltage) => totalJoltage + joltage,
     0,
   ).toString();
