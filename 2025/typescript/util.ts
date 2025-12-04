@@ -5,9 +5,17 @@ export function readInput(day: string): Promise<string> {
 /**
  * Splits a string into lines. Skips a potentially empty trailing line.
  */
-export function lines(input: string): string[] {
+export function toLines(input: string): string[] {
   const lines = input.split(/\r?\n/);
   return lines.at(-1) ? lines : lines.slice(0, -1);
+}
+
+export function toGrid(input: string): string[][] {
+  return toLines(input).map((row) => row.split(""));
+}
+
+export function fromGrid(grid: string[][]): string {
+  return grid.map(row => row.join("")).join("\n");
 }
 
 export function mod(n: number, m: number): number {

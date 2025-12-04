@@ -46,7 +46,7 @@ function removeRollOfPaper(
   if (!isAccessibleRollOfPaper(grid, x, y)) {
     return false;
   }
-  grid[y][x] = ".";
+  grid[y][x] = "x";
   return true;
 }
 
