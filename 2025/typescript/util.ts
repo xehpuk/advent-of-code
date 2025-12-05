@@ -15,7 +15,7 @@ export function toGrid(input: string): string[][] {
 }
 
 export function fromGrid(grid: string[][]): string {
-  return grid.map(row => row.join("")).join("\n");
+  return grid.map((row) => row.join("")).join("\n");
 }
 
 export function mod(n: number, m: number): number {
