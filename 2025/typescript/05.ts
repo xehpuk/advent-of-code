@@ -2,16 +2,11 @@ import { toLines } from "./util.ts";
 
 export function part1(input: string): string {
   const ingredients = parseIngredients(input);
-  let fresh = 0;
-  for (const ingredient of ingredients.available) {
-    for (const range of ingredients.freshRanges) {
-      if (range.start <= ingredient && ingredient <= range.end) {
-        fresh++;
-        break;
-      }
-    }
-  }
-  return fresh.toString();
+  return ingredients.available.filter((ingredient) =>
+    ingredients.freshRanges.some((range) =>
+      range.start <= ingredient && ingredient <= range.end
+    )
+  ).length.toString();
 }
 
 export function part2(input: string): string {
