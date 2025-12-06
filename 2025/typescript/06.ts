@@ -18,29 +18,22 @@ export function part1(input: string): string {
 
 export function part2(input: string): string {
   const lines = toLines(input);
-  const ops = Array.from(lines.at(-1)!.matchAll(/\S/g)!, (m) => m[0])
-    .toReversed();
-  const transposed = transpose(lines.slice(0, -1)).join("\n").split("\n\n")
-    .map((block) => block.split("\n").map(Number));
   let grandTotal = 0;
-  for (let i = 0; i < transposed.length; i++) {
-    grandTotal += transposed[i].reduce((result, n) =>
-      ops[i] === "+" ? result + n : result * n
-    );
-  }
-  return grandTotal.toString();
-}
-
-function transpose(lines: string[]): string[] {
-  const result = [];
+  const numbers = [];
   for (let c = lines[0].length - 1; c >= 0; c--) {
-    result.push("");
-    for (let r = 0; r < lines.length; r++) {
-      const char = lines[r][c];
-      if (char !== " ") {
-        result[result.length - 1] += char;
-      }
+    let numberString = "";
+    for (let r = 0; r < lines.length - 1; r++) {
+      numberString += lines[r][c];
+    }
+    numbers.push(Number(numberString));
+    const op = lines.at(-1)![c];
+    if (op !== " ") {
+      grandTotal += numbers.reduce((result, n) =>
+        op === "+" ? result + n : result * n
+      );
+      numbers.length = 0;
+      c--;
     }
   }
-  return result;
+  return grandTotal.toString();
 }
