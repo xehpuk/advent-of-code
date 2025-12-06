@@ -17,5 +17,30 @@ export function part1(input: string): string {
 }
 
 export function part2(input: string): string {
-  return "// TODO";
+  const lines = toLines(input);
+  const ops = Array.from(lines.at(-1)!.matchAll(/\S/g)!, (m) => m[0])
+    .toReversed();
+  const transposed = transpose(lines.slice(0, -1)).join("\n").split("\n\n")
+    .map((block) => block.split("\n").map(Number));
+  let grandTotal = 0;
+  for (let i = 0; i < transposed.length; i++) {
+    grandTotal += transposed[i].reduce((result, n) =>
+      ops[i] === "+" ? result + n : result * n
+    );
+  }
+  return grandTotal.toString();
+}
+
+function transpose(lines: string[]): string[] {
+  const result = [];
+  for (let c = lines[0].length - 1; c >= 0; c--) {
+    result.push("");
+    for (let r = 0; r < lines.length; r++) {
+      const char = lines[r][c];
+      if (char !== " ") {
+        result[result.length - 1] += char;
+      }
+    }
+  }
+  return result;
 }
