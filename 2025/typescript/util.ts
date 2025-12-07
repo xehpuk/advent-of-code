@@ -25,3 +25,11 @@ export function mod(n: number, m: number): number {
 export function countDigits(n: number): number {
   return n === 0 ? 1 : Math.trunc(Math.log10(n) + 1);
 }
+
+export function sum(numbers: number[], initialValue: number = 0): number {
+  return numbers.reduce((result, n) => result + n, initialValue);
+}
+
+export function product(numbers: number[], initialValue: number = 1): number {
+  return numbers.reduce((result, n) => result * n, initialValue);
+}

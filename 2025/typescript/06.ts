@@ -1,4 +1,4 @@
-import { toLines } from "./util.ts";
+import { product, sum, toLines } from "./util.ts";
 
 export function part1(input: string): string {
   const problems = toLines(input).map((line) => line.trim().split(/\s+/));
@@ -12,8 +12,7 @@ export function part1(input: string): string {
         : results[j] * Number(row[j]);
     }
   }
-  return results.reduce((grandTotal, result) => grandTotal + result, 0)
-    .toString();
+  return sum(results).toString();
 }
 
 export function part2(input: string): string {
@@ -21,16 +20,17 @@ export function part2(input: string): string {
   let grandTotal = 0;
   const numbers = [];
   for (let c = lines[0].length - 1; c >= 0; c--) {
-    let numberString = "";
+    let number = 0;
     for (let r = 0; r < lines.length - 1; r++) {
-      numberString += lines[r][c];
+      const digit = lines[r][c];
+      if (digit !== " ") {
+        number = 10 * number + Number(digit);
+      }
     }
-    numbers.push(Number(numberString));
+    numbers.push(number);
     const op = lines.at(-1)![c];
     if (op !== " ") {
-      grandTotal += numbers.reduce((result, n) =>
-        op === "+" ? result + n : result * n
-      );
+      grandTotal += op === "+" ? sum(numbers) : product(numbers);
       numbers.length = 0;
       c--;
     }

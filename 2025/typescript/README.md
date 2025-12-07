@@ -10,10 +10,14 @@ Install [Deno](https://deno.com/).
 
 ### Inputs
 
-The inputs are not part of this repository to respect [the wishes of the author](https://adventofcode.com/2025/about#faq_copying). Create a directory named `./input` and put them there. For e.g. day 1, the files should be named like this:
+The inputs are not part of this repository to respect
+[the wishes of the author](https://adventofcode.com/2025/about#faq_copying).
+Create a directory named `./input` and put them there. For e.g. day 1, the files
+should be named like this:
 
 - `01.test.txt` for the test input from the puzzle text
-- `01.txt` for the real [downloadable puzzle input](https://adventofcode.com/2025/day/1/input)
+- `01.txt` for the real
+  [downloadable puzzle input](https://adventofcode.com/2025/day/1/input)
 
 ## Commands
 

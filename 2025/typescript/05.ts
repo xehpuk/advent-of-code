@@ -1,4 +1,4 @@
-import { toLines } from "./util.ts";
+import { sum, toLines } from "./util.ts";
 
 export function part1(input: string): string {
   const ingredients = parseIngredients(input);
@@ -29,9 +29,8 @@ export function part2(input: string): string {
       }
     }
   }
-  return freshRanges
-    .map((range) => range.end - range.start + 1)
-    .reduce((sum, r) => sum + r, 0).toString();
+  return sum(freshRanges.map((range) => range.end - range.start + 1))
+    .toString();
 }
 
 function parseIngredients(input: string): Ingredients {
