@@ -1,7 +1,12 @@
 {
+  "permissions": {
+    "default": {
+      "read": ["./input"]
+    }
+  },
   "tasks": {
-    "day": "deno run --allow-read=./input main.ts",
-    "test": "deno test --allow-read=./input"
+    "day": "deno run -P main.ts",
+    "test": "deno test -P"
   },
   "test": {
     "exclude": [
