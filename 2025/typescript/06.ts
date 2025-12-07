@@ -1,7 +1,7 @@
 import { product, sum, toLines } from "./util.ts";
 
 export function part1(input: string): string {
-  const problems = toLines(input).map((line) => line.trim().split(/\s+/));
+  const problems = toLines(input).map((line) => Array.from(line.match(/\S+/g)!));
   const ops = problems.at(-1)!;
   const results = problems[0].map(Number);
   for (let i = 1; i < problems.length - 1; i++) {
