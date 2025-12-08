@@ -17,7 +17,7 @@ export function part1(input: string, n: number = 1000): string {
     connect(circuits, junctionBox, junctionBox2);
   }
   circuits.sort((circuit1, circuit2) => circuit2.size - circuit1.size);
-  return product(circuits.map((circuit) => circuit.size).slice(0, 3))
+  return product(circuits.slice(0, 3).map((circuit) => circuit.size))
     .toString();
 }
 
@@ -76,7 +76,7 @@ function connect(
   circuits: Set<Point3d>[],
   junctionBox: Point3d,
   junctionBox2: Point3d,
-) {
+): void {
   const circuitIndex = circuits.findIndex((circuit) =>
     circuit.has(junctionBox)
   );
