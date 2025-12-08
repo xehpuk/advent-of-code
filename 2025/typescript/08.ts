@@ -59,7 +59,6 @@ export function part1(input: string, n: number = 1000): string {
     .toString();
 }
 
-// FIXME slow af
 export function part2(input: string): string {
   console.time("parsing");
   const junctionBoxes: Point3d[] = toLines(input).map((line) => {
@@ -67,35 +66,35 @@ export function part2(input: string): string {
     return { x, y, z };
   });
   console.timeEnd("parsing");
-  const minDistances: {
+  const distances: {
     junctionBox: Point3d;
     junctionBox2: Point3d;
     distance: number;
-  }[] = [];
+  }[] = Array(junctionBoxes.length * (junctionBoxes.length - 1) / 2);
   console.time("insertion");
+  let c = 0;
   for (let i = 0; i < junctionBoxes.length - 1; i++) {
     const junctionBox = junctionBoxes[i];
     for (let j = i + 1; j < junctionBoxes.length; j++) {
       const junctionBox2 = junctionBoxes[j];
       const distance = euclidianDistance(junctionBox, junctionBox2);
-      insertSorted(
-        minDistances,
-        {
-          junctionBox,
-          junctionBox2,
-          distance,
-        },
-        (junctionBox, junctionBox2) =>
-          junctionBox.distance - junctionBox2.distance,
-      );
+      distances[c++] = {
+        junctionBox,
+        junctionBox2,
+        distance,
+      };
     }
   }
   console.timeEnd("insertion");
+  console.time("sorting")
+  distances.sort((junctionBox, junctionBox2) =>
+    junctionBox.distance - junctionBox2.distance);
+  console.timeEnd("sorting")
   const circuits: Set<Point3d>[] = junctionBoxes.map((junctionBox) =>
     new Set([junctionBox])
   );
   console.time("connecting");
-  for (const { junctionBox, junctionBox2 } of minDistances) {
+  for (const { junctionBox, junctionBox2 } of distances) {
     const circuitIndex = circuits.findIndex((circuit) =>
       circuit.has(junctionBox)
     );
