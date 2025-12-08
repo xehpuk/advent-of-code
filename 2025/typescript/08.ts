@@ -4,7 +4,7 @@ export function part1(input: string, n: number = 1000): string {
   const junctionBoxes = parseJunctionBoxes(input);
   const minConnections = calcConnections(
     junctionBoxes,
-    (connections: Connection[], connection: Connection) =>
+    (connections, connection) =>
       insertSorted(
         connections,
         connection,
@@ -16,7 +16,7 @@ export function part1(input: string, n: number = 1000): string {
   for (const { junctionBox, junctionBox2 } of minConnections) {
     connect(circuits, junctionBox, junctionBox2);
   }
-  circuits.sort((circuit1, circuit2) => circuit2.size - circuit1.size);
+  circuits.sort((circuit, circuit2) => circuit2.size - circuit.size);
   return product(circuits.slice(0, 3).map((circuit) => circuit.size))
     .toString();
 }
@@ -25,11 +25,10 @@ export function part2(input: string): string {
   const junctionBoxes = parseJunctionBoxes(input);
   const connections = calcConnections(
     junctionBoxes,
-    (connections: Connection[], connection: Connection) =>
-      connections.push(connection),
+    (connections, connection) => connections.push(connection),
   );
-  connections.sort((junctionBox, junctionBox2) =>
-    junctionBox.distance - junctionBox2.distance
+  connections.sort((connection, connection2) =>
+    connection.distance - connection2.distance
   );
   const circuits = initCircuits(junctionBoxes);
   for (const { junctionBox, junctionBox2 } of connections) {
