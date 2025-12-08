@@ -10,7 +10,7 @@ Deno.test.beforeAll(async () => {
 });
 
 Deno.test("08.1", () => {
-  assertEquals(part1(input), "40");
+  assertEquals(part1(input, 10), "40");
 });
 
 Deno.test("08.2", () => {

@@ -1,50 +1,61 @@
-import { product, toLines } from "./util.ts";
+import { insertSorted, product, toLines } from "./util.ts";
 
-// FIXME this connects all junction boxes with their nearest neighbor once
-export function part1(input: string): string {
+export function part1(input: string, n: number = 1000): string {
   const junctionBoxes: Point3d[] = toLines(input).map((line) => {
     const [x, y, z] = line.match(/\d+/g)!.map(Number);
     return { x, y, z };
   });
+  const minDistances: {
+    junctionBox: Point3d;
+    junctionBox2: Point3d;
+    distance: number;
+  }[] = [];
+  for (let i = 0; i < junctionBoxes.length - 1; i++) {
+    const junctionBox = junctionBoxes[i];
+    for (let j = i + 1; j < junctionBoxes.length; j++) {
+      const junctionBox2 = junctionBoxes[j];
+      const distance = euclidianDistance(junctionBox, junctionBox2);
+      insertSorted(
+        minDistances,
+        {
+          junctionBox,
+          junctionBox2,
+          distance,
+        },
+        (junctionBox, junctionBox2) =>
+          junctionBox.distance - junctionBox2.distance,
+        n,
+      );
+    }
+  }
+  console.log(minDistances);
+
   const circuits: Set<Point3d>[] = junctionBoxes.map((junctionBox) =>
     new Set([junctionBox])
   );
-  for (const junctionBox of junctionBoxes) {
-    let minDistance = Infinity;
-    let nearestNeighbor = junctionBox;
-    for (const junctionBox2 of junctionBoxes) {
-      if (junctionBox === junctionBox2) {
-        continue;
-      }
-      const distance = euclidianDistance(junctionBox, junctionBox2);
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestNeighbor = junctionBox2;
-      }
-    }
-    console.log(junctionBox, nearestNeighbor, minDistance);
+  for (const { junctionBox, junctionBox2 } of minDistances) {
     const circuitIndex = circuits.findIndex((circuit) =>
       circuit.has(junctionBox)
     );
-    const circuitIndexNearestNeighbor = circuits.findIndex((circuit) =>
-      circuit.has(nearestNeighbor)
+    const circuitIndex2 = circuits.findIndex((circuit) =>
+      circuit.has(junctionBox2)
     );
-    if (circuitIndex === circuitIndexNearestNeighbor) {
+    if (circuitIndex === circuitIndex2) {
       continue;
     }
-    console.log(circuitIndexNearestNeighbor, "=>", circuitIndex);
+    console.log(circuitIndex2, "=>", circuitIndex);
     console.log(
-      circuits[circuitIndexNearestNeighbor],
+      circuits[circuitIndex2],
       "=>",
       circuits[circuitIndex],
     );
     let minIndex: number;
     let maxIndex: number;
-    if (circuitIndex < circuitIndexNearestNeighbor) {
+    if (circuitIndex < circuitIndex2) {
       minIndex = circuitIndex;
-      maxIndex = circuitIndexNearestNeighbor;
+      maxIndex = circuitIndex2;
     } else {
-      minIndex = circuitIndexNearestNeighbor;
+      minIndex = circuitIndex2;
       maxIndex = circuitIndex;
     }
     circuits[minIndex] = circuits[minIndex].union(
