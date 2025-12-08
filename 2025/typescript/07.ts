@@ -1,24 +1,20 @@
-import { sum, toLines } from "./util.ts";
+import { sum, toGrid, toLines } from "./util.ts";
 
 export function part1(input: string): string {
-  const tachyonManifold = toLines(input).map((line) => line.split(""));
+  const tachyonManifold = toGrid(input);
   let splitCount = 0;
   for (let r = 0; r < tachyonManifold.length - 1; r++) {
     const row = tachyonManifold[r];
     const nextRow = tachyonManifold[r + 1];
     for (let c = 0; c < row.length; c++) {
       const cell = row[c];
-      if (cell === "S" || cell === "|") {
+      if (cell === "S") {
         if (nextRow[c] === "^") {
           splitCount++;
-          if (c > 0) {
-            nextRow[c - 1] = "|";
-          }
-          if (c < row.length - 1) {
-            nextRow[c + 1] = "|";
-          }
+          nextRow[c - 1] = "S";
+          nextRow[c + 1] = "S";
         } else {
-          nextRow[c] = "|";
+          nextRow[c] = "S";
         }
       }
     }
@@ -27,31 +23,38 @@ export function part1(input: string): string {
 }
 
 export function part2(input: string): string {
-  const tachyonManifold: ("^" | number)[][] = toLines(input).map((line) =>
-    line.split("").map((cell) =>
-      cell === "." ? 0 : cell === "S" ? 1 : cell as "^"
-    )
-  );
+  const tachyonManifold: number[][] = parseTachyonManifold(input);
   for (let r = 0; r < tachyonManifold.length - 1; r++) {
     const row = tachyonManifold[r];
     const nextRow = tachyonManifold[r + 1];
     for (let c = 0; c < row.length; c++) {
       const cell = row[c];
-      if (cell !== "^") {
-        if (cell > 0) {
-          if (nextRow[c] === "^") {
-            if (c > 0) {
-              (nextRow[c - 1] as number) += cell;
-            }
-            if (c < row.length - 1) {
-              (nextRow[c + 1] as number) += cell;
-            }
-          } else {
-            (nextRow[c] as number) += cell;
-          }
+      if (cell > 0) {
+        if (nextRow[c] === -1) {
+          nextRow[c - 1] += cell;
+          nextRow[c + 1] += cell;
+        } else {
+          nextRow[c] += cell;
         }
       }
     }
   }
-  return sum(tachyonManifold.at(-1) as number[]).toString();
+  return sum(tachyonManifold.at(-1)!).toString();
+}
+
+function parseTachyonManifold(input: string): number[][] {
+  return toLines(input).map((line) =>
+    line.split("").map((cell) => {
+      switch (cell) {
+        case ".":
+          return 0;
+        case "S":
+          return 1;
+        case "^":
+          return -1;
+        default:
+          throw new RangeError(cell);
+      }
+    })
+  );
 }
